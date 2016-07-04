@@ -1,0 +1,148 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../data-table/data-table.html">
+
+<dom-module id="products-index">
+
+    <template>
+
+        <style>
+            :host {
+                display: block;
+                padding: 10px;
+            }
+
+            paper-input.filter {
+                --paper-input-container: {
+
+                    width: 50%;
+                    display: block;
+                    float: left;: left;
+                };
+                clear: right;
+
+            }
+        </style>
+        <paper-input class="filter"
+                     label="Product Name / Barcode"
+                     value="{{search_field}}"></paper-input>
+        <paper-input class="filter"
+                     label="Product Code"
+                     value="{{product_code}}"></paper-input>
+
+        <data-table url="/v1/products?{{searchInput}}{{productCode}}"
+                    cols='{"Id":"Id","Barcode":"Barcode","ProductCode":"ProductCode","Name":"Name"}'
+                    sorted="Id"
+                    id-row="Id"
+                    get-url="/v1/products/:id/"
+                    post-url="/v1/products/:id/"
+                    edit-url="#/products/edit/:id:/"
+                    delete-url="/v1/products/:id:/">
+        </data-table>
+        <a style="position:fixed;bottom:10%;right:10%;"
+           href="#/products/create">
+            <paper-fab icon="add">add</paper-fab>
+        </a>
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'products-index',
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+
+            properties: {
+                /* Overriden from AppLocalizeBehavior */
+                language: {
+                    value: 'en',
+                    type: String
+                },
+                search_field: {
+                    type: String,
+                    observer: '_classifySearch'
+                },
+                product_code: {
+                    type: String,
+                    observer: '_productCode'
+                },
+                /* Overriden from AppLocalizeBehavior */
+                formats: {
+                    type: Object,
+                    value: function () {
+                        return {
+                            number: {USD: {style: 'currency', currency: 'USD'}}
+                        };
+                    }
+                }
+            },
+            _productCode: function (input) {
+                if (input) {
+                    this.productCode = ",ProductCode:" + input;
+                }
+            },
+            _classifySearch: function (input) {
+                if (isBarcode(input)) {
+                    this.searchInput = "query=Barcode:" + input;
+                }
+                else if (!isNaN(input)) {
+                    this.searchInput = "query=Barcode:" + input;
+                }
+                else {
+                    this.searchInput = "query=Name:" + input;
+                }
+            },
+        });
+        function isBarcode(barcode) {
+            // check length
+            if (barcode.length < 8 || barcode.length > 18 ||
+                    (barcode.length != 8 && barcode.length != 12 &&
+                    barcode.length != 13 && barcode.length != 14 &&
+                    barcode.length != 18)) {
+                return false;
+            }
+
+            var lastDigit = Number(barcode.substring(barcode.length - 1));
+            var checkSum = 0;
+            if (isNaN(lastDigit)) {
+                return false;
+            } // not a valid upc/ean
+
+            var arr = barcode.substring(0, barcode.length - 1).split("").reverse();
+            var oddTotal = 0, evenTotal = 0;
+
+            for (var i = 0; i < arr.length; i++) {
+                if (isNaN(arr[i])) {
+                    return false;
+                } // can't be a valid upc/ean we're checking for
+
+                if (i % 2 == 0) {
+                    oddTotal += Number(arr[i]) * 3;
+                }
+                else {
+                    evenTotal += Number(arr[i]);
+                }
+            }
+            checkSum = (10 - ((evenTotal + oddTotal) % 10)) % 10;
+
+            // true if they are equal
+            return checkSum == lastDigit;
+        }
+    </script>
+
+</dom-module>

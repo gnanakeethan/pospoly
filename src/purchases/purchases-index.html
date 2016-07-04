@@ -1,0 +1,157 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../data-table/data-table.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<dom-module id="purchases-index">
+
+    <template>
+
+        <style>
+            :host {
+                display: block;
+                padding: 10px;
+            }
+
+            .card {
+                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+                padding: 16px;
+                margin: 24px;
+                border-radius: 5px;
+                background-color: #fff;
+                color: #757575;
+            }
+
+            .circle {
+                display: inline-block;
+                height: 64px;
+                width: 64px;
+                border-radius: 50%;
+                background: #ddd;
+                line-height: 64px;
+                font-size: 30px;
+                color: #555;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 22px;
+                margin: 16px 0;
+                color: #212121;
+            }
+        </style>
+
+        <div class="card">
+            <paper-button on-click="_gotoCreate" colored="">Create</paper-button>
+            <paper-input class="filter"
+                         label="Product Name / Barcode"
+                         value="{{search_field}}"></paper-input>
+            <paper-input class="filter"
+                         label="Product Code"
+                         value="{{product_code}}"></paper-input>
+
+            <data-table url="http://localhost:8080/v1/purchases?{{searchInput}}{{productCode}}"
+                        cols='{"Id":"ID","InventoryId.BatchNo":"Batch Name","InventoryId.ProductId.Name":"Product Name","CreatedAt":"Bought On","AverageCost":"Average Cost","Units":"Units Purchased"}'
+                        sorted="CreatedAt"
+                        sortables='["CreatedAt","Id"]'
+                        sort-mode="asc"
+                        id-row="Id"
+                        get-url="http://localhost:8080/v1/purchases/:id/"
+                        post-url="http://localhost:8080/v1/purchases/:id/"
+                        edit-url="#/purchases/edit/:id:/"
+                        delete-url="//localhost:8080/v1/purchases/:id:/"
+                        delete-page="//localhost:8080/v1/purchases/:id:/"
+            ></data-table>
+        </div>
+
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'purchases-index',
+            _gotoCreate: function (event) {
+                event.target.addEventListener('transitionend', function (e) {
+                    location.href = '#/purchases/create';
+                });
+            },
+            properties: {
+
+                search_field: {
+                    type: String,
+                    observer: '_classifySearch'
+                },
+                product_code: {
+                    type: String,
+                    observer: '_productCode'
+                },
+            },
+
+            _productCode: function (input) {
+                if (input) {
+                    this.productCode = ",ProductCode:" + input;
+                }
+            },
+            _classifySearch: function (input) {
+                if (isBarcode(input)) {
+                    this.searchInput = "query=InventoryId.ProductId.Barcode:" + input;
+                }
+                else if (!isNaN(input)) {
+                    this.searchInput = "query=InventoryId.ProductId.Barcode:" + input;
+                }
+                else {
+                    this.searchInput = "query=InventoryId.ProductId.Name:" + input;
+                }
+            },
+
+        });
+
+        function isBarcode(barcode) {
+            // check length
+            if (barcode.length < 8 || barcode.length > 18 ||
+                    (barcode.length != 8 && barcode.length != 12 &&
+                    barcode.length != 13 && barcode.length != 14 &&
+                    barcode.length != 18)) {
+                return false;
+            }
+
+            var lastDigit = Number(barcode.substring(barcode.length - 1));
+            var checkSum = 0;
+            if (isNaN(lastDigit)) {
+                return false;
+            } // not a valid upc/ean
+
+            var arr = barcode.substring(0, barcode.length - 1).split("").reverse();
+            var oddTotal = 0, evenTotal = 0;
+
+            for (var i = 0; i < arr.length; i++) {
+                if (isNaN(arr[i])) {
+                    return false;
+                } // can't be a valid upc/ean we're checking for
+
+                if (i % 2 == 0) {
+                    oddTotal += Number(arr[i]) * 3;
+                }
+                else {
+                    evenTotal += Number(arr[i]);
+                }
+            }
+            checkSum = (10 - ((evenTotal + oddTotal) % 10)) % 10;
+
+            // true if they are equal
+            return checkSum == lastDigit;
+        }
+    </script>
+
+</dom-module>

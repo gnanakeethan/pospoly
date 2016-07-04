@@ -1,0 +1,406 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+
+<dom-module id="products-create">
+
+    <template>
+
+        <style>
+            :host {
+                display: block;
+                padding: 10px;
+            }
+
+            .card {
+                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+                padding: 16px;
+                margin: 24px;
+                border-radius: 5px;
+                background-color: #fff;
+                color: #757575;
+            }
+
+            .circle {
+                display: inline-block;
+                height: 64px;
+                width: 64px;
+                border-radius: 50%;
+                background: #ddd;
+                line-height: 64px;
+                font-size: 30px;
+                color: #555;
+                text-align: center;
+            }
+
+            table {
+                width: 100%;
+                border-spacing: 0px;
+                border-collapse: seperate;
+            }
+
+            table.card {
+                background: white;
+                @apply(--shadow-elevation-2dp);
+                border-radius: 2px;
+            }
+
+            th {
+                font-size: 12px;
+                color: rgba(0, 0, 0, .54);
+                @apply(--paper-font-common-base);
+                @apply(--paper-font-common-nowrap);
+                font-weight: 500;
+                text-align: left;
+                height: 56px;
+                padding-left: 26px;
+                padding-right: 26px;
+            }
+
+            th[data-sorted='asc']::after {
+                content: "(asc)";
+            }
+
+            th[data-sorted='desc']::after {
+                content: "(desc)";
+            }
+
+            tr {
+                height: 48px;
+            }
+
+            td {
+                font-size: 13px;
+                font-weight: normal;
+                color: rgba(0, 0, 0, .87);
+                padding-left: 26px;
+                padding-right: 26px;
+                border-top: 1px solid var(--paper-datatable-divider-color, --divider-color);
+            }
+
+            tr:hover td {
+                background: #ddd;
+            }
+        </style>
+
+        <iron-ajax id="initProduct"
+                   on-response="_logProduct"
+                   url="//localhost:8080/v1/products/"
+                   method="POST"
+                   body="{{productIn}}"
+                   last-response="{{product}}"
+                   verbose
+                   content-type="application/json"></iron-ajax>
+
+        <iron-ajax id="putProduct"
+                   on-response="_logProduct"
+                   url="//localhost:8080/v1/products/{{product.Id}}"
+                   method="PUT"
+                   body="{{product}}"
+                   content-type="application/json"></iron-ajax>
+
+
+        <iron-ajax url="//localhost:8080/v1/inventories/?query=ProductId.Id:{{product.Id}}&limit=0"
+                   last-response="{{inventories}}"
+                   id="inventories"
+                   on-response="_checkInv"
+                   auto></iron-ajax>
+
+        <template is="dom-repeat" items="{{inventories}}" as="inventory">
+            <iron-ajax
+                    auto
+                    url="//localhost:8080/v1/inventory_scale/?query=InventoryId:{{inventory.Id}}&limit=20"
+                    last-response="{{insos}}"
+                    on-response="_appendIns"></iron-ajax>
+        </template>
+
+        <iron-ajax url="//localhost:8080/v1/scales/"
+                   last-response="{{scales}}"
+                   auto></iron-ajax>
+
+        <div class="card">
+            <div class="circle">{{productId}}</div>
+            <hr>
+            <paper-input label="Product Name" value="{{product.Name}}" on-focus="_initProduct"></paper-input>
+            <paper-input label="Product Code" value="{{product.ProductCode}}"></paper-input>
+            <paper-input label="Barcode" value="{{product.Barcode}}"></paper-input>
+
+
+            <paper-dropdown-menu label="Master Scale">
+                <paper-listbox selected="{{product.ScaleId.Id}}" attr-for-selected="data-value"
+                               class="dropdown-content">
+                    <template is="dom-repeat" items="{{scales}}" as="scale">
+                        <paper-item data-value="{{scale.Id}}">{{scale.Description}}</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
+            <table>
+                <template is="dom-repeat" items="{{inventories}}" as="inventory">
+                    <tr>
+                        <td>{{inventory.Id}}</td>
+                        <td>
+                            <paper-input value="{{inventory.BatchNo}}"></paper-input>
+                        </td>
+                        <td>
+                            <paper-input value="{{inventory.Expiry}}"></paper-input>
+                        </td>
+                        <td>
+                            <paper-button on-click="_addIns" data-id="{{inventory.Id}}">Add Scale
+                            </paper-button>
+
+                            <paper-button on-click="_delInventory" data-id="{{inventory.Id}}">Delete</paper-button>
+                        </td>
+
+                    </tr>
+                </template>
+
+                <iron-ajax
+                        id="invChange"
+                        body="{{inventoryChanged}}"
+                        method="PUT"
+                        on-response="updateInventory"
+                        content-type="application/json"
+                        url="//localhost:8080/v1/inventories/{{inventoryChanged.Id}}"
+                        verbose>
+                </iron-ajax>
+            </table>
+            <paper-button on-click="_addInventory">Add</paper-button>
+
+
+            <table>
+                <template is="dom-repeat" items="{{ins}}" as="in">
+                    <tr>
+                        <td>{{in.Id}}</td>
+                        <td>
+                            <paper-input value="{{in.Units}}"></paper-input>
+                        </td>
+                        <td>
+                            <paper-input value="{{in.Price}}"></paper-input>
+                        </td>
+                        <td>
+                            <paper-dropdown-menu label="Batch">
+                                <paper-listbox selected="{{in.InventoryId.Id}}" attr-for-selected="data-value"
+                                               class="dropdown-content">
+                                    <template is="dom-repeat" items="{{inventories}}" as="inventory">
+                                        <paper-item data-value="{{inventory.Id}}">{{inventory.BatchNo}}</paper-item>
+                                    </template>
+                                </paper-listbox>
+                            </paper-dropdown-menu>
+                        </td>
+                        <td>
+                            <paper-dropdown-menu label="Child Scale">
+                                <paper-listbox selected="{{in.ScaleId.Id}}" attr-for-selected="data-value"
+                                               class="dropdown-content">
+                                    <template is="dom-repeat" items="{{scales}}" as="scale">
+                                        <paper-item data-value="{{scale.Id}}">{{scale.Description}}</paper-item>
+                                    </template>
+                                </paper-listbox>
+                            </paper-dropdown-menu>
+                        </td>
+                    </tr>
+                </template>
+            </table>
+        </div>
+
+
+        <iron-ajax
+                id="insChange"
+                url="//localhost:8080/v1/inventory_scale/{{insChanged.Id}}"
+                method="PUT"
+                verbose
+                last-response="{{onCha}}"
+                body="{{insChanged}}"
+                content-type="application/json"
+                on-response="updateInventory"></iron-ajax>
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'products-create',
+            _logProduct: function () {
+                console.log(this.product);
+            },
+            properties: {
+                productId: {
+                    type: String,
+                    reflectToAttribute: true,
+                },
+                productIn: {
+                    type: Object,
+                    reflectToAttribute: true,
+                    value: {
+                        "Id": null,
+                        "ProductCode": "",
+                        "Barcode": "",
+                        "Name": "",
+                        "Singular": 1,
+                        "Priority": 0,
+                        "Ordering": 0,
+                        "Image": "",
+                        "ImageType": "",
+                        "ScaleId": {
+                            "Id": 3
+                        },
+                        "CreatedAt": "0001-01-01T00:00:00Z",
+                        "UpdatedAt": "0001-01-01T00:00:00Z",
+                        "Service": 0
+                    },
+                },
+                ins: {
+                    type: Array,
+                    reflectToAttribute: true,
+                    value: [],
+                },
+                inventories: {
+                    type: Array,
+//                    value: [],
+                },
+                insChanged: {
+                    type: Object,
+                    value: {
+                        "Id": null,
+                        "InventoryId": {Id: null},
+                        "ScaleId": {Id: null},
+                        "Units": 1,
+                        "Price": 0
+                    }
+                }
+            },
+            observers: [
+                'productChanged(product.*)',
+                'invChanged(inventories.*)',
+                'productChanged(product.ScaleId.*)',
+                '_insChange(ins.*)'
+            ],
+            productChanged: function (changed) {
+                this.product.ScaleId.Id = parseInt(this.product.ScaleId.Id);
+                this.$.putProduct.generateRequest();
+            }
+            ,
+            invChanged: function (changed) {
+                id = changed.path.slice(13);
+                id = id.slice(0, id.indexOf('.'));
+                console.log(id);
+                console.log(this.inventories);
+                if (this.inventories) {
+                    path = eval('this.inventories[' + id + ']');
+                    this.inventoryChanged = path;
+                    console.log(path);
+                    this.$.invChange.method = "PUT";
+                    this.$.invChange.generateRequest();
+                }
+
+            },
+            _initProduct: function () {
+                if (!this.product)
+                    this.$.initProduct.generateRequest();
+            },
+            _insChange: function (changed) {
+                id = -1;
+                if (changed.path !== "ins.splices"
+                        || changed.path !== "ins.length") {
+                    id = changed.path.slice(5);
+                    id = id.slice(0, id.indexOf('.'));
+                }
+                if (!isNaN(parseInt(id))) {
+                    path = eval('this.ins[' + id + ']');
+                    path.Units = parseFloat(path.Units);
+                    path.Price = parseFloat(path.Price);
+                    this.insChanged = path;
+                    this.$.insChange.method = "PUT";
+                    console.log(this.insChanged);
+                    console.log(this.$.insChange);
+                    this.$.insChange.generateRequest();
+                }
+
+            }
+            ,
+            updateInventory: function () {
+                console.log(this.onCha);
+                this.$.inventories.generateRequest();
+            }
+            ,
+            _delInventory: function (event) {
+                invId = event.target.dataId;
+                this.inventoryChanged = {Id: invId};
+                this.$.invChange.method = "DELETE";
+                this.$.invChange.generateRequest();
+                this.inventories = [];
+                this.$.inventories.generateRequest();
+            }
+            ,
+            _addInventory: function (event) {
+                this.inventoryChanged = {
+                    BatchNo: '',
+                    Expiry: '0001-01-01T00:00:00Z',
+                    ProductId: {Id: parseInt(this.product.Id)},
+                    Service: 0,
+                    CreatedAt: '0001-01-01T00:00:00Z',
+                    UpdatedAt: '0001-01-01T00:00:00Z'
+                };
+                console.log(this.inventoryChanged);
+                this.$.invChange.method = "POST";
+                this.$.invChange.generateRequest();
+            }
+            ,
+            _addIns: function (event) {
+                console.log(event);
+                this.insChanged.InventoryId.Id = event.target.dataId;
+                this.insChanged.ScaleId.Id = this.scales[0].Id;
+                console.log(this.insChanged);
+                this.$.insChange.method = "POST";
+                this.$.insChange.generateRequest();
+                this.ins = [];
+                this.inventories = [];
+                this.$.inventories.generateRequest();
+                this.refreshInventories = random(0, 1000);
+            }
+            ,
+            _appendIns: function () {
+                console.log(this.invId);
+                console.log('inssor');
+                console.log(this.insos);
+                if (this.insos)
+                    for (i = 0; i < this.insos.length; i++) {
+                        this.push('ins', this.insos[i]);
+                    }
+                console.log(this.ins);
+            }
+            ,
+            _checkInv: function () {
+                console.log(this.inventories);
+                if (this.inventories) {
+
+                    for (i = 0; i < this.inventories.length; i++) {
+                        req = eval('this.$.insLoader' + this.inventories[i].Id);
+                        console.log(req);
+                    }
+                }
+//                this.$.inventories.generateRequest();
+            }
+        })
+        ;
+        function sleep(milliseconds) {
+            var start = new Date().getTime();
+            for (var i = 0; i < 1e7; i++) {
+                if ((new Date().getTime() - start) > milliseconds) {
+                    break;
+                }
+            }
+        }
+
+    </script>
+
+</dom-module>
