@@ -46,6 +46,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <data-table url="/v1/products?{{searchInput}}{{productCode}}"
                     cols='{"Id":"Id","Barcode":"Barcode","ProductCode":"ProductCode","Name":"Name"}'
                     sorted="Id"
+                    sortables='["Barcode"]'
                     id-row="Id"
                     get-url="/v1/products/:id/"
                     post-url="/v1/products/:id/"
