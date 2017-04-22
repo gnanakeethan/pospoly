@@ -73,45 +73,57 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
 
         <iron-ajax
-                on-response="_checkData"
-                id="mainRequest"
-                auto url="{{url}}&offset={{offset}}&limit={{limit}}&{{sortString}}"
-                last-response="{{data}}"></iron-ajax>
+            on-response="_checkData"
+            id="mainRequest"
+            auto url="{{url}}&offset={{offset}}&amp;limit={{limit}}&amp;{{sortString}}"
+            last-response="{{data}}"></iron-ajax>
 
         <iron-ajax id="deleteRequest" method="DELETE"></iron-ajax>
+        <iron-ajax 
+          content-type="application/json" id="editRequest" method="PUT" last-response="{{editResult}}"></iron-ajax> 
+
+
 
 
         <table>
             <thead>
-            <tr>
-                <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
-                    <th id="sortables" data-column="{{col}}" on-click="_sortToggle">{{_getColName(col)}}</th>
-                </template>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <template is="dom-if" if="{{!data}}">
-                <tr>
-                    <b>No Rows to Show</b>
-                </tr>
-            </template>
-            <template is="dom-repeat" items="{{data}}" as="datum">
                 <tr>
                     <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
-                        <td>{{_getCol(datum,col)}}</td>
+                        <th id="sortables" data-column="{{col}}" on-click="_sortToggle">{{_getColName(col)}}</th>
                     </template>
-                    <td>
-
-                        <paper-button style="background:red;color:white;" on-click="_deleteRequest"
-                                      data-id="{{_getCol(datum,idRow)}}">DELETE
-                        </paper-button>
-                        <a href="{{editableLink(datum)}}">
-                            <paper-button>Edit</paper-button>
-                        </a>
-                    </td>
+                    <th></th>
                 </tr>
-            </template>
+            </thead>
+            <tbody>
+                <template is="dom-if" if="{{!data}}">
+                    <tr>
+                        <b>No Rows to Show</b>
+                    </tr>
+                </template>
+                <template is="dom-repeat" items="{{data}}" as="datum">
+                    <tr>
+                        <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
+                            <td>                            
+                                <template is="dom-if" if="{{!_isEditable(col)}}">
+                                    {{_getCol(datum,col)}}
+                                </template>
+                                <template is="dom-if" if="{{_isEditable(col)}}">
+                                    <input data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{col}}" value="{{_getCol(datum,col)}}" on-change="_editRequest" data-id="{{_getCol(datum,idRow)}}">
+                                    {{_getCol(datum,"BillId.Id")}}
+                                </template>
+                            </td>
+                        </template>
+                        <td>
+
+                            <paper-button style="background:red;color:white;" on-click="_deleteRequest"
+                                data-id="{{_getCol(datum,idRow)}}">DELETE
+                            </paper-button>
+                            <a href="{{editableLink(datum)}}">
+                                <paper-button>Edit</paper-button>
+                            </a>
+                        </td>
+                    </tr>
+                </template>
             </tbody>
         </table>
 
@@ -140,7 +152,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 data: {
                     type: Object,
-
+                },
+                editable:{
+                    type:Object,
                 },
                 limit: {
                     type: Number,
@@ -192,24 +206,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             },
             ready: function () {
-                console.log(this.sorted);
                 this._sortedChanged();
             },
             _sortedChanged: function () {
                 this.sortString = "order=" + this.sortMode + "&sortby=" + this.sorted;
-            },
-            _getHeader: function (cols) {
-                var dataArray = new Array;
-                for (var o in cols) {
-                    dataArray.push(cols[o]);
-                }
-                return dataArray;
             },
             _getColName: function (col) {
                 return this.cols[col];
             },
             _getCols: function (cols) {
                 return Object.keys(cols);
+            },
+            _isEditable:function(col){
+                return this.editable.indexOf(col)>0;
             },
             _sortToggle: function (col) {
                 console.log(col.target.dataColumn);
@@ -271,6 +280,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if (this.page <= 0)
                     this.page = 1;
             },
+            _editRequest: function (event) {
+                id = event.target.dataId;
+                params = {};
+                params[event.target.name] = event.target.value;
+                if(!isNaN(event.target.value)){
+                    params[event.target.name] = parseFloat(event.target.value);
+                }
+                if (this.postUrl) {
+                    postUrl = this.postUrl.replace(":id:", id);
+                    this.$.editRequest.url = postUrl;
+                    this.$.editRequest.body = params;
+                    this.$.editRequest.generateRequest();
+                    this.$.mainRequest.generateRequest();
+                    this.$.mainRequest.generateRequest();
+                }
+
+            },
             _deleteRequest: function (event) {
                 id = event.target.dataId;
                 if (this.deletePage) {
@@ -300,6 +326,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
             _checkData: function () {
                 console.log(this.data);
+
+            }
+            ,_editReturn :function(){
+
+                console.log(this.editResult);
             }
         });
 
