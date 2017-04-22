@@ -9,6 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="./product-data-table.html">
 
 <link rel="stylesheet" href="../../bower_components/bulma/css/bulma.css" type="text/css" media="screen" title="no title" charset="utf-8">
@@ -53,35 +54,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="columns">
             <!-- .column -->
             <div class="column is-half">
-                <product-data-table url="/v1/sales?{{searchInput}}{{productCode}}"
-                    cols='{"InventoryId.ProductId.Name":"Product Name","Units":"Units","Total":"Cost"}'
-                    editable='{"Units"}'
-                    sorted="Id"
-                    sortables='["Barcode"]'
-                    id-row="Id"
-                    get-url="/v1/sales/:id:/"
-                    post-url="/v1/sales/:id:/"
-                    delete-url="/v1/sales/:id:/">
-                </product-data-table>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th style="width:50%;">Name</th>
-                            <th>Qty</th>
-                            <th>Price</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template is="dom-repeat">
-
-                        </template>
-                        <tr>
-                        </tr>
-                    </tbody>
-
-                </table>
+                <iron-ajax 
+                    auto
+                    url="/v1/bills?query=balance__gt:0"
+                    on-response="_setLastBill"
+                    last-response="{{bills}}">
+                </iron-ajax>
+                <template is="dom-repeat" items="{{bills}}" as="bill">
+                    <paper-button style="background:green;color:white;" on-click="_setBill" data-id="{{bill.Id}}">
+                        {{bill.Id}}
+                    </paper-button>
+                </template>
+                    <product-data-table url="/v1/sales?query=BillId.Id:{{currentBill}}"
+                        bill-id="{{currentBill}}"
+                        cols='{"InventoryId.ProductId.Name":"Product Name","Units":"Units","Total":"Cost"}'
+                        editable='{"Units"}'
+                        id-row="Id"
+                        get-url="/v1/sales/:id:/"
+                        post-url="/v1/sales/:id:/"
+                        delete-url="/v1/sales/:id:/">
+                    </product-data-table>
             </div>
         </div>
     </template>
@@ -90,7 +82,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         Polymer({
 
-            is: 'dashboard-index'
+            is: 'dashboard-index',
+            properties:{
+                currentBill:{
+                    type:Number,
+                }
+
+            },
+            _setLastBill:function(){
+                this.currentBill = this.bills[this.bills.length-1];
+            },
+            _setBill:function(event){
+                this.currentBill = event.target.dataId;
+            }
 
         });
 
