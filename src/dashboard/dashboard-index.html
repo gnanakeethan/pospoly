@@ -9,7 +9,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../data-table/data-table.html">
+<link rel="import" href="./product-data-table.html">
 
 <link rel="stylesheet" href="../../bower_components/bulma/css/bulma.css" type="text/css" media="screen" title="no title" charset="utf-8">
 <dom-module id="dashboard-index">
@@ -53,16 +53,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="columns">
             <!-- .column -->
             <div class="column is-half">
-        <data-table url="/v1/sales?{{searchInput}}{{productCode}}"
-            cols='{"Units":"Units","Cost":"Cost","InventoryId.ProductId.Name":"BatchNo"}'
-            editable='{"Units"}'
+                <product-data-table url="/v1/sales?{{searchInput}}{{productCode}}"
+                    cols='{"InventoryId.ProductId.Name":"Product Name","Units":"Units","Total":"Cost"}'
+                    editable='{"Units"}'
                     sorted="Id"
                     sortables='["Barcode"]'
                     id-row="Id"
                     get-url="/v1/sales/:id:/"
                     post-url="/v1/sales/:id:/"
                     delete-url="/v1/sales/:id:/">
-        </data-table>
+                </product-data-table>
                 <table>
                     <thead>
                         <tr>
