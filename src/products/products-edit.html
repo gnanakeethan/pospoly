@@ -93,19 +93,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         background: #ddd;
       }
     </style>
-    <iron-ajax url="//localhost:8080/v1/products/{{productId}}"
+    <iron-ajax url="/v1/products/{{productId}}"
       last-response="{{product}}"
       debounce-duration="200"
       auto></iron-ajax>
     <iron-ajax id="putProduct"
-      url="//localhost:8080/v1/products/{{productId}}"
+      url="/v1/products/{{productId}}"
       method="PUT"
       debounce-duration="2000"
       body="{{product}}"
       content-type="application/json"></iron-ajax>
 
 
-    <iron-ajax url="//localhost:8080/v1/inventories/?query=ProductId.Id:{{productId}}&limit=0"
+    <iron-ajax url="/v1/inventories/?query=ProductId.Id:{{productId}}&limit=0"
       last-response="{{inventories}}"
       id="inventories"
       on-response="_checkInv"
@@ -114,12 +114,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <template is="dom-repeat" items="{{inventories}}" as="inventory">
       <iron-ajax
         auto
-        url="//localhost:8080/v1/inventory_scale/?query=InventoryId:{{inventory.Id}}&limit=20"
+        url="/v1/inventory_scale/?query=InventoryId:{{inventory.Id}}&limit=20"
         last-response="{{insos}}"
         on-response="_appendIns"></iron-ajax>
     </template>
 
-    <iron-ajax url="//localhost:8080/v1/scales/"
+    <iron-ajax url="/v1/scales/"
       last-response="{{scales}}"
       auto></iron-ajax>
 
@@ -167,7 +167,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           method="PUT"
           on-response="updateInventory"
           content-type="application/json"
-          url="//localhost:8080/v1/inventories/{{inventoryChanged.Id}}"
+          url="/v1/inventories/{{inventoryChanged.Id}}"
           verbose>
         </iron-ajax>
       </table>
@@ -215,7 +215,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <iron-ajax
       id="insChange"
-      url="//localhost:8080/v1/inventory_scale/{{insChanged.Id}}"
+      url="/v1/inventory_scale/{{insChanged.Id}}"
       method="PUT"
       verbose
       last-response="{{onCha}}"

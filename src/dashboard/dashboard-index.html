@@ -10,6 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="./product-data-table.html">
 
 <link rel="stylesheet" href="../../bower_components/bulma/css/bulma.css" type="text/css" media="screen" title="no title" charset="utf-8">
@@ -47,6 +48,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             tr:hover td {
                 background: #ddd;
             }
+            tr > td {
+            border-top:1px solid #ccc;
+
+        }
+        td {
+        vertical-align:middle;
+    }
+        
         </style>
 
 
@@ -54,6 +63,70 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="columns">
             <!-- .column -->
             <div class="column is-half">
+                <product-data-table 
+                    id="productdatatable"
+                    url="/v1/sales?query=BillId.Id:{{currentBill}}"
+                    bill-id="{{currentBill}}"
+                    cols='{"InventoryId.ProductId.Name":"Product Name","Units":"Units","Total":"Cost"}'
+                    editable='{"Units"}'
+                    refresh="true"
+                    id-row="Id"
+                    get-url="/v1/sales/:id:/"
+                    post-url="/v1/sales/:id:/"
+                    delete-url="/v1/sales/:id:/">
+                </product-data-table>
+                <iron-ajax content-type="application/json" id="createRequest" method="POST" last-response="{{createResult}}"></iron-ajax> 
+                <input id="product_identifier" value="{{productIdentifier}}"
+                on-keyup="_searchInput"
+                autofocus>
+                <iron-ajax url="/v1/products?{{searchInput}}"
+                    auto
+                    debounce-duration="100"
+                    on-response="_singleProduct"
+                    last-response="{{productList}}">
+                </iron-ajax>
+                <iron-ajax auto id="inventoryRequest" url="/v1/inventories?query=ProductId:{{productList.0.Id}}" last-response="{{inventoryList}}">
+                </iron-ajax>
+                <table>
+                <template is="dom-repeat" items="{{productList}}" as="product">
+                    <tr>
+                        <td>{{product.Name}}</td>
+                        <td><paper-button on-click="_selectProduct" data-id="{{index}}">Select</paper-button></td>
+                    </tr>
+                </template>
+                </table>
+                <template is="dom-if" if="{{_singleProduct(productList)}}" restamp=true>
+                    <paper-dialog sizing-target opened>
+                        <paper-dialog-scrollable>
+                            <table>
+                                <template is="dom-repeat" items="{{inventoryList}}" as="inventory">
+                                    <tr>
+                                        <td>
+                                            {{inventory.BatchNo}}
+                                        </td>
+                                        <td>
+                                            <template is="dom-repeat" items="{{inventory.InventoryScale}}" as="scale">
+                                                {{scale.Units}}@{{scale.Price}} <br />
+                                            </template>
+                                        </td>
+                                        <td>
+                                            <paper-button on-click="_putRecord" data-id="{{inventory.Id}}">Select</paper-button>
+                                        </td>
+
+
+                                    </tr>
+                                </template>
+                            </table>
+
+                        </paper-dialog-scrollable>
+                    </paper-dialog>
+                </template>
+            </div>
+            <!-- .column -->
+        </div>
+        <div class="columns">
+            <div class="column">
+            
                 <iron-ajax 
                     auto
                     url="/v1/bills?query=balance__gt:0"
@@ -65,15 +138,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         {{bill.Id}}
                     </paper-button>
                 </template>
-                    <product-data-table url="/v1/sales?query=BillId.Id:{{currentBill.Id}}"
-                        bill-id="{{currentBill}}"
-                        cols='{"InventoryId.ProductId.Name":"Product Name","Units":"Units","Total":"Cost"}'
-                        editable='{"Units"}'
-                        id-row="Id"
-                        get-url="/v1/sales/:id:/"
-                        post-url="/v1/sales/:id:/"
-                        delete-url="/v1/sales/:id:/">
-                    </product-data-table>
             </div>
         </div>
     </template>
@@ -84,17 +148,74 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             is: 'dashboard-index',
             properties:{
+
+                productIdentifier:{
+                    type:String,
+                    observer:'_searchInput'
+                },
                 currentBill:{
                     type:Number,
+                },
+                postUrl:{
+                    type:"String",
+                    value:"/v1/sales/:id:/"
                 }
 
             },
+            _selectProduct:function(event){
+                console.log(event.target.dataId)
+                console.log(this.productList[event.target.dataId])
+                this.productIdentifier = this.productList[event.target.dataId].Name; 
+            },
+
+            _searchInput:function(){
+                input = this.$.product_identifier.value;
+                console.log(input)
+                if (!isNaN(input)) {
+                    this.searchInput = "query=Barcode:" + input;
+                }
+                else {
+                    this.searchInput = "query=Name:" + input;
+                }
+            },
             _setLastBill:function(){
-                this.currentBill = this.bills[this.bills.length-1];
+                this.currentBill = this.bills[this.bills.length-1].Id;
             },
             _setBill:function(event){
                 this.currentBill = event.target.dataId;
-            }
+            },
+            _singleProduct:function(productList){
+                if(productList.length===1){
+                    this.$.inventoryRequest.generateRequest();
+                    return true;
+                }
+                return false;
+            },
+            _putRecord:function(event){
+                if(this.productList.length==1){
+                    id = this.currentBill;
+                    invId = event.target.dataId;
+                    console.log(invId);
+                    params = {};
+                    params["InventoryId"] = {};
+                    params["InventoryId"]["Id"] = invId;
+                    params["BillId"]= {};
+                    params["BillId"]["Id"] = id;
+                    console.log("id"+id)
+
+                    params["Units"]=1.000;
+                    params["Discount"] = 0.0;
+                    if (this.postUrl) {
+                        postUrl = this.postUrl.replace(":id:/",'');
+                        console.log(postUrl);
+                        this.$.createRequest.url = postUrl;
+                        this.$.createRequest.body = params;
+                        this.$.createRequest.generateRequest();
+                        sleep(300);
+                        this.$.productdatatable.refresh= true;
+                    }
+                }
+            },
 
         });
 
