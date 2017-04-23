@@ -65,7 +65,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         {{bill.Id}}
                     </paper-button>
                 </template>
-                    <product-data-table url="/v1/sales?query=BillId.Id:{{currentBill}}"
+                    <product-data-table url="/v1/sales?query=BillId.Id:{{currentBill.Id}}"
                         bill-id="{{currentBill}}"
                         cols='{"InventoryId.ProductId.Name":"Product Name","Units":"Units","Total":"Cost"}'
                         editable='{"Units"}'
