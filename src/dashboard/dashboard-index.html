@@ -179,18 +179,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
             onEnter:function(){
                 this.$.productDialog.open();
-                console.log(this.$.product_identifier)
                 this.$.product_identifier.focus();
             },
             _selectProduct:function(event){
-                console.log(event.target.dataId)
-                console.log(this.productList[event.target.dataId])
                 this.productIdentifier = this.productList[event.target.dataId].Name; 
             },
 
             _searchInput:function(){
                 input = this.$.product_identifier.value;
-                console.log(input)
                 if (!isNaN(input)) {
                     this.searchInput = "query=Barcode:" + input;
                 }
@@ -202,12 +198,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.currentBill = this.bills[this.bills.length-1].Id;
             },
             _setBill:function(event){
-                console.log(event);
                 if(event.target.dataId)
                     this.currentBill = event.target.dataId;
                 if(key = parseInt(event.detail.keyboardEvent.key))
                 {
-                    console.log(key)
                     if(key==10)
                         key=0;
                     this.currentBill = this.bills[key-1].Id;
@@ -224,9 +218,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if(this.productList.length==1 && (this.productList[0].Id == event.target.dataId || this.inventoryList[0].ProductId.Id==this.productList[0].Id)){
                     delete invId;
                     id = this.currentBill;
-                    console.log(this.productList)
-                    console.log(this.inventoryList)
-                    console.log(id)
                     if(this.inventoryList.length ==1 && !event.target.dataId){
                         invId = this.inventoryList[0].Id;
                     } else if(this.inventoryList.length > 1 && event.target.dataId){
@@ -238,18 +229,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         params["InventoryId"]["Id"] = invId;
                         params["BillId"]= {};
                         params["BillId"]["Id"] = id;
-                        console.log("id"+id)
                         params["Units"]=1.000;
                         params["Discount"] = 0.0;
                         if (this.postUrl) {
                             postUrl = this.postUrl.replace(":id:/",'');
-                            console.log(postUrl);
                             this.$.createRequest.url = postUrl;
                             this.$.createRequest.body = params;
-                            console.log(params);
-                            sleep(200);
                             this.$.createRequest.generateRequest();
-                            sleep(200)
                             this.$.productdatatable.refresh= true;
                             this.productIdentifier = "";
                             this.$.product_identifier.focus();
