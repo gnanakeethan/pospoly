@@ -80,7 +80,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <iron-ajax content-type="application/json" id="createRequest" method="POST" last-response="{{createResult}}"></iron-ajax> 
                 <iron-ajax url="/v1/products?{{searchInput}}"
                     auto
-                    debounce-duration="100"
                     on-response="_singleProduct"
                     last-response="{{productList}}">
                 </iron-ajax>
@@ -132,7 +131,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 <iron-ajax 
                     auto
-                    url="/v1/bills?query=balance__gte:0,net_total__gte:cash_paid+card_paid"
+                    url="/v1/bills?query=balance__gte:0,net_total__gte:cash_paid+card_paid&amp;limit=100"
                     on-response="_setLastBill"
                     last-response="{{bills}}">
                 </iron-ajax>
@@ -180,7 +179,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
             onEnter:function(){
                 this.$.productDialog.open();
-                sleep(300)
                 console.log(this.$.product_identifier)
                 this.$.product_identifier.focus();
             },
@@ -223,36 +221,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             },
             _putRecord:function(event){
-                if(this.productList.length==1){
+                if(this.productList.length==1 && (this.productList[0].Id == event.target.dataId || this.inventoryList[0].ProductId.Id==this.productList[0].Id)){
+                    delete invId;
                     id = this.currentBill;
+                    console.log(this.productList)
+                    console.log(this.inventoryList)
                     console.log(id)
-                    if(this.inventoryList.length > 1 && event.target.dataId){
+                    if(this.inventoryList.length ==1 && !event.target.dataId){
+                        invId = this.inventoryList[0].Id;
+                    } else if(this.inventoryList.length > 1 && event.target.dataId){
                         invId = event.target.dataId
                     }
-                    else if(this.inventoryList.length ==1 && !event.target.dataId){
-                        invId = this.inventoryList[0].Id;
-                    }
-                    console.log(invId);
-                    params = {};
-                    params["InventoryId"] = {};
-                    params["InventoryId"]["Id"] = invId;
-                    params["BillId"]= {};
-                    params["BillId"]["Id"] = id;
-                    console.log("id"+id)
-                    params["Units"]=1.000;
-                    params["Discount"] = 0.0;
-                    if (this.postUrl) {
-                        postUrl = this.postUrl.replace(":id:/",'');
-                        console.log(postUrl);
-                        this.$.createRequest.url = postUrl;
-                        this.$.createRequest.body = params;
-                        this.$.createRequest.generateRequest();
-                        sleep(300);
-                        this.$.productdatatable.refresh= true;
-                        this.productIdentifier = "";
-                        this.$.product_identifier.focus();
-                        this.$.inventoryDialog.close();
-                        this.$.productDialog.open();
+                    if(invId){
+                        params = {};
+                        params["InventoryId"] = {};
+                        params["InventoryId"]["Id"] = invId;
+                        params["BillId"]= {};
+                        params["BillId"]["Id"] = id;
+                        console.log("id"+id)
+                        params["Units"]=1.000;
+                        params["Discount"] = 0.0;
+                        if (this.postUrl) {
+                            postUrl = this.postUrl.replace(":id:/",'');
+                            console.log(postUrl);
+                            this.$.createRequest.url = postUrl;
+                            this.$.createRequest.body = params;
+                            console.log(params);
+                            sleep(200);
+                            this.$.createRequest.generateRequest();
+                            sleep(200)
+                            this.$.productdatatable.refresh= true;
+                            this.productIdentifier = "";
+                            this.$.product_identifier.focus();
+                            this.$.inventoryDialog.close();
+                            this.$.productDialog.open();
+                        }
 
                     }
                 }
