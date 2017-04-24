@@ -10,6 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
 
 
 <dom-module id="products-create">
@@ -46,7 +47,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             table {
                 width: 100%;
                 border-spacing: 0px;
-                border-collapse: seperate;
             }
 
             table.card {
@@ -85,7 +85,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 color: rgba(0, 0, 0, .87);
                 padding-left: 26px;
                 padding-right: 26px;
-                border-top: 1px solid var(--paper-datatable-divider-color, --divider-color);
             }
 
             tr:hover td {

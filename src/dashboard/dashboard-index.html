@@ -63,7 +63,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="columns">
             <!-- .column -->
             <div class="column is-half">
-<iron-a11y-keys id="a11y" keys="enter" target="[[target]]" on-keys-pressed="onEnter"></iron-a11y-keys>
+                <iron-a11y-keys id="a11y" keys="enter" target="[[target]]" on-keys-pressed="onEnter"></iron-a11y-keys>
+                <iron-a11y-keys id="a11y" keys="fn+1 fn+2 fn+3 fn+4 fn+5 fn+6 fn+7 fn+8 fn+9 fn+0" target="[[target]]" on-keys-pressed="_setBill"></iron-a11y-keys>
                 <product-data-table 
                     id="productdatatable"
                     url="/v1/sales?query=BillId.Id:{{currentBill}}&limit=100"
@@ -131,13 +132,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 <iron-ajax 
                     auto
-                    url="/v1/bills?query=balance__gt:0"
+                    url="/v1/bills?query=balance__gte:0,net_total__gte:cash_paid+card_paid"
                     on-response="_setLastBill"
                     last-response="{{bills}}">
                 </iron-ajax>
                 <template is="dom-repeat" items="{{bills}}" as="bill">
                     <paper-button style="background:green;color:white;" on-click="_setBill" data-id="{{bill.Id}}">
-                        {{bill.Id}}
+                        {{_getIndex(index)}}
                     </paper-button>
                 </template>
             </div>
@@ -162,17 +163,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type:"String",
                     value:"/v1/sales/:id:/"
                 },
-      target: {
-        type: Object,
-        value: function() {
-          return document.body;
-        }
-      },
+                target: {
+                    type: Object,
+                    value: function() {
+                        return document.body;
+                    }
+                },
                 productList:{
                     type:Object,
                     observer:'_singleProduct'
                 }
 
+            },
+            _getIndex:function(index){
+                return index+1;
             },
             onEnter:function(){
                 this.$.productDialog.open();
@@ -200,7 +204,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.currentBill = this.bills[this.bills.length-1].Id;
             },
             _setBill:function(event){
-                this.currentBill = event.target.dataId;
+                console.log(event);
+                if(event.target.dataId)
+                    this.currentBill = event.target.dataId;
+                if(key = parseInt(event.detail.keyboardEvent.key))
+                {
+                    console.log(key)
+                    if(key==10)
+                        key=0;
+                    this.currentBill = this.bills[key-1].Id;
+                }
             },
             _singleProduct:function(productList){
                 if(productList.length===1){
