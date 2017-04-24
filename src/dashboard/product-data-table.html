@@ -10,8 +10,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
 
-<dom-module id="data-table">
+<dom-module id="product-data-table">
 
     <template>
         <style>
@@ -36,21 +37,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             th {
                 font-size: 12px;
                 color: rgba(0, 0, 0, .54);
+                padding:12px;
+                padding-left:20px;
                 @apply(--paper-font-common-base);
                 @apply(--paper-font-common-nowrap);
                 font-weight: 500;
-                text-align: left;
-                height: 56px;
-                padding-left: 26px;
-                padding-right: 26px;
-            }
-
-            th[data-sorted='asc']::after {
-                content: "(asc)";
-            }
-
-            th[data-sorted='desc']::after {
-                content: "(desc)";
             }
 
             tr {
@@ -61,8 +52,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 font-size: 13px;
                 font-weight: normal;
                 color: rgba(0, 0, 0, .87);
-                padding-left: 26px;
-                padding-right: 26px;
+                padding-left:12px;
+                padding-right:12px;
+                padding-top:5px;
                 border-top: 1px solid var(--paper-datatable-divider-color, --divider-color);
             }
 
@@ -73,12 +65,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
 
         <iron-ajax
-            on-response="_checkData"
             id="mainRequest"
-            auto url="{{url}}&offset={{offset}}&amp;limit={{limit}}&amp;{{sortString}}"
+            auto url="{{url}}"
             last-response="{{data}}"></iron-ajax>
 
         <iron-ajax id="deleteRequest" method="DELETE"></iron-ajax>
+        <iron-ajax content-type="application/json" id="editRequest" method="PUT" last-response="{{editResult}}"></iron-ajax> 
 
 
 
@@ -93,16 +85,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </tr>
             </thead>
             <tbody>
-                <template is="dom-if" if="{{!data}}">
-                    <tr>
-                        <b>No Rows to Show</b>
-                    </tr>
-                </template>
                 <template is="dom-repeat" items="{{data}}" as="datum">
                     <tr>
                         <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
                             <td>                            
+                                <template is="dom-if" if="{{!_isEditable(col)}}">
                                     {{_getCol(datum,col)}}
+                                </template>
+                                <template is="dom-if" if="{{_isEditable(col)}}">
+                                    <input data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{col}}" value="{{_getCol(datum,col)}}" on-change="_editRequest" data-id="{{_getCol(datum,idRow)}}">
+                                    <iron-ajax content-type="application/json" auto url="{{_getUpdateUrl(datum)}}" method="PUT" on-response="_refreshMain"></iron-ajax> 
+                                </template>
                             </td>
                         </template>
                         <td>
@@ -110,62 +103,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             <paper-button style="background:red;color:white;" on-click="_deleteRequest"
                                 data-id="{{_getCol(datum,idRow)}}">DELETE
                             </paper-button>
-                            <a href="{{editableLink(datum)}}">
-                                <paper-button>Edit</paper-button>
-                            </a>
                         </td>
                     </tr>
                 </template>
             </tbody>
         </table>
-
-        <paper-dropdown-menu value="{{limit}}">
-            <paper-listbox class="dropdown-content">
-                <paper-item>10</paper-item>
-                <paper-item>20</paper-item>
-                <paper-item>50</paper-item>
-                <paper-item>100</paper-item>
-            </paper-listbox>
-        </paper-dropdown-menu>
-        <paper-button on-click="_prevPage">Prev</paper-button>
-        <paper-button on-click="_nextPage">Next</paper-button>
-        Showing Rows from {{_add(offset,1)}} to {{_calculate(page,limit)}} at Page {{page}}
     </template>
 
     <script>
 
         Polymer({
 
-            is: 'data-table',
+            is: 'product-data-table',
             properties: {
                 url: {
                     type: String,
                     reflectToAttribute: true
                 },
+                billId:{
+                    type:Object,
+                    reflectToAttribute:true,
+                },
                 data: {
                     type: Object,
                 },
-                limit: {
-                    type: Number,
-                    value: 10,
-                    observer: '_limitChanged',
+                editable:{
+                    type:Object,
                 },
-                sortString: {
-                    type: String,
-                },
-                sorted: {
-                    type: String,
-                    observer: '_sortedChanged',
-                    reflectToAttribute: true,
-                },
-                page: {
-                    value: 1,
-                    type: Number,
-                    observer: '_pageChanged'
-                },
-                sortables: {
-                    type: Array,
-                    reflectToAttribute: true
+                productList:{
+                    type:Object,
                 },
                 cols: {
                     type: Object,
@@ -183,22 +149,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: String,
                     reflectToAttribute: true
                 },
-                sortMode: {
-                    type: String,
-                    reflectToAttribute: true,
-                    value: "asc",
+                refresh:{
+                    type:Boolean,
+                    reflectToAttribute:true,
+                    observer:'_refreshMain'
                 },
                 idRow: {
                     type: String,
                     reflectToAttribute: true
                 }
-
+            },
+            _refreshMain:function(){
+                this.$.mainRequest.generateRequest();
+                this.refresh = false;
             },
             ready: function () {
-                this._sortedChanged();
-            },
-            _sortedChanged: function () {
-                this.sortString = "order=" + this.sortMode + "&sortby=" + this.sorted;
             },
             _getColName: function (col) {
                 return this.cols[col];
@@ -206,66 +171,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _getCols: function (cols) {
                 return Object.keys(cols);
             },
-            _sortToggle: function (col) {
-                console.log(col.target.dataColumn);
-                if (sort = this.sortables.indexOf(col.target.dataColumn) >= 0) {
-                    console.log(sort);
-                    this.sorted = (col.target.dataColumn);
-                    els = document.querySelectorAll('#sortables');
-                    for (var i = 0; i < els.length; i++) {
-                        els[i].removeAttribute("data-sorted");
-                    }
-                    if (this.sortMode == "asc") {
-                        col.target.setAttribute('data-sorted', "desc");
-                        this.sortMode = "desc";
-                    } else {
-                        col.target.setAttribute('data-sorted', "asc");
-                        this.sortMode = "asc";
-                    }
-                    console.log(col.target);
-                    this._sortedChanged();
-                }
+            _isEditable:function(col){
+                return this.editable.indexOf(col)>0;
             },
             _add: function (val1, val2) {
                 return parseInt(val1) + parseInt(val2);
             },
-            _limitChanged: function (limit) {
-                if (isNaN(this.offset))
-                    this.offset = 0;
-                this.page = parseInt((parseInt(this.offset) + parseInt(this.limit)) / parseInt(this.limit));
-            },
-            _pageChanged: function (page) {
-                this.offset = parseInt(this.limit) * (parseInt(page) - 1);
-            },
-            _calculate: function (page, limit) {
-                return parseInt(page) * parseInt(limit);
-            },
             _getCol: function (datum, col) {
                 return eval('datum.' + col);
             },
-            _inCols: function (item) {
-                return this.cols.indexOf(item) >= 0;
-            },
-            _toArray: function (obj) {
-                return Object.keys(obj).map(function (key) {
-                    return {
-                        name: key,
-                        value: obj[key]
-                    };
-                });
-            },
-            _nextPage: function () {
-                if (this.data)
-                    this.page += 1;
-                if (this.page <= 0)
-                    this.page = 1;
-            },
-            _prevPage: function () {
-                this.page -= 1;
+            _editRequest: function (event) {
+                id = event.target.dataId;
+                params = {};
+                params[event.target.name] = event.target.value;
+                if(!isNaN(event.target.value)){
+                    params[event.target.name] = parseFloat(event.target.value);
+                }
+                if (this.postUrl) {
+                    postUrl = this.postUrl.replace(":id:", id);
+                    this.$.editRequest.url = postUrl;
+                    this.$.editRequest.body = params;
+                    this.$.editRequest.generateRequest();
+                    sleep(300);
+                    this.$.mainRequest.generateRequest();
+                }
 
-                if (this.page <= 0)
-                    this.page = 1;
             },
+
             _deleteRequest: function (event) {
                 id = event.target.dataId;
                 if (this.deletePage) {
@@ -281,22 +213,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 console.log(deleteUrl);
 
             },
-            _refreshMain: function () {
-                this.$.mainRequest.generateRequest();
-            },
-
-            editableLink: function (datum) {
-                if (this.editUrl)
-                    return this.editUrl.replace(":id:", eval('datum.' + this.idRow));
-            },
             deletableLink: function (datum) {
                 if (this.deleteUrl)
                     return this.deleteUrl.replace(":id:", eval('datum.' + this.idRow));
             },
-            _checkData: function () {
-                console.log(this.data);
-
-            }
+            _getUpdateUrl:function(datum){
+                return "/v1/sales/"+datum.Id;
+            },
         });
 
     </script>

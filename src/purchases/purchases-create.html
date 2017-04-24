@@ -48,7 +48,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         </style>
         <paper-button on-click="_openProductDialog">open</paper-button>
-        <paper-dialog id="addProductDialog"sizing-target>
+        <paper-dialog id="addProductDialog" sizing-target>
             <paper-dialog-scrollable>
             </paper-dialog-scrollable>
         </paper-dialog>
@@ -61,9 +61,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             is: 'purchases-create',
             _openProductDialog: function () {
-                this.importHref('/src/products/products-create.html');
+                this.importHref('src/products/products-create.html');
                 domel = document.createElement('products-create');
-                this.$.addProductDialog.querySelector('paper-dialog-scrollable').appendChild(domel);
+                domma = this.$.addProductDialog.querySelector('products-create');
+                if(! this.$.addProductDialog.querySelector('paper-dialog-scrollable').contains(domma)){
+                    this.$.addProductDialog.querySelector('paper-dialog-scrollable').appendChild(domel);
+                }
                 this.$.addProductDialog.open();
             }
 
