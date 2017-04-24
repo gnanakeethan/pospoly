@@ -178,18 +178,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
       <table>
-        <template is="dom-repeat" items="{{ins}}" as="in">
+        <template is="dom-repeat" items="{{ins}}" as="inid">
           <tr>
-            <td>{{in.Id}}</td>
+            <td>{{inid.Id}}</td>
             <td>
-              <paper-input value="{{in.Units}}"></paper-input>
+              <paper-input value="{{inid.Units}}"></paper-input>
             </td>
             <td>
-              <paper-input value="{{in.Price}}"></paper-input>
+              <paper-input value="{{inid.Price}}"></paper-input>
             </td>
             <td>
               <paper-dropdown-menu label="Batch">
-                <paper-listbox selected="{{in.InventoryId.Id}}" attr-for-selected="data-value"
+                <paper-listbox selected="{{inid.InventoryId.Id}}" attr-for-selected="data-value"
                   class="dropdown-content">
                   <template is="dom-repeat" items="{{inventories}}" as="inventory">
                     <paper-item data-value="{{inventory.Id}}">{{inventory.BatchNo}}</paper-item>
@@ -199,7 +199,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </td>
             <td>
               <paper-dropdown-menu label="Child Scale">
-                <paper-listbox selected="{{in.ScaleId.Id}}" attr-for-selected="data-value"
+                <paper-listbox selected="{{inid.ScaleId.Id}}" attr-for-selected="data-value"
                   class="dropdown-content">
                   <template is="dom-repeat" items="{{scales}}" as="scale">
                     <paper-item data-value="{{scale.Id}}">{{scale.Description}}</paper-item>
