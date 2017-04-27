@@ -24,8 +24,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 padding: 10px;
             }
 
-            table {
-                margin:2.5%;
+            paper-dialog{
+                padding:3%;
             }
             th {
                 color: rgba(0, 0, 0, .74);
@@ -43,7 +43,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             tr {
-                height: 48px;
             }
             tr:hover td {
                 background: #ddd;
@@ -94,8 +93,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <table>
                             <template is="dom-repeat" items="{{productList}}" as="product">
                                 <tr>
-                                    <td>{{product.Name}}</td>
-                                    <td><paper-button on-click="_selectProduct" data-id="{{index}}">Select</paper-button></td>
+                                    <td style="padding:5px;" on-click="_selectProduct" data-id="{{index}}">{{product.Name}}</td>
                                 </tr>
                             </template>
                         </table>
@@ -106,16 +104,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <table>
                             <template is="dom-repeat" items="{{inventoryList}}" as="inventory">
                                 <tr>
-                                    <td>
+                                    <td on-click="_putRecord" data-id="{{inventory.Id}}" style="padding:10px 10px 10px 14px;">
                                         {{inventory.BatchNo}}
                                     </td>
-                                    <td>
+                                    <td on-click="_putRecord" data-id="{{inventory.Id}}">
                                         <template is="dom-repeat" items="{{inventory.InventoryScale}}" as="scale">
                                             {{scale.Units}}@{{scale.Price}} <br />
                                         </template>
-                                    </td>
-                                    <td>
-                                        <paper-button on-click="_putRecord" data-id="{{inventory.Id}}">Select</paper-button>
                                     </td>
                                 </tr>
                             </template>

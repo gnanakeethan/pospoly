@@ -45,7 +45,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             tr {
-                height: 48px;
+                height:35px;
+                vertical-align:middle;
             }
 
             td {
@@ -88,22 +89,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template is="dom-repeat" items="{{data}}" as="datum">
                     <tr>
                         <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
-                            <td>                            
+                            <td on-dblclick="_deleteRequest"
+                                data-id="{{_getCol(datum,idRow)}}">                            
                                 <template is="dom-if" if="{{!_isEditable(col)}}">
                                     {{_getCol(datum,col)}}
                                 </template>
                                 <template is="dom-if" if="{{_isEditable(col)}}">
-                                    <input data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{col}}" value="{{_getCol(datum,col)}}" on-change="_editRequest" data-id="{{_getCol(datum,idRow)}}">
+                                    <input type="number" data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{col}}" value="{{_getCol(datum,col)}}" on-focusout="_editRequest" data-id="{{_getCol(datum,idRow)}}">
                                     <iron-ajax content-type="application/json" auto url="{{_getUpdateUrl(datum)}}" method="PUT" on-response="_refreshMain"></iron-ajax> 
                                 </template>
-                            </td>
-                        </template>
-                        <td>
 
-                            <paper-button style="background:red;color:white;" on-click="_deleteRequest"
-                                data-id="{{_getCol(datum,idRow)}}">DELETE
+                            </td>
                             </paper-button>
-                        </td>
+
+                        </template>
+
                     </tr>
                 </template>
             </tbody>
