@@ -68,7 +68,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     id="productdatatable"
                     url="/v1/sales?query=BillId.Id:{{currentBill}}&limit=100"
                     bill-id="{{currentBill}}"
-                    cols='{"InventoryId.ProductId.Name":"Product Name","Units":"Units","Total":"Cost"}'
+                    cols='{"InventoryId.ProductId.ProductCode":"Product Code" ,"InventoryId.ProductId.Name":"Product Name","Units__number":"Quantity","Total__currency":"Total"}'
                     editable='{"Units"}'
                     refresh="true"
                     id-row="Id"
