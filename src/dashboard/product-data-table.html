@@ -72,6 +72,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <iron-ajax id="deleteRequest" method="DELETE"></iron-ajax>
         <iron-ajax content-type="application/json" id="editRequest" method="PUT" last-response="{{editResult}}"></iron-ajax> 
 
+        <iron-a11y-keys id="a11y" keys="enter" target="[[target]]" on-keys-pressed="onEnter"></iron-a11y-keys>
+        <iron-a11y-keys id="a11y" keys="a b c d e f g h i j k l m n o p q r s t u v w x y z" target="[[target]]" on-keys-pressed="onRandom"></iron-a11y-keys>
 
 
 
@@ -80,7 +82,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <tr>
                     <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
                         <th id="sortables" data-column="{{col}}" on-click="_sortToggle"
-                           style$="text-align:{{_isCurrency(col)}}" >{{_getColName(col)}}</th>
+                            style$="text-align:{{_isCurrency(col)}}" >{{_getColName(col)}}</th>
                     </template>
                     <th></th>
                 </tr>
@@ -106,6 +108,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 </tr>
             </template>
+            <tr>
+                <td>
+                    <paper-input id="product_identifier" value="{{newProduct}}" on-keyup="_searchInput" autofocus>
+                    </paper-input>
+                </td>
+            </tr>
         </tbody>
     </table>
 </template>
@@ -118,7 +126,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         properties: {
             url: {
                 type: String,
-                reflectToAttribute: true
+                reflectToAttribute: true,
+            },
+            target: {
+                type: Object,
+                value: function() {
+                    return document.body;
+                }
+            },
+            newProduct:{
+                type:String,
+                notify:true,
+                reflectToAttribute:true,
             },
             billId:{
                 type:Object,
@@ -166,6 +185,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         ready: function () {
         },
+        onRandom:function(event){
+            key = event.detail.keyboardEvent.key;
+
+            this.$.product_identifier.focus();
+        },
+
+        onEnter:function(){
+            this.$.product_identifier.focus();
+        },
+
         _getColName: function (col) {
             return this.cols[col];
         },

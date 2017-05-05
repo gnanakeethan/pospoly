@@ -62,7 +62,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="columns">
             <!-- .column -->
             <div class="column is-half">
-                <iron-a11y-keys id="a11y" keys="enter" target="[[target]]" on-keys-pressed="onEnter"></iron-a11y-keys>
                 <iron-a11y-keys id="a11y" keys="fn+1 fn+2 fn+3 fn+4 fn+5 fn+6 fn+7 fn+8 fn+9 fn+0" target="[[target]]" on-keys-pressed="_setBill"></iron-a11y-keys>
                 <product-data-table 
                     id="productdatatable"
@@ -72,6 +71,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     editable='{"Units"}'
                     refresh="true"
                     id-row="Id"
+                    new-product="{{productIdentifier}}"
                     get-url="/v1/sales/:id:/"
                     post-url="/v1/sales/:id:/"
                     delete-url="/v1/sales/:id:/">
@@ -86,9 +86,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     on-response="_putRecord"
                     last-response="{{inventoryList}}">
                 </iron-ajax>
-                <paper-dialog sizing-target id="productDialog" opened on-iron-overlay-closed="_clearInput">
+                <paper-dialog sizing-target id="productDialog" opened on-iron-overlay-closed="_clearInputi">
                     <paper-dialog-scrollable>
-                        <paper-input id="product_identifier" value="{{productIdentifier}}" on-keyup="_searchInput" autofocus>
+                        <paper-input hidden id="product_identifier" value="{{productIdentifier}}" on-keyup="_searchInput" autofocus>
                         </paper-input>
                         <table>
                             <template is="dom-repeat" items="{{productList}}" as="product">
@@ -182,16 +182,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _getIndex:function(index){
                 return index+1;
             },
-            onEnter:function(){
-                this.$.productDialog.open();
-                this.$.product_identifier.focus();
-            },
             _selectProduct:function(event){
                 this.productIdentifier = this.productList[event.target.dataId].Name; 
             },
 
             _searchInput:function(){
-                input = this.$.product_identifier.value;
+                this.$.productDialog.open();
+                console.log(this.productIdentifier)
+                input = this.productIdentifier;
                 if (!isNaN(input)) {
                     this.searchInput = "query=Barcode:" + input;
                 }
