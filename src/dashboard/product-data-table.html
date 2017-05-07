@@ -110,9 +110,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </template>
             <tr>
                 <td>
+                    {{productIn.Name}}
+                </td>
+                <td>
                     <paper-input id="product_identifier" value="{{newProduct}}" on-keyup="_searchInput" autofocus>
+
+
                     </paper-input>
                 </td>
+                <td>
+                    <paper-input value="{{quantity}}">
+                        </paper-input>
+                
+                </td>
+                <td></td>
+
             </tr>
         </tbody>
     </table>
@@ -128,6 +140,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 type: String,
                 reflectToAttribute: true,
             },
+            quantity:{
+                type:Number,
+                value:0,
+                reflectToAttribute:true,
+                notify:true,
+            },
+            
             target: {
                 type: Object,
                 value: function() {
@@ -138,6 +157,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 type:String,
                 notify:true,
                 reflectToAttribute:true,
+            },
+            productIn:{
+                type:Object,
+                reflectToAttribute:true
             },
             billId:{
                 type:Object,

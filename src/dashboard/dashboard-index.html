@@ -60,9 +60,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <!-- .columns -->
         <div class="columns">
+
+            <template is="dom-if" if="{{!productIdentifier}}">
+                    <iron-a11y-keys id="a11y" keys="ctrl+1 ctrl+2" target="[[target]]" on-keys-pressed="_setBill"></iron-a11y-keys>
+            </template>
             <!-- .column -->
             <div class="column is-half">
-                <iron-a11y-keys id="a11y" keys="fn+1 fn+2 fn+3 fn+4 fn+5 fn+6 fn+7 fn+8 fn+9 fn+0" target="[[target]]" on-keys-pressed="_setBill"></iron-a11y-keys>
                 <product-data-table 
                     id="productdatatable"
                     url="/v1/sales?query=BillId.Id:{{currentBill}}&limit=100"
@@ -71,12 +74,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     editable='{"Units"}'
                     refresh="true"
                     id-row="Id"
+                    product-in="{{productList.0}}"
                     new-product="{{productIdentifier}}"
+                    quantity="{{quantity}}"
                     get-url="/v1/sales/:id:/"
                     post-url="/v1/sales/:id:/"
                     delete-url="/v1/sales/:id:/">
                 </product-data-table>
                 <iron-ajax content-type="application/json" id="createRequest" method="POST" last-response="{{createResult}}"></iron-ajax> 
+            </div>
+            <!-- .column -->
+            <!-- .column -->
+            <div class="column">
                 <iron-ajax url="/v1/products?sortby=priority&order=desc&{{searchInput}}"
                     auto
                     on-response="_singleProduct"
@@ -86,7 +95,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     on-response="_putRecord"
                     last-response="{{inventoryList}}">
                 </iron-ajax>
-                <paper-dialog sizing-target id="productDialog" opened on-iron-overlay-closed="_clearInputi">
+                <paper-dialog sizing-target id="productDialog" opened>
                     <paper-dialog-scrollable>
                         <paper-input hidden id="product_identifier" value="{{productIdentifier}}" on-keyup="_searchInput" autofocus>
                         </paper-input>
@@ -125,14 +134,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </paper-dialog-scrollable>
                 </paper-dialog>
             </div>
-            <!-- .column -->
+            <!-- /.column -->
         </div>
         <div class="columns">
             <div class="column">
 
                 <iron-ajax 
                     auto
-                    url="/v1/bills?query=balance__gte:0,net_total__gte:cash_paid+card_paid&amp;limit=100"
+                    url="/v1/bills/payable"
                     on-response="_setLastBill"
                     last-response="{{bills}}">
                 </iron-ajax>
@@ -156,6 +165,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type:String,
                     observer:'_searchInput'
                 },
+                invId:{
+                    type:Number,
+                    observer:'_inventoryWatcher'
+                },
                 currentBill:{
                     type:Number,
                 },
@@ -172,13 +185,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 productList:{
                     type:Object,
                     observer:'_singleProduct'
+                },
+                quantity:{
+                    type:Number,
+                    value:0,
+                    observer:'_quantityChanged'
                 }
 
             },
             _clearInput:function(){
-                    this.productIdentifier = "";
+                this.productIdentifier = "";
             },
-
             _getIndex:function(index){
                 return index+1;
             },
@@ -193,40 +210,53 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 if (!isNaN(input)) {
                     this.searchInput = "query=Barcode:" + input;
                 }
-                else {
-                    this.searchInput = "query=Name:" + input;
+                else { this.searchInput = "query=Name:" + input;
                 }
             },
             _setLastBill:function(){
                 this.currentBill = this.bills[this.bills.length-1].Id;
             },
+            _inventoryWatcher:function(){
+                this.$.inventoryDialog.close();
+                this.$.quantityInput.focus();
+            },
+            _quantityChanged:function(){
+
+                console.log(parseFloat(this.quantity).toFixed(3))
+                console.log(this.invId)
+                if(this.quantity>0 && this.invId)
+                    this._putRecordPost(this.invId,parseFloat(this.quantity).toFixed(3));
+
+            },
             _shortcutInventory:function(event){
                 a = ['q','w','e','r','t','y','u','i','o','p']
                 key = a.indexOf(event.detail.keyboardEvent.key);
                 if(key>=0 && key <=10){
-                    this._putRecordPost(this.inventoryList[key].Id);
+                    this.invId = this.inventoryList[key].Id;
                 }
             },
             _shortcutProduct:function(event){
-
                 a = ['q','w','e','r','t','y','u','i','o','p']
                 key = a.indexOf(event.detail.keyboardEvent.key);
                 console.log(key)
                 if(key>=0 && key <=10){
                     this.productIdentifier = this.productList[key].Name;
-
                 }
 
             },
             _setBill:function(event){
+                
+                console.log(event)
                 if(event.target.dataId)
                     this.currentBill = event.target.dataId;
                 if(key = parseInt(event.detail.keyboardEvent.key))
                 {
-                    if(key==10)
-                        key=0;
+                    if(key==0)
+                        key=10;
                     this.currentBill = this.bills[key-1].Id;
                 }
+                this.productIdentifier="";
+                this.quantity = "";
             },
             _singleProduct:function(productList){
                 if(productList.length===1){
@@ -244,19 +274,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         invId = event.target.dataId
                     }
                     if(invId){
-                        this._putRecordPost(invId);
+                        this.invId = invId;
                     }
                 }
             },
-            _putRecordPost:function(invId){
+            _putRecordPost:function(invId,units=1.000){
                 params = {};
                 id = this.currentBill;
                 params["InventoryId"] = {};
                 params["InventoryId"]["Id"] = invId;
                 params["BillId"]= {};
                 params["BillId"]["Id"] = id;
-                params["Units"]=1.000;
+                params["Units"]=parseFloat(units);
                 params["Discount"] = 0.0;
+                console.log(params);
                 if (this.postUrl) {
                     postUrl = this.postUrl.replace(":id:/",'');
                     this.$.createRequest.url = postUrl;
@@ -268,6 +299,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.productIdentifier = "";
                     this.$.product_identifier.focus();
                     this.$.inventoryDialog.close();
+                this.quantity="";
                     this.$.productDialog.open();
                 }
             }
