@@ -10,5 +10,18 @@
     "src/purchases/purchases-create.html",
     "src/purchases/purchases-edit.html",
     "src/purchases/purchases-index.html"
-  ]
+  ],
+"builds": [{
+    "name": "bundled",
+    "bundle": true,
+    "js": {"minify": true},
+    "css": {"minify": true},
+    "html": {"minify": true}
+  },{
+    "name": "unbundled",
+    "js": {"minify": true},
+    "css": {"minify": true},
+    "html": {"minify": true}
+  }
+]
 }
