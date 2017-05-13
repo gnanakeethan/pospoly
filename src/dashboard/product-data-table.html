@@ -116,11 +116,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
                     </paper-input>
+                    {{productIn.Name}}
                 </td>
                 <td>
                     <paper-input id="quantity_input" no-label-float value="{{quantity}}">
-                    </paper-input>
-
+                        </paper-input>
+                
                 </td>
                 <td></td>
 
@@ -152,7 +153,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 notify:true,
                 observer: '_quantityWatcher'
             },
-
+            
             target: {
                 type: Object,
                 value: function() {
