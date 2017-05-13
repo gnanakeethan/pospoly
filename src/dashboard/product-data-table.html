@@ -113,13 +113,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     {{productIn.Name}}
                 </td>
                 <td>
-                    <paper-input id="product_identifier" value="{{newProduct}}" on-keyup="_searchInput" autofocus>
+                    <paper-input no-label-float style="" id="product_identifier" value="{{newProduct}}" autofocus>
 
 
                     </paper-input>
                 </td>
                 <td>
-                    <paper-input value="{{quantity}}">
+                    <paper-input id="quantity_input" no-label-float value="{{quantity}}">
                         </paper-input>
                 
                 </td>
@@ -145,6 +145,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 value:0,
                 reflectToAttribute:true,
                 notify:true,
+            },
+            quantityFocus:{
+                type:Boolean,
+                value:false,
+                reflectToAttribute:true,
+                notify:true,
+                observer: '_quantityWatcher'
             },
             
             target: {
@@ -216,6 +223,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         onEnter:function(){
             this.$.product_identifier.focus();
+        },
+        _quantityWatcher:function(){
+            this.$.product_identifier.focus();
+            if(this.quantityFocus)
+            {
+                this.$.quantity_input.focus();
+            }
+
         },
 
         _getColName: function (col) {

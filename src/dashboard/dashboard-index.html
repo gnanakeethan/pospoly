@@ -62,7 +62,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="columns">
 
             <template is="dom-if" if="{{!productIdentifier}}">
-                    <iron-a11y-keys id="a11y" keys="ctrl+1 ctrl+2" target="[[target]]" on-keys-pressed="_setBill"></iron-a11y-keys>
+                <iron-a11y-keys id="a11y" keys="ctrl+1 ctrl+2" target="[[target]]" on-keys-pressed="_setBill"></iron-a11y-keys>
             </template>
             <!-- .column -->
             <div class="column is-half">
@@ -75,6 +75,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     refresh="true"
                     id-row="Id"
                     product-in="{{productList.0}}"
+                    quantity-focus="{{quantityFocus}}"
                     new-product="{{productIdentifier}}"
                     quantity="{{quantity}}"
                     get-url="/v1/sales/:id:/"
@@ -97,7 +98,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </iron-ajax>
                 <paper-dialog sizing-target id="productDialog" opened>
                     <paper-dialog-scrollable>
-                        <paper-input hidden id="product_identifier" value="{{productIdentifier}}" on-keyup="_searchInput" autofocus>
+                        <paper-input hidden id="product_identifier" value="{{productIdentifier}}"  autofocus>
                         </paper-input>
                         <table>
                             <template is="dom-repeat" items="{{productList}}" as="product">
@@ -108,10 +109,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </table>
                     </paper-dialog-scrollable>
                 </paper-dialog>
-                <template is="dom-if" if="productList">
+                <template is="dom-if" if="{{_hasMany(productList)}}">
                     <iron-a11y-keys id="a11y" keys="ctrl+q ctrl+w ctrl+e ctrl+r ctrl+t ctrl+y ctrl+u ctrl+i ctrl+o ctrl+p ctrl+[ ctrl+]" target="[[target]]" on-keys-pressed="_shortcutProduct"></iron-a11y-keys>
                 </template>
-                <template is="dom-if" if="inventoryList">
+                <template is="dom-if" if="{{_hasMany(inventoryList)}}">
                     <iron-a11y-keys id="a11y" keys="ctrl+q ctrl+w ctrl+e ctrl+r ctrl+t ctrl+y ctrl+u ctrl+i ctrl+o ctrl+p ctrl+[ ctrl+]" target="[[target]]" on-keys-pressed="_shortcutInventory"></iron-a11y-keys>
                 </template>
                 <paper-dialog sizing-target id="inventoryDialog">
@@ -190,9 +191,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type:Number,
                     value:0,
                     observer:'_quantityChanged'
-                }
+                },
+                quantityFocus:{
+                    type:Boolean,
+                    value:false,
+                    reflectToAttribute:true,
+                    notify:true,
+                    observer: '_quantityWatcher'
+                },
 
             },
+            _hasMany:function(arraylist){
+                console.log(arraylist)
+                if(arraylist.length<=1){
+                    return false;
+                }
+                return true;
+            },
+
             _clearInput:function(){
                 this.productIdentifier = "";
             },
@@ -218,10 +234,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
             _inventoryWatcher:function(){
                 this.$.inventoryDialog.close();
-                this.$.quantityInput.focus();
+                console.log('setout')
+                this.quantityFocus = true;
+            },
+            _quantityWatcher:function(){
+                console.log('testing')
             },
             _quantityChanged:function(){
-
                 console.log(parseFloat(this.quantity).toFixed(3))
                 console.log(this.invId)
                 if(this.quantity>0 && this.invId)
@@ -231,21 +250,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _shortcutInventory:function(event){
                 a = ['q','w','e','r','t','y','u','i','o','p']
                 key = a.indexOf(event.detail.keyboardEvent.key);
+                console.log(key)
                 if(key>=0 && key <=10){
                     this.invId = this.inventoryList[key].Id;
+                    this._inventoryWatcher();
                 }
+                console.log(this.invId)
             },
             _shortcutProduct:function(event){
                 a = ['q','w','e','r','t','y','u','i','o','p']
                 key = a.indexOf(event.detail.keyboardEvent.key);
                 console.log(key)
+                console.log(this.productList)
                 if(key>=0 && key <=10){
                     this.productIdentifier = this.productList[key].Name;
+                    this._singleProduct(this.productList)
                 }
 
             },
             _setBill:function(event){
-                
+
                 console.log(event)
                 if(event.target.dataId)
                     this.currentBill = event.target.dataId;
@@ -268,6 +292,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _putRecord:function(event){
                 if(this.productList.length==1 && (this.productList[0].Id == event.target.dataId || this.inventoryList[0].ProductId.Id==this.productList[0].Id)){
                     delete invId;
+                    invId=null;
                     if(this.inventoryList.length ==1 && !event.target.dataId){
                         invId = this.inventoryList[0].Id;
                     } else if(this.inventoryList.length > 1 && event.target.dataId){
@@ -301,6 +326,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.$.inventoryDialog.close();
                 this.quantity="";
                     this.$.productDialog.open();
+                    this.quantityFocus = false;
                 }
             }
 
