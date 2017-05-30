@@ -29,36 +29,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 padding: 3%;
             }
 
-            th {
-                color: rgba(0, 0, 0, .74);
-                @apply(--paper-font-common-base);
-                @apply(--paper-font-common-nowrap);
-                font-weight: 500;
-            }
-
-            th[data-sorted='asc']::after {
-                content: "(asc)";
-            }
-
-            th[data-sorted='desc']::after {
-                content: "(desc)";
-            }
-
-            tr {
-            }
-
-            tr:hover td {
-                background: #ddd;
-            }
-
-            tr > td {
-                border-top: 1px solid #ccc;
-
-            }
-
-            td {
-                vertical-align: middle;
-            }
 
         </style>
 
@@ -81,6 +51,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         refresh="true"
                         id-row="Id"
                         product-in="{{productList.0}}"
+                        product-list="{{productList}}"
                         quantity-focus="{{quantityFocus}}"
                         new-product="{{productIdentifier}}"
                         quantity="{{quantity}}"
@@ -91,10 +62,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <iron-ajax content-type="application/json" id="createRequest" method="POST"
                            last-response="{{createResult}}"></iron-ajax>
             </div>
-             <!--.column-->
-             <!--.column-->
-            <div class="column is-3">
-                <iron-ajax url="/v1/products/bill?sortby=priority&order=desc&{{searchInput}}"
+            <!--.column-->
+            <!--.column-->
+        </div>
+        <div class="row">
+
+            <div class="column is-one-third">
+                <iron-ajax url="/v1/products/bill/?{{searchInput}}"
                            auto
                            on-response="_singleProduct"
                            last-response="{{productList}}">
