@@ -71,10 +71,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 on-keys-pressed="_setBill"></iron-a11y-keys>
             </template>
             <!-- .column -->
-            <div class="column is-half">
+            <div class="column is-one-third">
                 <product-data-table
                         id="productdatatable"
-                        url="/v1/sales?query=BillId.Id:{{currentBill}}&limit=100"
+                        url="/v1/sales?query=BillId.Id:{{currentBill}}&limit=100&sortby=Id&order=desc"
                         bill-id="{{currentBill}}"
                         cols='{"InventoryId.ProductId.ProductCode":"Product Code" ,"InventoryId.ProductId.Name":"Product Name","Units__number":"Quantity","InventoryId.InventoryScale[0].ScaleId.Unit":"Unit","Total__currency":"Total"}'
                         editable='{"Units"}'
@@ -91,10 +91,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <iron-ajax content-type="application/json" id="createRequest" method="POST"
                            last-response="{{createResult}}"></iron-ajax>
             </div>
-            <!-- .column -->
-            <!-- .column -->
-            <div class="column">
-                <iron-ajax url="/v1/products?sortby=priority&order=desc&{{searchInput}}"
+             <!--.column-->
+             <!--.column-->
+            <div class="column is-3">
+                <iron-ajax url="/v1/products/bill?sortby=priority&order=desc&{{searchInput}}"
                            auto
                            on-response="_singleProduct"
                            last-response="{{productList}}">
@@ -103,7 +103,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                            on-response="_putRecord"
                            last-response="{{inventoryList}}">
                 </iron-ajax>
-                <paper-dialog sizing-target id="productDialog" opened>
+                <paper-dialog sizing-target id="productDialog">
                     <paper-dialog-scrollable>
                         <paper-input hidden id="product_identifier" value="{{productIdentifier}}" autofocus>
                         </paper-input>
