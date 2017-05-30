@@ -13,7 +13,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="./product-data-table.html">
 
-<link rel="stylesheet" href="../../bower_components/bulma/css/bulma.css" type="text/css" media="screen" title="no title" charset="utf-8">
+<link rel="stylesheet" href="../../bower_components/bulma/css/bulma.css" type="text/css" media="screen" title="no title"
+      charset="utf-8">
 <dom-module id="dashboard-index">
 
     <template>
@@ -24,9 +25,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 padding: 10px;
             }
 
-            paper-dialog{
-                padding:3%;
+            paper-dialog {
+                padding: 3%;
             }
+
             th {
                 color: rgba(0, 0, 0, .74);
                 @apply(--paper-font-common-base);
@@ -44,15 +46,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             tr {
             }
+
             tr:hover td {
                 background: #ddd;
             }
+
             tr > td {
-                border-top:1px solid #ccc;
+                border-top: 1px solid #ccc;
 
             }
+
             td {
-                vertical-align:middle;
+                vertical-align: middle;
             }
 
         </style>
@@ -62,70 +67,79 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="columns">
 
             <template is="dom-if" if="{{!productIdentifier}}">
-                <iron-a11y-keys id="a11y" keys="ctrl+1 ctrl+2" target="[[target]]" on-keys-pressed="_setBill"></iron-a11y-keys>
+                <iron-a11y-keys id="a11y" keys="ctrl+1 ctrl+2" target="[[target]]"
+                                on-keys-pressed="_setBill"></iron-a11y-keys>
             </template>
             <!-- .column -->
             <div class="column is-half">
-                <product-data-table 
-                    id="productdatatable"
-                    url="/v1/sales?query=BillId.Id:{{currentBill}}&limit=100"
-                    bill-id="{{currentBill}}"
-                    cols='{"InventoryId.ProductId.ProductCode":"Product Code" ,"InventoryId.ProductId.Name":"Product Name","Units__number":"Quantity","InventoryId.InventoryScale[0].ScaleId.Unit":"Unit","Total__currency":"Total"}'
-                    editable='{"Units"}'
-                    refresh="true"
-                    id-row="Id"
-                    product-in="{{productList.0}}"
-                    quantity-focus="{{quantityFocus}}"
-                    new-product="{{productIdentifier}}"
-                    quantity="{{quantity}}"
-                    get-url="/v1/sales/:id:/"
-                    post-url="/v1/sales/:id:/"
-                    delete-url="/v1/sales/:id:/">
+                <product-data-table
+                        id="productdatatable"
+                        url="/v1/sales?query=BillId.Id:{{currentBill}}&limit=100"
+                        bill-id="{{currentBill}}"
+                        cols='{"InventoryId.ProductId.ProductCode":"Product Code" ,"InventoryId.ProductId.Name":"Product Name","Units__number":"Quantity","InventoryId.InventoryScale[0].ScaleId.Unit":"Unit","Total__currency":"Total"}'
+                        editable='{"Units"}'
+                        refresh="true"
+                        id-row="Id"
+                        product-in="{{productList.0}}"
+                        quantity-focus="{{quantityFocus}}"
+                        new-product="{{productIdentifier}}"
+                        quantity="{{quantity}}"
+                        get-url="/v1/sales/:id:/"
+                        post-url="/v1/sales/:id:/"
+                        delete-url="/v1/sales/:id:/">
                 </product-data-table>
-                <iron-ajax content-type="application/json" id="createRequest" method="POST" last-response="{{createResult}}"></iron-ajax> 
+                <iron-ajax content-type="application/json" id="createRequest" method="POST"
+                           last-response="{{createResult}}"></iron-ajax>
             </div>
             <!-- .column -->
             <!-- .column -->
             <div class="column">
                 <iron-ajax url="/v1/products?sortby=priority&order=desc&{{searchInput}}"
-                    auto
-                    on-response="_singleProduct"
-                    last-response="{{productList}}">
+                           auto
+                           on-response="_singleProduct"
+                           last-response="{{productList}}">
                 </iron-ajax>
-                <iron-ajax id="inventoryRequest" url="/v1/inventories?query=ProductId:{{productList.0.Id}}&limit=100" 
-                    on-response="_putRecord"
-                    last-response="{{inventoryList}}">
+                <iron-ajax id="inventoryRequest" url="/v1/inventories?query=ProductId:{{productList.0.Id}}&limit=100"
+                           on-response="_putRecord"
+                           last-response="{{inventoryList}}">
                 </iron-ajax>
                 <paper-dialog sizing-target id="productDialog" opened>
                     <paper-dialog-scrollable>
-                        <paper-input hidden id="product_identifier" value="{{productIdentifier}}"  autofocus>
+                        <paper-input hidden id="product_identifier" value="{{productIdentifier}}" autofocus>
                         </paper-input>
                         <table>
                             <template is="dom-repeat" items="{{productList}}" as="product">
                                 <tr>
-                                    <td style="padding:5px;" on-click="_selectProduct" data-id="{{index}}">{{product.Name}}</td>
+                                    <td style="padding:5px;" on-click="_selectProduct" data-id="{{index}}">
+                                        {{product.Name}}
+                                    </td>
                                 </tr>
                             </template>
                         </table>
                     </paper-dialog-scrollable>
                 </paper-dialog>
                 <template is="dom-if" if="{{_hasMany(productList)}}">
-                    <iron-a11y-keys id="a11y" keys="ctrl+q ctrl+w ctrl+e ctrl+r ctrl+t ctrl+y ctrl+u ctrl+i ctrl+o ctrl+p ctrl+[ ctrl+]" target="[[target]]" on-keys-pressed="_shortcutProduct"></iron-a11y-keys>
+                    <iron-a11y-keys id="a11y"
+                                    keys="ctrl+q ctrl+w ctrl+e ctrl+r ctrl+t ctrl+y ctrl+u ctrl+i ctrl+o ctrl+p ctrl+[ ctrl+]"
+                                    target="[[target]]" on-keys-pressed="_shortcutProduct"></iron-a11y-keys>
                 </template>
                 <template is="dom-if" if="{{_hasMany(inventoryList)}}">
-                    <iron-a11y-keys id="a11y" keys="ctrl+q ctrl+w ctrl+e ctrl+r ctrl+t ctrl+y ctrl+u ctrl+i ctrl+o ctrl+p ctrl+[ ctrl+]" target="[[target]]" on-keys-pressed="_shortcutInventory"></iron-a11y-keys>
+                    <iron-a11y-keys id="a11y"
+                                    keys="ctrl+q ctrl+w ctrl+e ctrl+r ctrl+t ctrl+y ctrl+u ctrl+i ctrl+o ctrl+p ctrl+[ ctrl+]"
+                                    target="[[target]]" on-keys-pressed="_shortcutInventory"></iron-a11y-keys>
                 </template>
                 <paper-dialog sizing-target id="inventoryDialog">
                     <paper-dialog-scrollable>
                         <table>
                             <template is="dom-repeat" items="{{inventoryList}}" as="inventory">
                                 <tr>
-                                    <td on-click="_putRecord" data-id="{{inventory.Id}}" style="padding:10px 10px 10px 14px;">
+                                    <td on-click="_putRecord" data-id="{{inventory.Id}}"
+                                        style="padding:10px 10px 10px 14px;">
                                         {{inventory.BatchNo}}
                                     </td>
                                     <td on-click="_putRecord" data-id="{{inventory.Id}}">
                                         <template is="dom-repeat" items="{{inventory.InventoryScale}}" as="scale">
-                                            {{scale.Units}}@{{scale.Price}} <br />
+                                            {{scale.Units}}@{{scale.Price}} <br/>
                                         </template>
                                     </td>
                                 </tr>
@@ -140,11 +154,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="columns">
             <div class="column">
 
-                <iron-ajax 
-                    auto
-                    url="/v1/bills/payable"
-                    on-response="_setLastBill"
-                    last-response="{{bills}}">
+                <iron-ajax
+                        auto
+                        url="/v1/bills/payable"
+                        on-response="_setLastBill"
+                        last-response="{{bills}}">
                 </iron-ajax>
                 <template is="dom-repeat" items="{{bills}}" as="bill">
                     <paper-button style="background:green;color:white;" on-click="_setBill" data-id="{{bill.Id}}">
@@ -160,177 +174,177 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         Polymer({
 
             is: 'dashboard-index',
-            properties:{
+            properties: {
 
-                productIdentifier:{
-                    type:String,
-                    observer:'_searchInput'
+                productIdentifier: {
+                    type: String,
+                    observer: '_searchInput'
                 },
-                invId:{
-                    type:Number,
-                    observer:'_inventoryWatcher'
+                invId: {
+                    type: Number,
+                    observer: '_inventoryWatcher'
                 },
-                currentBill:{
-                    type:Number,
+                currentBill: {
+                    type: Number,
                 },
-                postUrl:{
-                    type:"String",
-                    value:"/v1/sales/:id:/"
+                postUrl: {
+                    type: "String",
+                    value: "/v1/sales/:id:/"
                 },
                 target: {
                     type: Object,
-                    value: function() {
+                    value: function () {
                         return document.body;
                     }
                 },
-                productList:{
-                    type:Object,
-                    observer:'_singleProduct'
+                productList: {
+                    type: Object,
+                    observer: '_singleProduct'
                 },
-                quantity:{
-                    type:Number,
-                    value:0,
-                    observer:'_quantityChanged'
+                quantity: {
+                    type: Number,
+                    value: 0,
+                    observer: '_quantityChanged'
                 },
-                quantityFocus:{
-                    type:Boolean,
-                    value:false,
-                    reflectToAttribute:true,
-                    notify:true,
+                quantityFocus: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true,
+                    notify: true,
                     observer: '_quantityWatcher'
                 },
 
             },
-            _hasMany:function(arraylist){
+            _hasMany: function (arraylist) {
                 console.log(arraylist)
-                if(arraylist.length<=1){
+                if (arraylist.length <= 1) {
                     return false;
                 }
                 return true;
             },
 
-            _clearInput:function(){
+            _clearInput: function () {
                 this.productIdentifier = "";
             },
-            _getIndex:function(index){
-                return index+1;
+            _getIndex: function (index) {
+                return index + 1;
             },
-            _selectProduct:function(event){
-                this.productIdentifier = this.productList[event.target.dataId].Name; 
+            _selectProduct: function (event) {
+                this.productIdentifier = this.productList[event.target.dataId].Name;
             },
 
-            _searchInput:function(){
+            _searchInput: function () {
                 this.$.productDialog.open();
                 console.log(this.productIdentifier)
                 input = this.productIdentifier;
                 if (!isNaN(input)) {
                     this.searchInput = "query=Barcode:" + input;
                 }
-                else { this.searchInput = "query=Name:" + input;
+                else {
+                    this.searchInput = "query=Name:" + input;
                 }
             },
-            _setLastBill:function(){
-                this.currentBill = this.bills[this.bills.length-1].Id;
+            _setLastBill: function () {
+                this.currentBill = this.bills[this.bills.length - 1].Id;
             },
-            _inventoryWatcher:function(){
+            _inventoryWatcher: function () {
                 this.$.inventoryDialog.close();
                 console.log('setout')
                 this.quantityFocus = true;
             },
-            _quantityWatcher:function(){
+            _quantityWatcher: function () {
                 console.log('testing')
             },
-            _quantityChanged:function(){
+            _quantityChanged: function () {
                 console.log(parseFloat(this.quantity).toFixed(3))
                 console.log(this.invId)
-                if(this.quantity>0 && this.invId)
-                    this._putRecordPost(this.invId,parseFloat(this.quantity).toFixed(3));
+                if (this.quantity > 0 && this.invId)
+                    this._putRecordPost(this.invId, parseFloat(this.quantity).toFixed(3));
 
             },
-            _shortcutInventory:function(event){
-                a = ['q','w','e','r','t','y','u','i','o','p']
+            _shortcutInventory: function (event) {
+                a = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
                 key = a.indexOf(event.detail.keyboardEvent.key);
                 console.log(key)
-                if(key>=0 && key <=10){
+                if (key >= 0 && key <= 10) {
                     this.invId = this.inventoryList[key].Id;
                     this._inventoryWatcher();
                 }
                 console.log(this.invId)
             },
-            _shortcutProduct:function(event){
-                a = ['q','w','e','r','t','y','u','i','o','p']
+            _shortcutProduct: function (event) {
+                a = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
                 key = a.indexOf(event.detail.keyboardEvent.key);
                 console.log(key)
                 console.log(this.productList)
-                if(key>=0 && key <=10){
+                if (key >= 0 && key <= 10) {
                     this.productIdentifier = this.productList[key].Name;
                     this._singleProduct(this.productList)
                 }
 
             },
-            _setBill:function(event){
+            _setBill: function (event) {
 
                 console.log(event)
-                if(event.target.dataId)
+                if (event.target.dataId)
                     this.currentBill = event.target.dataId;
-                if(key = parseInt(event.detail.keyboardEvent.key))
-                {
-                    if(key==0)
-                        key=10;
-                    this.currentBill = this.bills[key-1].Id;
+                if (key = parseInt(event.detail.keyboardEvent.key)) {
+                    if (key == 0)
+                        key = 10;
+                    this.currentBill = this.bills[key - 1].Id;
                 }
-                this.productIdentifier="";
+                this.productIdentifier = "";
                 this.quantity = "";
             },
-            _singleProduct:function(productList){
-                if(productList.length===1){
+            _singleProduct: function (productList) {
+                if (productList.length === 1) {
                     this.$.inventoryRequest.generateRequest();
                     this.$.inventoryDialog.open();
                     this.$.productDialog.close();
                 }
             },
-            _putRecord:function(event){
-                if(this.productList.length==1 && (this.productList[0].Id == event.target.dataId || this.inventoryList[0].ProductId.Id==this.productList[0].Id)){
+            _putRecord: function (event) {
+                if (this.productList.length == 1 && (this.productList[0].Id == event.target.dataId || this.inventoryList[0].ProductId.Id == this.productList[0].Id)) {
                     delete invId;
-                    invId=null;
-                    if(this.inventoryList.length ==1 && !event.target.dataId){
+                    invId = null;
+                    if (this.inventoryList.length == 1 && !event.target.dataId) {
                         invId = this.inventoryList[0].Id;
-                    } else if(this.inventoryList.length > 1 && event.target.dataId){
+                    } else if (this.inventoryList.length > 1 && event.target.dataId) {
                         invId = event.target.dataId
                     }
-                    if(invId){
+                    if (invId) {
                         this.invId = invId;
                     }
                 }
             },
-            _putRecordPost:function(invId,units=1.000){
+            _putRecordPost: function (invId, units=1.000) {
                 params = {};
                 id = this.currentBill;
                 params["InventoryId"] = {};
                 params["InventoryId"]["Id"] = invId;
-                params["BillId"]= {};
+                params["BillId"] = {};
                 params["BillId"]["Id"] = id;
-                params["Units"]=parseFloat(units);
+                params["Units"] = parseFloat(units);
                 params["Discount"] = 0.0;
                 console.log(params);
                 if (this.postUrl) {
-                    postUrl = this.postUrl.replace(":id:/",'');
+                    postUrl = this.postUrl.replace(":id:/", '');
                     this.$.createRequest.url = postUrl;
                     this.$.createRequest.body = params;
                     this.$.createRequest.generateRequest();
-                    this.$.productdatatable.refresh= true;
-                    this.productList=[];
-                    this.inventoryList=[];
+                    this.$.productdatatable.refresh = true;
+                    this.productList = [];
+                    this.inventoryList = [];
                     this.productIdentifier = "";
                     this.$.product_identifier.focus();
                     this.$.inventoryDialog.close();
-                this.quantity="";
+                    this.quantity = "";
                     this.$.productDialog.open();
                     this.quantityFocus = false;
                 }
             }
 
-});
+        });
 
     </script>
 
