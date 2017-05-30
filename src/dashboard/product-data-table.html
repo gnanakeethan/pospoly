@@ -21,16 +21,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 clear: both;
                 float: none;
             }
-            table{
-                font-family:"Noto Sans UI";
+
+            * {
+                font-family: "Noto Mono";
+                font-weight: 500;
+            }
+
+            tr {
+                background: #ccc;
             }
 
             th {
                 font-size: 12px;
                 color: rgba(0, 0, 0, .54);
-                @apply(--paper-font-common-base);
-                @apply(--paper-font-common-nowrap);
-                font-weight: 500;
+                /*@apply(--paper-font-common-nowrap);*/
+                padding-right: 5px;
+                padding-left: 5px;
+                font-weight: 900;
+                /*height:90px;*/
+                /*transform: translate(0,0) rotate(270deg);*/
             }
 
             tr {
@@ -40,20 +49,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             td {
                 font-size: 13px;
-                padding:0;
-                margin:0;
+                margin: 0;
                 vertical-align: middle;
                 color: rgba(0, 0, 0, .67);
-                border-top: 1px solid var(--paper-datatable-divider-color, --divider-color);
             }
 
-            tr:hover td {
+            tr.alternate:hover td {
                 background: #777;
                 color: #fff;
             }
 
+            tr.alternate:nth-child(odd) {
+                background: #ccc;
+                color: #000;
+            }
+
+            tr.alternate:nth-child(even) {
+                background: #ddd;
+                color: #000;
+            }
+
             td.table__Units__number__class {
-                width: 60px;
+                width: 30px;
+            }
+
+            input.table__Units__number__class {
+                background: rgba(255, 255, 255, 0.4);
+                width: 25px;
+                border: none;
+            }
+
+            td.table__Total__currency__class {
+                width: 70px;
             }
         </style>
 
@@ -64,34 +91,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <iron-ajax id="deleteRequest" method="DELETE"></iron-ajax>
         <iron-ajax content-type="application/json" id="editRequest" method="PUT"
+                   debounce-duration="100"
                    last-response="{{editResult}}"></iron-ajax>
 
         <iron-a11y-keys id="a11y" keys="enter" target="[[target]]" on-keys-pressed="onEnter"></iron-a11y-keys>
         <iron-a11y-keys id="a11y" keys="a b c d e f g h i j k l m n o p q r s t u v w x y z" target="[[target]]"
                         on-keys-pressed="onRandom"></iron-a11y-keys>
-
-
         <table>
             <thead>
-            <tr>
-                <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
-                    <th id="sortables" data-column="{{col}}" on-click="_sortToggle"
-                        style$="text-align:{{_isCurrency(col)}}">{{_getColName(col)}}
-                    </th>
+            <tr class="alternate">
+                <template is="dom-if" if="{{_isset(newProduct)}}">
+                    <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
+                        <th id="sortables" data-column="{{col}}" on-click="_sortToggle"
+                            style$="text-align:{{_isCurrency(col)}}">{{_getColName(col)}}
+                        </th>
+                    </template>
+                    <th></th>
                 </template>
-                <th></th>
+                <template is="dom-if" if="{{!_isset(newProduct)}}">
+                    <th>Product Code</th>
+                    <th>Product Name</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </template>
             </tr>
             </thead>
             <tbody>
-            <tr>
+            <tr class="alternate">
                 <td>
                 </td>
                 <td>
-                    <!--<input type="text" value="{{newProduct}}" id="product_identifier" autofocus>-->
                     <paper-input no-label-float style="" id="product_identifier" value="{{newProduct}}" autofocus>
-
                     </paper-input>
-                    <!--{{productIn.Name}}-->
                 </td>
                 <td>
                     <paper-input id="quantity_input" no-label-float value="{{quantity}}">
@@ -100,31 +133,53 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </td>
                 <td></td>
                 <td></td>
+                <td></td>
             </tr>
-            <template is="dom-repeat" items="{{data}}" as="datum">
-                <tr>
-                    <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
-                        <td data-id="{{_getCol(datum,idRow)}}"
-                            class$="table__{{col}}__class"
-                            style$="text-align:{{_isCurrency(col)}};">
-                            <template is="dom-if" if="{{!_isEditable(col)}}">
-                                {{_getCol(datum,col)}}
-                            </template>
-                            <template is="dom-if" if="{{_isEditable(col)}}">
-                                <input style$="text-align:{{_isNumber(col)}}" size=4 class$="table__{{col}}__class"
-                                       data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{_filterColName(col)}}"
-                                       value="{{_getCol(datum,col)}}" on-focusout="_editRequest"
-                                       data-id="{{_getCol(datum,idRow)}}">
-                                <iron-ajax content-type="application/json" auto url="{{_getUpdateUrl(datum)}}"
-                                           method="PUT" on-response="_refreshMain"></iron-ajax>
-                            </template>
 
+            <template is="dom-if" if="{{_isset(newProduct)}}">
+
+                <template is="dom-repeat" items="{{data}}" as="datum">
+                    <tr class="alternate">
+                        <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
+                            <td data-id="{{_getCol(datum,idRow)}}"
+                                class$="table__{{col}}__class"
+                                style$="text-align:{{_isCurrency(col)}};">
+                                <template is="dom-if" if="{{!_isEditable(col)}}">
+                                    {{_getCol(datum,col)}}
+                                </template>
+                                <template is="dom-if" if="{{_isEditable(col)}}">
+                                    <input style$="text-align:{{_isNumber(col)}}" size=4 class$="table__{{col}}__class"
+                                           data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{_filterColName(col)}}"
+                                           value="{{_getCol(datum,col)}}" on-focusout="_editRequest"
+                                           data-id="{{_getCol(datum,idRow)}}">
+                                    <iron-ajax content-type="application/json" auto url="{{_getUpdateUrl(datum)}}"
+                                               method="PUT" on-response="_refreshMain"></iron-ajax>
+                                </template>
+
+                            </td>
+
+                        </template>
+                        <td>
+                            <paper-button data-id="{{datum.Id}}" on-click="_deleteRequest">Delete</paper-button>
                         </td>
-                        </paper-button>
 
-                    </template>
+                    </tr>
+                </template>
+            </template>
 
-                </tr>
+            <template is="dom-if" if="{{!_isset(newProduct)}}">
+
+                <template is="dom-repeat" items="{{productList}}" as="datum">
+                    <tr class="alternate">
+                        <td>{{datum.ProductCode}}</td>
+                        <td>{{datum.Name}}</td>
+                        <td></td>
+                        <td></td>
+
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </template>
             </template>
 
             </tbody>
@@ -288,9 +343,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.$.editRequest.url = postUrl;
                     this.$.editRequest.body = params;
                     this.$.editRequest.generateRequest();
-                    sleep(300);
-                    this.$.mainRequest.generateRequest();
                 }
+                sleep(200);
+                this.$.mainRequest.generateRequest();
 
             },
 
@@ -300,6 +355,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 }
                 else if (this.deleteUrl) {
+
                     deleteUrl = this.deleteUrl.replace(":id:", id);
                     this.$.deleteRequest.url = deleteUrl;
                     this.$.deleteRequest.generateRequest();
@@ -316,6 +372,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _getUpdateUrl: function (datum) {
                 return "/v1/sales/" + datum.Id;
             },
+            _isset: function (value) {
+
+                return value === "";
+            },
+
         });
 
     </script>
