@@ -27,6 +27,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 font-weight: 500;
             }
 
+            table {
+                border: none;
+            }
+
             tr {
                 background: #ccc;
             }
@@ -34,11 +38,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             th {
                 font-size: 12px;
                 color: rgba(0, 0, 0, .54);
-                /*@apply(--paper-font-common-nowrap);*/
-                padding-right: 5px;
-                padding-left: 5px;
+                @apply(--paper-font-common-nowrap);
+                padding: 5px;
+                vertical-align: middle;
                 font-weight: 900;
-                /*height:90px;*/
+                height: 30px;
                 /*transform: translate(0,0) rotate(270deg);*/
             }
 
@@ -100,22 +104,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <table>
             <thead>
             <tr class="alternate">
-                <template is="dom-if" if="{{_isset(newProduct)}}">
-                    <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
-                        <th id="sortables" data-column="{{col}}" on-click="_sortToggle"
-                            style$="text-align:{{_isCurrency(col)}}">{{_getColName(col)}}
-                        </th>
-                    </template>
-                    <th></th>
+                <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
+                    <th id="sortables" data-column="{{col}}" on-click="_sortToggle"
+                        style$="text-align:{{_isCurrency(col)}}">{{_getColName(col)}}
+                    </th>
                 </template>
-                <template is="dom-if" if="{{!_isset(newProduct)}}">
-                    <th>Product Code</th>
-                    <th>Product Name</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </template>
+                <th></th>
             </tr>
             </thead>
             <tbody>

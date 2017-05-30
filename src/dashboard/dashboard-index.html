@@ -28,6 +28,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             paper-dialog {
                 padding: 3%;
             }
+            .productList {
+                padding:0;
+            }
 
 
         </style>
@@ -41,7 +44,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 on-keys-pressed="_setBill"></iron-a11y-keys>
             </template>
             <!-- .column -->
-            <div class="column is-one-third">
+            <div class="column is-4">
 
                 <product-data-table
                         id="productdatatable"
@@ -68,7 +71,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
         <div class="row">
 
-            <div class="column is-4 is-4-mobile is-4-tablet">
+            <div class="column is-4 is-4-mobile is-4-tablet productList">
                 <iron-ajax url="/v1/products/bill/?{{searchInput}}"
                            auto
                            on-response="_singleProduct"
