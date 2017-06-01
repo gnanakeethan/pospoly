@@ -11,6 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+
 <link rel="import" href="./product-data-table.html">
 
 <link rel="stylesheet" href="../../bower_components/bulma/css/bulma.css" type="text/css" media="screen" title="no title"
@@ -22,14 +23,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <style>
             :host {
                 display: block;
-                padding: 10px;
+                /*padding: 10px;*/
             }
 
-            paper-dialog {
-                padding: 3%;
-            }
             .productList {
-                padding:0;
+                padding: 0;
             }
 
 
@@ -44,18 +42,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 on-keys-pressed="_setBill"></iron-a11y-keys>
             </template>
             <!-- .column -->
-            <div class="column is-4">
+            <div class="column is-5-desktop is-5-mobile is-5-tablet is-5-widescreen">
 
                 <product-data-table
                         id="productdatatable"
                         url="/v1/sales?query=BillId.Id:{{currentBill}}&limit=100&sortby=Id&order=desc"
                         bill-id="{{currentBill}}"
-                        cols='{"InventoryId.ProductId.ProductCode":"Product Code" ,"InventoryId.ProductId.Name":"Product Name","Units__number":"Qty","InventoryId.InventoryScale[0].ScaleId.Unit":"","Total__currency":"Total"}'
+                        cols='{"InventoryId.ProductId.ProductCode":"PCode" ,"InventoryId.ProductId.Name":"Product Name","Units__number":"Qty","InventoryId.InventoryScale[0].ScaleId.Unit":"","Total__currency":"Total"}'
                         editable='{"Units"}'
-                        refresh="true"
+                        refresh="{{refresh}}"
                         id-row="Id"
                         product-in="{{productList.0}}"
                         product-list="{{productList}}"
+                        inventory-list="{{inventoryList}}"
                         quantity-focus="{{quantityFocus}}"
                         new-product="{{productIdentifier}}"
                         quantity="{{quantity}}"
@@ -81,21 +80,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                            on-response="_putRecord"
                            last-response="{{inventoryList}}">
                 </iron-ajax>
-                <!--<paper-dialog sizing-target id="productDialog">-->
-                <!--<paper-dialog-scrollable>-->
                 <paper-input hidden id="product_identifier" value="{{productIdentifier}}" autofocus>
                 </paper-input>
-                <!--<table>-->
-                <!--<template is="dom-repeat" items="{{productList}}" as="product">-->
-                <!--<tr>-->
-                <!--<td style="padding:5px;" on-click="_selectProduct" data-id="{{index}}">-->
-                <!--{{product.Name}}-->
-                <!--</td>-->
-                <!--</tr>-->
-                <!--</template>-->
-                <!--</table>-->
-                <!--</paper-dialog-scrollable>-->
-                <!--</paper-dialog>-->
                 <template is="dom-if" if="{{_hasMany(productList)}}">
                     <iron-a11y-keys id="a11y"
                                     keys="ctrl+q ctrl+w ctrl+e ctrl+r ctrl+t ctrl+y ctrl+u ctrl+i ctrl+o ctrl+p ctrl+[ ctrl+]"
@@ -106,26 +92,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     keys="ctrl+q ctrl+w ctrl+e ctrl+r ctrl+t ctrl+y ctrl+u ctrl+i ctrl+o ctrl+p ctrl+[ ctrl+]"
                                     target="[[target]]" on-keys-pressed="_shortcutInventory"></iron-a11y-keys>
                 </template>
-                <paper-dialog sizing-target id="inventoryDialog">
-                    <paper-dialog-scrollable>
-                        <table>
-                            <template is="dom-repeat" items="{{inventoryList}}" as="inventory">
-                                <tr>
-                                    <td on-click="_putRecord" data-id="{{inventory.Id}}"
-                                        style="padding:10px 10px 10px 14px;">
-                                        {{inventory.BatchNo}}
-                                    </td>
-                                    <td on-click="_putRecord" data-id="{{inventory.Id}}">
-                                        <template is="dom-repeat" items="{{inventory.InventoryScale}}" as="scale">
-                                            {{scale.Units}}@{{scale.Price}} <br/>
-                                        </template>
-                                    </td>
-                                </tr>
-                            </template>
-                        </table>
-
-                    </paper-dialog-scrollable>
-                </paper-dialog>
             </div>
             <!-- /.column -->
         </div>
@@ -161,6 +127,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 invId: {
                     type: Number,
                     observer: '_inventoryWatcher'
+                },
+                refresh: {
+                    type: Boolean,
                 },
                 currentBill: {
                     type: Number,
@@ -223,15 +192,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             },
             _setLastBill: function () {
+                console.log(this.bills);
                 this.currentBill = this.bills[this.bills.length - 1].Id;
             },
             _inventoryWatcher: function () {
-                this.$.inventoryDialog.close();
+//                this.$.inventoryDialog.close();
                 console.log('setout')
                 this.quantityFocus = true;
             },
             _quantityWatcher: function () {
-                console.log('testing')
+//                console.log('testing')
             },
             _quantityChanged: function () {
                 console.log(parseFloat(this.quantity).toFixed(3))
@@ -278,12 +248,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 console.log(productList);
                 if (productList.length === 1) {
                     this.$.inventoryRequest.generateRequest();
-                    this.$.inventoryDialog.open();
+//                    this.$.inventoryDialog.open();
                     this.$.productDialog.close();
                 }
             },
             _putRecord: function (event) {
-                if (this.productList.length == 1 && (this.productList[0].Id == event.target.dataId || this.inventoryList[0].ProductId.Id == this.productList[0].Id)) {
+                console.log(this.invId);
+                console.log('testing')
+                if ((this.productList[0].Id == event.target.dataId || this.inventoryList[0].ProductId.Id == this.productList[0].Id)) {
                     delete invId;
                     invId = null;
                     if (this.inventoryList.length == 1 && !event.target.dataId) {
@@ -316,11 +288,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.inventoryList = [];
                     this.productIdentifier = "";
                     this.$.product_identifier.focus();
-                    this.$.inventoryDialog.close();
+//                    this.$.inventoryDialog.close();
                     this.quantity = "";
                     this.quantity = "";
                     this.quantity = "";
                     this.quantityFocus = false;
+                    this.refresh = true;
                 }
             },
             _isset: function (value) {

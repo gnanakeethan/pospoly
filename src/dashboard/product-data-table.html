@@ -10,6 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
 <link rel="import" href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
 
 <dom-module id="product-data-table">
@@ -28,7 +29,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             table {
-                border: none;
+                border: 0px solid #fff !important;
             }
 
             tr {
@@ -47,13 +48,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             tr {
-                height: 29px;
+                height: 40px;
                 vertical-align: middle;
             }
 
             td {
                 font-size: 13px;
                 margin: 0;
+                padding-left: 5px;
                 vertical-align: middle;
                 color: rgba(0, 0, 0, .67);
             }
@@ -86,16 +88,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             td.table__Total__currency__class {
                 width: 70px;
             }
+
         </style>
 
         <iron-ajax
                 id="mainRequest"
-                auto url="{{url}}"
+                auto url="{{url}}&refresh={{refresh}}"
                 last-response="{{data}}"></iron-ajax>
 
         <iron-ajax id="deleteRequest" method="DELETE"></iron-ajax>
         <iron-ajax content-type="application/json" id="editRequest" method="PUT"
-                   debounce-duration="100"
+                   debounce-duration="300"
                    last-response="{{editResult}}"></iron-ajax>
 
         <iron-a11y-keys id="a11y" keys="enter" target="[[target]]" on-keys-pressed="onEnter"></iron-a11y-keys>
@@ -147,16 +150,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                            value="{{_getCol(datum,col)}}" on-focusout="_editRequest"
                                            data-id="{{_getCol(datum,idRow)}}">
                                     <iron-ajax content-type="application/json" auto url="{{_getUpdateUrl(datum)}}"
-                                               method="PUT" on-response="_refreshMain"></iron-ajax>
+                                               method="PUT" on-response="_onRefresh"></iron-ajax>
                                 </template>
 
                             </td>
 
                         </template>
                         <td>
-                            <paper-button data-id="{{datum.Id}}" on-click="_deleteRequest">Delete</paper-button>
+                            <paper-button tabindex="-1" data-id="{{datum.Id}}" on-click="_deleteRequest">Delete</paper-button>
                         </td>
-
                     </tr>
                 </template>
             </template>
@@ -171,7 +173,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <td></td>
 
                         <td></td>
+                        <td class="delete-button"></td>
+                    </tr>
+                </template>
+                <template is="dom-repeat" items="{{inventoryList}}" as="datum">
+                    <tr class="alternate">
                         <td></td>
+                        <td>{{datum.BatchNo}}</td>
+                        <td>{{datum.InventoryScale.0.Units}}</td>
+                        <td></td>
+                        <td>{{datum.InventoryScale.0.Price}}</td>
+
+                        <td class="delete-button"></td>
                     </tr>
                 </template>
             </template>
@@ -225,12 +238,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 data: {
                     type: Object,
+                    observer: '_modifyData'
                 },
                 editable: {
                     type: Object,
                 },
                 productList: {
                     type: Object,
+                    observer: '_modifyProductList'
+                },
+                inventoryList: {
+                    type: Object,
+
                 },
                 cols: {
                     type: Object,
@@ -259,9 +278,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             },
             _refreshMain: function () {
-                sleep(100)
-                this.$.mainRequest.generateRequest();
-                this.refresh = false;
+                if (this.refresh)
+                    this.refresh = false;
+            },
+            _onRefresh: function () {
+                this.refresh = true;
             },
             ready: function () {
             },
@@ -353,7 +374,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     deleteUrl = this.deleteUrl.replace(":id:", id);
                     this.$.deleteRequest.url = deleteUrl;
                     this.$.deleteRequest.generateRequest();
-                    this.$.mainRequest.generateRequest();
+                    sleep(200);
                     this.$.mainRequest.generateRequest();
                 }
                 console.log(deleteUrl);
