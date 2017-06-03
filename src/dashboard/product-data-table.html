@@ -248,14 +248,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 data: {
                     type: Object,
-                    observer: '_modifyData'
                 },
                 editable: {
                     type: Object,
                 },
                 productList: {
                     type: Object,
-                    observer: '_modifyProductList'
                 },
                 inventoryList: {
                     type: Object,
@@ -295,7 +293,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.refresh = false;
             },
             _onRefresh: function () {
-                console.log('passed')
                 this.refresh = true;
             },
             ready: function () {
@@ -337,7 +334,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     return "right";
             },
             _isCurrency: function (col) {
-                console.log(col.split("__").includes("currency"));
                 if (col.split("__").includes("currency"))
                     return "right";
             },
@@ -391,7 +387,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     sleep(200);
                     this.$.mainRequest.generateRequest();
                 }
-                console.log(deleteUrl);
+                this.refresh = true;
 
             },
             deletableLink: function (datum) {

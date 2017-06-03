@@ -7,15 +7,30 @@
     "src/products/products-edit.html",
     "src/dashboard/dashboard-index.html",
     "src/data-table/data-table.html",
+    "src/dashboard/product-data-table.html",
     "src/purchases/purchases-create.html",
     "src/purchases/purchases-edit.html",
     "src/purchases/purchases-index.html"
   ],
-"builds": [{
-    "name": "bundled",
-    "bundle": true,
-    "js": {"minify": true},
-    "css": {"minify": true},
-    "html": {"minify": true}
-  }]
+  "builds": [
+    {
+      "name": "bundled",
+      "bundle": true,
+      "addServiceWorker": true,
+      "js": {
+        "minify": true
+      },
+      "css": {
+        "minify": true
+      },
+      "html": {
+        "minify": true
+      }
+    }
+  ],
+  "lint": {
+    "rules": [
+      "polymer-1"
+    ]
+  }
 }

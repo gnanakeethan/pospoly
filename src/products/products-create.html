@@ -227,7 +227,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             is: 'products-create',
             _logProduct: function () {
-                console.log(this.product);
             },
             properties: {
                 productId: {
@@ -289,12 +288,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             invChanged: function (changed) {
                 id = changed.path.slice(13);
                 id = id.slice(0, id.indexOf('.'));
-                console.log(id);
-                console.log(this.inventories);
                 if (this.inventories) {
                     path = eval('this.inventories[' + id + ']');
                     this.inventoryChanged = path;
-                    console.log(path);
                     this.$.invChange.method = "PUT";
                     this.$.invChange.generateRequest();
                 }
@@ -317,15 +313,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     path.Price = parseFloat(path.Price);
                     this.insChanged = path;
                     this.$.insChange.method = "PUT";
-                    console.log(this.insChanged);
-                    console.log(this.$.insChange);
                     this.$.insChange.generateRequest();
                 }
 
             }
             ,
             updateInventory: function () {
-                console.log(this.onCha);
                 this.$.inventories.generateRequest();
             }
             ,
@@ -347,16 +340,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     CreatedAt: '0001-01-01T00:00:00Z',
                     UpdatedAt: '0001-01-01T00:00:00Z'
                 };
-                console.log(this.inventoryChanged);
                 this.$.invChange.method = "POST";
                 this.$.invChange.generateRequest();
             }
             ,
             _addIns: function (event) {
-                console.log(event);
                 this.insChanged.InventoryId.Id = event.target.dataId;
                 this.insChanged.ScaleId.Id = this.scales[0].Id;
-                console.log(this.insChanged);
                 this.$.insChange.method = "POST";
                 this.$.insChange.generateRequest();
                 this.ins = [];
@@ -366,23 +356,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
             ,
             _appendIns: function () {
-                console.log(this.invId);
-                console.log('inssor');
-                console.log(this.insos);
                 if (this.insos)
                     for (i = 0; i < this.insos.length; i++) {
                         this.push('ins', this.insos[i]);
                     }
-                console.log(this.ins);
             }
             ,
             _checkInv: function () {
-                console.log(this.inventories);
                 if (this.inventories) {
 
                     for (i = 0; i < this.inventories.length; i++) {
                         req = eval('this.$.insLoader' + this.inventories[i].Id);
-                        console.log(req);
                     }
                 }
 //                this.$.inventories.generateRequest();

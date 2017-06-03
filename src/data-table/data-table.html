@@ -207,9 +207,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 return Object.keys(cols);
             },
             _sortToggle: function (col) {
-                console.log(col.target.dataColumn);
                 if (sort = this.sortables.indexOf(col.target.dataColumn) >= 0) {
-                    console.log(sort);
                     this.sorted = (col.target.dataColumn);
                     els = document.querySelectorAll('#sortables');
                     for (var i = 0; i < els.length; i++) {
@@ -222,7 +220,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         col.target.setAttribute('data-sorted', "asc");
                         this.sortMode = "asc";
                     }
-                    console.log(col.target);
                     this._sortedChanged();
                 }
             },
@@ -278,7 +275,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.$.mainRequest.generateRequest();
                     this.$.mainRequest.generateRequest();
                 }
-                console.log(deleteUrl);
 
             },
             _refreshMain: function () {
@@ -294,7 +290,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     return this.deleteUrl.replace(":id:", eval('datum.' + this.idRow));
             },
             _checkData: function () {
-                console.log(this.data);
 
             }
         });

@@ -20,8 +20,7 @@
     "iron-elements": "^1.0.10",
     "app-localize-behavior": "^0.9.2",
     "polymer-paper-datatable": "git@github.com:jay8t6/paper-datatable.git#^0.9.11",
-    "bulma": "^0.4.0",
-    "dom-repeat-n": "^1.0.6"
+    "bulma": "^0.4.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
