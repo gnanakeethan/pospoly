@@ -93,6 +93,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <iron-ajax
                 id="mainRequest"
+                debounce-duration="100"
                 auto url="{{url}}&refresh={{refresh}}"
                 last-response="{{data}}"></iron-ajax>
 
@@ -123,6 +124,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <paper-input no-label-float style="" id="product_identifier" value="{{newProduct}}" autofocus>
                     </paper-input>
                 </td>
+                <td></td>
                 <td>
                     <paper-input id="quantity_input" no-label-float value="{{quantity}}">
                     </paper-input>
@@ -149,15 +151,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                            data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{_filterColName(col)}}"
                                            value="{{_getCol(datum,col)}}" on-focusout="_editRequest"
                                            data-id="{{_getCol(datum,idRow)}}">
-                                    <iron-ajax content-type="application/json" auto url="{{_getUpdateUrl(datum)}}"
-                                               method="PUT" on-response="_onRefresh"></iron-ajax>
+                                    <iron-ajax auto
+                                               content-type="application/json"
+                                               url="{{_getUpdateUrl(datum)}}"
+                                               method="PUT"
+                                               on-response="_onRefresh"></iron-ajax>
                                 </template>
 
                             </td>
 
                         </template>
                         <td>
-                            <paper-button tabindex="-1" data-id="{{datum.Id}}" on-click="_deleteRequest">Delete</paper-button>
+                            <paper-button tabindex="-1" data-id="{{datum.Id}}" on-click="_deleteRequest">Delete
+                            </paper-button>
                         </td>
                     </tr>
                 </template>
@@ -171,7 +177,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <td>{{datum.Name}}</td>
                         <td></td>
                         <td></td>
-
+                        <td></td>
                         <td></td>
                         <td class="delete-button"></td>
                     </tr>
@@ -180,10 +186,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <tr class="alternate">
                         <td></td>
                         <td>{{datum.BatchNo}}</td>
+                        <td>{{_computeCurrency(datum.InventoryScale.0.Price)}}</td>
                         <td>{{datum.InventoryScale.0.Units}}</td>
                         <td></td>
-                        <td>{{datum.InventoryScale.0.Price}}</td>
-
+                        <td></td>
                         <td class="delete-button"></td>
                     </tr>
                 </template>
@@ -202,6 +208,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 url: {
                     type: String,
                     reflectToAttribute: true,
+                },
+                loading: {
+                    type: Boolean,
+                    value: true
                 },
                 quantity: {
                     type: Number,
@@ -269,19 +279,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 },
                 refresh: {
                     type: Boolean,
+                    value: false,
                     reflectToAttribute: true,
-                    observer: '_refreshMain'
+                    notify: true,
+                    observer:"_refreshMain"
                 },
                 idRow: {
                     type: String,
                     reflectToAttribute: true
                 }
             },
+
             _refreshMain: function () {
                 if (this.refresh)
                     this.refresh = false;
             },
             _onRefresh: function () {
+                console.log('passed')
                 this.refresh = true;
             },
             ready: function () {
@@ -361,7 +375,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
                 sleep(200);
                 this.$.mainRequest.generateRequest();
-
+                this.refresh = true;
             },
 
             _deleteRequest: function (event) {
@@ -386,6 +400,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
             _getUpdateUrl: function (datum) {
                 return "/v1/sales/" + datum.Id;
+            },
+
+            _computeCurrency: function (x) {
+                return parseFloat(x).toFixed(2);
             },
             _isset: function (value) {
 
