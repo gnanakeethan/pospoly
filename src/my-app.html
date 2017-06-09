@@ -218,19 +218,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
 
                 this.importHref(
-                        this.resolveUrl(page + '/' + page + '-' + this.path + '.html'), null, null, true);
+                    this.resolveUrl(page + '/' + page + '-' + this.path + '.html'), null, null, true);
             },
             _pathChanged: function (path) {
 
                 // load page import on demand.
                 this.importHref(
-                        this.resolveUrl(this.page + '/' + this.page + '-' + path + '.html'), null, null, true);
+                    this.resolveUrl(this.page + '/' + this.page + '-' + path + '.html'), null, null, true);
             }
             ,
             _pathIdChanged: function () {
                 // load page import on demand.
                 this.importHref(
-                        this.resolveUrl(this.page + '/' + this.page + '-' + this.path + '.html'), null, null, true);
+                    this.resolveUrl(this.page + '/' + this.page + '-' + this.path + '.html'), null, null, true);
             }
 
 
