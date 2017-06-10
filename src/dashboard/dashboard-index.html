@@ -62,13 +62,18 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
         <paper-input label="Cash"
             value="{{bill.CashPaid}}"
             on-blur="updateBill"></paper-input>
+        <paper-input label="Card"
+            value="{{bill.CardPaid}}"
+            on-blur="updateBill"></paper-input>
 
         <paper-input label="Net"
             value="{{bill.NetTotal}}"></paper-input>
+        <paper-input label="Discount"
+            value="{{bill.Discount}}"></paper-input>
         <paper-input disabled
             label="Balance"
             value="{{bill.Balance}}"></paper-input>
-        paper Bill Details {{_computeCurrency(bill.NetTotal)}} {{_computeCurrency(bill.Discount)}} {{_computeCurrency(bill.GrossTotal)}} {{_computeCurrency(bill.Cost)}} {{_computeCurrency(bill.Balance)}}
+
     </div>
     <!--.column-->
     <!--.column-->

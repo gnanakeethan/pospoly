@@ -8,10 +8,13 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import"
+    href="../../bower_components/polymer/polymer.html">
+<link rel="import"
+    href="../../bower_components/iron-ajax/iron-ajax.html">
 
-<link rel="import" href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import"
+    href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
 
 <dom-module id="product-data-table">
 
@@ -113,29 +116,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         style$="text-align:{{_isCurrency(col)}}">{{_getColName(col)}}
                     </th>
                 </template>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr class="alternate">
-                <td>
-                </td>
-                <td>
-                    <paper-input no-label-float style="" id="product_identifier" value="{{newProduct}}" autofocus>
-                    </paper-input>
-                </td>
-                <td></td>
-                <td>
-                    <paper-input id="quantity_input" no-label-float value="{{quantity}}">
-                    </paper-input>
+    <th></th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr class="alternate">
+            <td>
+            </td>
+            <td>
+                <paper-input no-label-float
+                    style=""
+                    id="product_identifier"
+                    value="{{newProduct}}"
+                    autofocus>
+                </paper-input>
+            </td>
+            <td></td>
+            <td>
+                <paper-input id="quantity_input"
+                    no-label-float
+                    on-blur="_setQuantity"
+                    value="{{quantityInternal}}">
+                </paper-input>
+                {{quantity}}
 
-                </td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
 
-            <template is="dom-if" if="{{_isset(newProduct)}}">
+        <template is="dom-if"
+            if="{{_isset(newProduct)}}">
 
                 <template is="dom-repeat" items="{{data}}" as="datum">
                     <tr class="alternate">
@@ -146,7 +158,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <template is="dom-if" if="{{!_isEditable(col)}}">
                                     {{_getCol(datum,col)}}
                                 </template>
-                                <template is="dom-if" if="{{_isEditable(col)}}">
+        <template is="dom-if"
+            if="{{_isEditable(col)}}">
                                     <input style$="text-align:{{_isNumber(col)}}" size=4 class$="table__{{col}}__class"
                                            data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{_filterColName(col)}}"
                                            value="{{_getCol(datum,col)}}" on-focusout="_editRequest"
@@ -158,18 +171,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                                on-response="_onRefresh"></iron-ajax>
                                 </template>
 
-                            </td>
+        </td>
 
-                        </template>
-                        <td>
-                            <paper-button tabindex="-1" data-id="{{datum.Id}}" on-click="_deleteRequest">Delete
-                            </paper-button>
-                        </td>
-                    </tr>
-                </template>
-            </template>
+        </template>
+        <td>
+            <paper-button tabindex="-1"
+                data-id="{{datum.Id}}"
+                on-click="_deleteRequest">Delete
+            </paper-button>
+        </td>
+        </tr>
+        </template>
+        </template>
 
-            <template is="dom-if" if="{{!_isset(newProduct)}}">
+        <template is="dom-if"
+            if="{{!_isset(newProduct)}}">
 
                 <template is="dom-repeat" items="{{productList}}" as="datum">
                     <tr class="alternate">
@@ -182,7 +198,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <td class="delete-button"></td>
                     </tr>
                 </template>
-                <template is="dom-repeat" items="{{inventoryList}}" as="datum">
+        <template is="dom-repeat"
+            items="{{inventoryList}}"
+            as="datum">
                     <tr class="alternate">
                         <td></td>
                         <td>{{datum.BatchNo}}</td>
@@ -193,14 +211,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <td class="delete-button"></td>
                     </tr>
                 </template>
-            </template>
+        </template>
 
-            </tbody>
-        </table>
+    </tbody>
+    </table>
     </template>
 
     <script>
-
         Polymer({
 
             is: 'product-data-table',
@@ -213,11 +230,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: Boolean,
                     value: true
                 },
+                quantityInternal: {
+                    type: Number,
+                    value: 0,
+                },
                 quantity: {
                     type: Number,
                     value: 0,
                     reflectToAttribute: true,
                     notify: true,
+                    observer: '_clearQuantity'
                 },
                 quantityFocus: {
                     type: Boolean,
@@ -229,7 +251,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 target: {
                     type: Object,
-                    value: function () {
+                    value: function() {
                         return document.body;
                     }
                 },
@@ -280,7 +302,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     value: false,
                     reflectToAttribute: true,
                     notify: true,
-                    observer:"_refreshMain"
+                    observer: "_refreshMain"
                 },
                 idRow: {
                     type: String,
@@ -288,56 +310,59 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             },
 
-            _refreshMain: function () {
+            _refreshMain: function() {
                 if (this.refresh)
                     this.refresh = false;
             },
-            _onRefresh: function () {
+            _onRefresh: function() {
                 this.refresh = true;
             },
-            ready: function () {
+            ready: function() {},
+            _setQuantity: function() {
+                this.quantity = this.quantityInternal;
             },
-            onRandom: function (event) {
+            onRandom: function(event) {
                 key = event.detail.keyboardEvent.key;
 
                 this.$.product_identifier.focus();
             },
 
-            onEnter: function () {
+            onEnter: function() {
                 this.$.product_identifier.focus();
             },
-            _quantityWatcher: function () {
+            _quantityWatcher: function() {
                 this.$.product_identifier.focus();
                 if (this.quantityFocus) {
+                    this.quantityInternal = "";
                     this.$.quantity_input.focus();
                 }
 
             },
 
-            _getColName: function (col) {
+            _getColName: function(col) {
                 return this.cols[col];
             },
-            _getCols: function (cols) {
+            _getCols: function(cols) {
                 return Object.keys(cols);
             },
-            _filterColName: function (col) {
+            _filterColName: function(col) {
                 return col.split("__")[0];
             },
-            _isEditable: function (col) {
+            _isEditable: function(col) {
                 return this.editable.indexOf(col.split("__")[0]) > 0;
             },
-            _add: function (val1, val2) {
+            _add: function(val1, val2) {
                 return parseInt(val1) + parseInt(val2);
             },
-            _isNumber: function (col) {
+            _isNumber: function(col) {
                 if (col.split("__").includes("number"))
                     return "right";
             },
-            _isCurrency: function (col) {
+            _isCurrency: function(col) {
                 if (col.split("__").includes("currency"))
                     return "right";
             },
-            _getCol: function (datum, col) {
+            _getCol: function(datum, col) {
                 formats = col.split("__");
                 col = formats[0]
                 formats = formats.slice(1)
@@ -345,10 +370,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 for (i = 0; i <= formats.length; i++) {
                     format = formats[i];
                     switch (format) {
-                        case "currency": {
-                            return parseFloat(eval('datum.' + col)).toFixed(2);
-                            break;
-                        }
+                        case "currency":
+                            {
+                                return parseFloat(eval('datum.' + col)).toFixed(2);
+                                break;
+                            }
                     }
                 }
 
@@ -356,7 +382,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 return eval('datum.' + col);
             },
 
-            _editRequest: function (event) {
+            _editRequest: function(event) {
                 id = event.target.dataId;
                 params = {};
                 params[event.target.name] = event.target.value;
@@ -374,12 +400,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.refresh = true;
             },
 
-            _deleteRequest: function (event) {
+            _deleteRequest: function(event) {
                 id = event.target.dataId;
                 if (this.deletePage) {
 
-                }
-                else if (this.deleteUrl) {
+                } else if (this.deleteUrl) {
 
                     deleteUrl = this.deleteUrl.replace(":id:", id);
                     this.$.deleteRequest.url = deleteUrl;
@@ -390,24 +415,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.refresh = true;
 
             },
-            deletableLink: function (datum) {
+            deletableLink: function(datum) {
                 if (this.deleteUrl)
                     return this.deleteUrl.replace(":id:", eval('datum.' + this.idRow));
             },
-            _getUpdateUrl: function (datum) {
+            _getUpdateUrl: function(datum) {
                 return "/v1/sales/" + datum.Id;
             },
 
-            _computeCurrency: function (x) {
+            _computeCurrency: function(x) {
                 return parseFloat(x).toFixed(2);
             },
-            _isset: function (value) {
+            _isset: function(value) {
 
                 return value === "";
             },
 
         });
-
     </script>
 
 </dom-module>
