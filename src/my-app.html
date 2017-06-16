@@ -7,30 +7,57 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/app-route/app-location.html">
-<link rel="import" href="../bower_components/app-route/app-route.html">
-<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
-<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
-<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
-<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
-<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
-<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
-<link rel="import" href="../bower_components/app-localize-behavior/app-localize-behavior.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
-<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
-<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import"
+    href="../bower_components/polymer/polymer.html">
+<link rel="import"
+    href="../bower_components/app-route/app-location.html">
+<link rel="import"
+    href="../bower_components/app-route/app-route.html">
+<link rel="import"
+    href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import"
+    href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import"
+    href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import"
+    href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import"
+    href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import"
+    href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import"
+    href="../bower_components/app-localize-behavior/app-localize-behavior.html">
+<link rel="import"
+    href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import"
+    href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import"
+    href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import"
+    href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import"
+    href="../bower_components/paper-item/paper-item.html">
 
-<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import"
+    href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import"
+    href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import"
+    href="../bower_components/paper-item/paper-item.html">
+<link rel="import"
+    href="../bower_components/paper-button/paper-button.html">
+<link rel="import"
+    href="../bower_components/paper-dialog/paper-dialog.html">
 
 
-<link rel="import" href="my-icons.html">
+<link rel="stylesheet"
+    href="/bower_components/bulma/css/bulma.css"
+    type="text/css"
+    media="screen"
+    title="no title"
+    charset="utf-8">
+<link rel="import"
+    href="my-icons.html">
 
 <dom-module id="my-app">
 
@@ -147,7 +174,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
 
     <script>
-
         Polymer({
 
             is: 'my-app',
@@ -177,9 +203,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 /* Overriden from AppLocalizeBehavior */
                 formats: {
                     type: Object,
-                    value: function () {
+                    value: function() {
                         return {
-                            number: {USD: {style: 'currency', currency: 'USD'}}
+                            number: {
+                                USD: {
+                                    style: 'currency',
+                                    currency: 'USD'
+                                }
+                            }
                         };
                     }
                 }
@@ -188,11 +219,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 Polymer.AppLocalizeBehavior
             ],
 
-            attached: function () {
+            attached: function() {
                 this.loadResources(this.resolveUrl('locale.json'));
             },
 
-            computePath: function (page, path) {
+            computePath: function(page, path) {
                 return page + '-' + path;
             },
 
@@ -202,17 +233,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 '_routePathIdChanged(subsubrouteData.id)',
             ],
 
-            _routePageChanged: function (page) {
+            _routePageChanged: function(page) {
                 this.page = page || 'dashboard';
             },
-            _routePathChanged: function (page) {
+            _routePathChanged: function(page) {
                 this.path = page || 'index';
             },
-            _routePathIdChanged: function (page) {
+            _routePathIdChanged: function(page) {
                 this.pathId = page || '1';
             },
 
-            _pageChanged: function (page) {
+            _pageChanged: function(page) {
                 if (page === 'dashboard' || !this.path) {
                     this.path = 'index';
                 }
@@ -220,23 +251,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.importHref(
                     this.resolveUrl(page + '/' + page + '-' + this.path + '.html'), null, null, true);
             },
-            _pathChanged: function (path) {
+            _pathChanged: function(path) {
 
                 // load page import on demand.
                 this.importHref(
                     this.resolveUrl(this.page + '/' + this.page + '-' + path + '.html'), null, null, true);
-            }
-            ,
-            _pathIdChanged: function () {
+            },
+            _pathIdChanged: function() {
                 // load page import on demand.
                 this.importHref(
                     this.resolveUrl(this.page + '/' + this.page + '-' + this.path + '.html'), null, null, true);
             }
 
 
-        })
-        ;
-
+        });
     </script>
 
 </dom-module>

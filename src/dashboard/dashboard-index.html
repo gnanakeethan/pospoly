@@ -11,6 +11,10 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 <link rel="import"
     href="./product-data-table.html">
 
+<link rel="import"
+    href="../printer-engine/printer-engine.html">
+
+
 <dom-module id="dashboard-index">
 
     <template>
@@ -73,11 +77,13 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
         <paper-input disabled
             label="Balance"
             value="{{bill.Balance}}"></paper-input>
+        <printer-engine print-end="http://base.dev/printer?bill_no={{bill.Id}}"></printer-engine>
 
     </div>
     <!--.column-->
     <!--.column-->
     </div>
+
     <iron-ajax content-type="application/json"
         id="createRequest"
         method="POST"
@@ -242,6 +248,7 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
                     }
                 }
                 this.bill.CashPaid = parseFloat(this.bill.CashPaid);
+                this.bill.CardPaid = parseFloat(this.bill.CardPaid);
                 this.$.updateBill.body = this.bill;
                 this.$.updateBill.url = "/v1/bills/" + this.bill.Id
                 this.$.updateBill.generateRequest();

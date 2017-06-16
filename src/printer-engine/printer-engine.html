@@ -1,0 +1,52 @@
+<link rel="import"
+    href="../../bower_components/polymer/polymer.html">
+
+
+<dom-module id="printer-engine">
+    <template>
+        <paper-button on-click="_print" raised>button</paper-button>
+
+        <iron-ajax
+                auto
+                id="mainRequest"
+                debounce-duration="100"
+                auto url="/v1/print/{{billId}}"
+                last-response="{{print}}">
+        </iron-ajax>
+        <iron-ajax id="applyPrint"
+                   content-type="application/json"
+                   url="/v1/?print=[[print_text]]&machine=[[printable_machine]]&printer=[[printable_printer]]&em=[[print_emphasis]]">
+        </iron-ajax>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'printer-engine',
+            properties: {
+                billId: {
+                    type: Number,
+                    value: null
+                },
+            },
+            _print: function() {
+                console.log(this.print);
+                prints = this.print;
+                main.printable_machine = prints[prints.length - 1]['machine'];
+                main.printable_printer = prints[prints.length - 1]['printer'];
+                for (i = 0; i < prints.length - 1; i++) {
+                    console.log(prints[i]['text']);
+                    if (prints[i]['text']) {
+                        main.print_text = encodeURIComponent(prints[i]['text']);
+                        main.print_emphasis = prints[i]['em'];
+                        sleep(75);
+                        main.$.applyPrint.generateRequest();
+                    }
+                }
+
+            }
+
+        });
+    </script>
+
+</dom-module>
