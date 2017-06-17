@@ -8,9 +8,11 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import"
+    href="../../bower_components/polymer/polymer.html">
 
-<link rel="import" href="./product-data-table.html">
+<link rel="import"
+    href="./product-data-table.html">
 
 <dom-module id="dashboard-index">
 
@@ -37,78 +39,79 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <iron-a11y-keys id="a11y" keys="ctrl+1 ctrl+2" target="[[target]]"
                     on-keys-pressed="_setBill"></iron-a11y-keys>
             </template>
-            <!-- .column -->
-            <div class="column">
+    <!-- .column -->
+    <div class="column">
 
-                <product-data-table
-                    id="productdatatable"
-                    url="https://localhost:8443/v1/sales?query=BillId.Id:{{currentBill}}&limit=100&sortby=Id&order=desc"
-                    bill-id="{{currentBill}}"
-                    cold='["Pcode","PName"]'
-                    cols='{"InventoryId.ProductId.ProductCode":"PCode" ,"InventoryId.ProductId.Name":"Product Name","InventoryId.InventoryScale[0].Price__currency":"Price","Units__number":"Qty","InventoryId.InventoryScale[0].ScaleId.Unit":"Unit","Total__currency":"Total"}'
-                    editable='["Units"]'
-                    refresh="{{refresh}}"
-                    id-row="Id"
-                    product-in="{{productList.0}}"
-                    product-list="{{productList}}"
-                    inventory-list="{{inventoryList}}"
-                    quantity-focus="{{quantityFocus}}"
-                    new-product="{{productIdentifier}}"
-                    quantity="{{quantity}}"
-                    get-url="https://localhost:8443/v1/sales/:id:/"
-                    post-url="https://localhost:8443/v1/sales/:id:/"
-                    delete-url="https://localhost:8443/v1/sales/:id:/">
-                </product-data-table>
+        <product-data-table id="productdatatable"
+            url="https://localhost:8443/v1/sales?query=BillId.Id:{{currentBill}}&limit=100&sortby=Id&order=desc"
+            bill-id="{{currentBill}}"
+            cold='["Pcode","PName","]'
+            cols='{"InventoryId.ProductId.ProductCode":"PCode" ,"InventoryId.ProductId.Name":"Product Name","InventoryId.ProductId.Name":"Product Name","InventoryId.InventoryScale[0].Price__currency":"Price","Units__number":"Qty","InventoryId.InventoryScale[0].ScaleId.Unit":"Unit","Total__currency":"Total"}'
 
-            </div>
-            <div class="column is-half">
-                Bill Details
-                {{_computeCurrency(bill.NetTotal)}}
-                {{_computeCurrency(bill.Discount)}}
-                {{_computeCurrency(bill.GrossTotal)}}
-                {{_computeCurrency(bill.Cost)}}
-                {{_computeCurrency(bill.Balance)}}
+            editable='["Units"]'
+            refresh="{{refresh}}"
+            id-row="Id"
+            product-in="{{productList.0}}"
+            product-list="{{productList}}"
+            inventory-list="{{inventoryList}}"
+            quantity-focus="{{quantityFocus}}"
+            new-product="{{productIdentifier}}"
+            quantity="{{quantity}}"
+            get-url="https://localhost:8443/v1/sales/:id:/"
+            post-url="https://localhost:8443/v1/sales/:id:/"
+            delete-url="https://localhost:8443/v1/sales/:id:/">
+        </product-data-table>
 
-            </div>
-            <!--.column-->
-            <!--.column-->
-        </div>
-        <iron-ajax content-type="application/json" id="createRequest" method="POST"
-            last-response="{{createResult}}"></iron-ajax>
-        <iron-ajax
-            auto
-            content-type="application/json"
-            method="get"
+    </div>
+    <div class="column is-half">
+        Bill Details {{_computeCurrency(bill.NetTotal)}} {{_computeCurrency(bill.Discount)}} {{_computeCurrency(bill.GrossTotal)}} {{_computeCurrency(bill.Cost)}} {{_computeCurrency(bill.Balance)}}
+
+    </div>
+    <!--.column-->
+    <!--.column-->
+    </div>
+    <iron-ajax content-type="application/json"
+        id="createRequest"
+        method="POST"
+        last-response="{{createResult}}"></iron-ajax>
+    <iron-ajax auto
+        content-type="application/json"
+        method="get"
+        debounce-duration="200"
+        id="billRequest"
+        url="https://localhost:8443/v1/bills/payable?refresh={{refresh}}"
+        last-response="{{bills}}">
+        <iron-ajax content-type="application/json"
+            method="post"
             debounce-duration="200"
-            id="billRequest"
-            url="https://localhost:8443/v1/bills/payable?refresh={{refresh}}"
-            last-response="{{bills}}">
-            <iron-ajax
-                content-type="application/json"
-                method="post"
-                debounce-duration="200"
-                id="createBill"
-                body="{{billBody}}"
-                on-response="_refreshBill"
-                url="https://localhost:8443/v1/bills/">
-            </iron-ajax>
-            <iron-ajax url="https://localhost:8443/v1/products/bill/?{{searchInput}}"
-                auto
-                on-response="_singleProduct"
-                last-response="{{productList}}">
-            </iron-ajax>
-            <iron-ajax id="inventoryRequest" url="https://localhost:8443/v1/inventories?query=ProductId:{{productList.0.Id}}&limit=100"
-                on-response="_putRecord"
-                last-response="{{inventoryList}}">
-            </iron-ajax>
-            <paper-input hidden id="product_identifier" value="{{productIdentifier}}" autofocus>
-            </paper-input>
-            <template is="dom-if" if="{{_hasMany(productList)}}">
+            id="createBill"
+            body="{{billBody}}"
+            on-response="_refreshBill"
+            url="https://localhost:8443/v1/bills/">
+        </iron-ajax>
+        <iron-ajax url="https://localhost:8443/v1/products/bill/?{{searchInput}}"
+            auto
+            on-response="_singleProduct"
+            last-response="{{productList}}">
+        </iron-ajax>
+        <iron-ajax id="inventoryRequest"
+            url="https://localhost:8443/v1/inventories?query=ProductId:{{productList.0.Id}}&limit=100"
+            on-response="_putRecord"
+            last-response="{{inventoryList}}">
+        </iron-ajax>
+        <paper-input hidden
+            id="product_identifier"
+            value="{{productIdentifier}}"
+            autofocus>
+        </paper-input>
+        <template is="dom-if"
+            if="{{_hasMany(productList)}}">
                 <iron-a11y-keys id="a11y"
                     keys="ctrl+q ctrl+w ctrl+e ctrl+r ctrl+t ctrl+y ctrl+u ctrl+i ctrl+o ctrl+p ctrl+[ ctrl+]"
                     target="[[target]]" on-keys-pressed="_shortcutProduct"></iron-a11y-keys>
             </template>
-            <template is="dom-if" if="{{_hasMany(inventoryList)}}">
+        <template is="dom-if"
+            if="{{_hasMany(inventoryList)}}">
                 <iron-a11y-keys id="a11y"
                     keys="ctrl+q ctrl+w ctrl+e ctrl+r ctrl+t ctrl+y ctrl+u ctrl+i ctrl+o ctrl+p ctrl+[ ctrl+]"
                     target="[[target]]" on-keys-pressed="_shortcutInventory"></iron-a11y-keys>
@@ -116,101 +119,107 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </template>
 
         <script>
+            class DashboardIndex extends Polymer.Element {
+                static get is() {
+                    return "dashboard-index";
+                }
+                static get properties() {
+                    return {
 
-            Polymer({
-
-                is: 'dashboard-index',
-                properties: {
-
-                    productIdentifier: {
-                        type: String,
-                        observer: '_searchInput'
-                    },
-                    bills: {
-                        type: Object,
-                        observer: '_setLastBill'
-                    },
-                    invId: {
-                        type: Number,
-                        observer: '_inventoryWatcher'
-                    },
-                    currentBill: {
-                        type: Number,
-                    },
-                    postUrl: {
-                        type: "String",
-                        value: "https://localhost:8443/v1/sales/:id:/"
-                    },
-                    target: {
-                        type: Object,
-                        value: function () {
-                            return document.body;
+                        productIdentifier: {
+                            type: String,
+                            observer: '_searchInput'
+                        },
+                        bills: {
+                            type: Object,
+                            observer: '_setLastBill'
+                        },
+                        invId: {
+                            type: Number,
+                            observer: '_inventoryWatcher'
+                        },
+                        currentBill: {
+                            type: Number,
+                        },
+                        postUrl: {
+                            type: "String",
+                            value: "https://localhost:8443/v1/sales/:id:/"
+                        },
+                        target: {
+                            type: Object,
+                            value: function() {
+                                return document.body;
+                            }
+                        },
+                        productList: {
+                            type: Object,
+                            observer: '_singleProduct'
+                        },
+                        quantity: {
+                            type: Number,
+                            value: 0,
+                            observer: '_quantityChanged'
+                        },
+                        quantityFocus: {
+                            type: Boolean,
+                            value: false,
+                            reflectToAttribute: true,
+                            notify: true,
+                        },
+                        billBody: {
+                            type: Object,
+                            value: {
+                                "CustomerId": null,
+                                "Cost": 0,
+                                "GrossTotal": 0,
+                                "Discount": 0,
+                                "NetTotal": 0,
+                                "Balance": 0,
+                                "CardPaid": 0,
+                                "CashPaid": 0,
+                                "UserId": {
+                                    "Id": 3,
+                                },
+                                "TerminalId": {
+                                    "Id": 3,
+                                },
+                            }
                         }
-                    },
-                    productList: {
-                        type: Object,
-                        observer: '_singleProduct'
-                    },
-                    quantity: {
-                        type: Number,
-                        value: 0,
-                        observer: '_quantityChanged'
-                    },
-                    quantityFocus: {
-                        type: Boolean,
-                        value: false,
-                        reflectToAttribute: true,
-                        notify: true,
-                    },
-                    billBody: {
-                        type: Object,
-                        value: {
-                            "CustomerId": null,
-                            "Cost": 0,
-                            "GrossTotal": 0,
-                            "Discount": 0,
-                            "NetTotal": 0,
-                            "Balance": 0,
-                            "CardPaid": 0,
-                            "CashPaid": 0,
-                            "UserId": {
-                                "Id": 3,
-                            },
-                            "TerminalId": {
-                                "Id": 3,
-                            },
-                        }
-                    }
 
-                },
-                _refreshBill:function(){
+                    };
+                }
+
+                constructor() {
+                    super();
+                }
+
+                _refreshBill() {
                     console.log(this.refresh);
                     this.$.billRequest.generateRequest();
-                },
+                }
 
-                _hasMany: function (arraylist) {
+                _hasMany(arraylist) {
                     if (arraylist.length <= 1) {
                         return false;
                     }
                     return true;
-                },
-                _getIndex: function (index) {
+                }
+                _getIndex(index) {
                     return index + 1;
-                },
-                _selectProduct: function (event) {
+                }
+                _selectProduct(event) {
                     this.productIdentifier = this.productList[event.target.dataId].Name;
-                },
+                }
 
-                _searchInput: function () {
-                    input = this.productIdentifier;
-                    if (!isNaN(input)) {
-                        this.searchInput = "query=Barcode:" + input;
+                _searchInput() {
+
+                    if (!isNaN(this.productIdentifier)) {
+                        this.searchInput = "query=Barcode:" + this.productIdentifier;
+                    } else {
+                        this.searchInput = "query=Name:" + this.productIdentifier;
                     }
-                    else {
-                        this.searchInput = "query=Name:" + input;
-                    }
-                },
-                _setLastBill: function () {
+                }
+                _setLastBill() {
                     if (!this.bills) {
                         this.$.createBill.generateRequest();
                     } else {
@@ -219,33 +228,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         this.bill = this.bills[0];
                     }
 
-                },
-                _inventoryWatcher: function () {
+                }
+                _inventoryWatcher() {
                     //                this.$.inventoryDialog.close();
                     this.quantityFocus = true;
-                },
-                _quantityChanged: function () {
+                }
+                _quantityChanged() {
                     if (this.quantity > 0 && this.invId)
                         this._putRecordPost(this.invId, parseFloat(this.quantity).toFixed(3));
-                },
-                _shortcutInventory: function (event) {
+                }
+                _shortcutInventory(event) {
                     a = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
                     key = a.indexOf(event.detail.keyboardEvent.key);
                     if (key >= 0 && key <= 10) {
                         this.invId = this.inventoryList[key].Id;
                         this._inventoryWatcher();
                     }
-                },
-                _shortcutProduct: function (event) {
-                    a = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
-                    key = a.indexOf(event.detail.keyboardEvent.key);
+                }
+                _shortcutProduct(event) {
+                    var a = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
+                    var key = a.indexOf(event.detail.keyboardEvent.key);
                     if (key >= 0 && key <= 10) {
                         this.productIdentifier = this.productList[key].Name;
                         this._singleProduct(this.productList)
                     }
 
-                },
-                _setBill: function (event) {
+                }
+                _setBill(event) {
 
                     if (event.target.dataId)
                         this.currentBill = event.target.dataId;
@@ -256,18 +265,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     }
                     this.productIdentifier = "";
                     this.quantity = "";
-                },
-                _singleProduct: function (productList) {
+                }
+                _singleProduct(productList) {
                     if (productList.length === 1) {
                         this.$.inventoryRequest.generateRequest();
                     }
 
 
-                },
-                _putRecord: function (event) {
+                }
+                _putRecord(event) {
                     if ((this.productList[0].Id == event.target.dataId || this.inventoryList[0].ProductId.Id == this.productList[0].Id)) {
-                        delete invId;
-                        invId = null;
+                        // delete invId;
+                        var invId = null;
                         if (this.inventoryList.length == 1 && !event.target.dataId) {
                             invId = this.inventoryList[0].Id;
                         } else if (this.inventoryList.length > 1 && event.target.dataId) {
@@ -277,12 +286,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             this.invId = invId;
                         }
                     }
-                },
-                _putRecordPost: function (invId, units=1.000) {
-                    params = {};
-                    id = this.currentBill;
-                    //                this.$.billRequest.generateRequest();
+                }
+                _putRecordPost(invId, units = 1.000) {
 
+                    var id = this.currentBill;
+
+                    var params = {}
                     params["InventoryId"] = {};
                     params["InventoryId"]["Id"] = invId;
                     params["BillId"] = {};
@@ -290,7 +299,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     params["Units"] = parseFloat(units);
                     params["Discount"] = 0.0;
                     if (this.postUrl) {
-                        postUrl = this.postUrl.replace(":id:/", '');
+                        var postUrl = this.postUrl.replace(":id:/", '');
                         this.$.createRequest.url = postUrl;
                         this.$.createRequest.body = params;
                         this.$.createRequest.generateRequest();
@@ -306,18 +315,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         this.quantityFocus = false;
 
                     }
-                },
-                _computeCurrency: function (x) {
+                }
+                _computeCurrency(x) {
                     return parseFloat(x).toFixed(2);
-                },
-                _isset: function (value) {
+                }
+                _isset(value) {
 
                     return value === "";
                 }
 
 
-            });
-
+            }
+            window.customElements.define(DashboardIndex.is, DashboardIndex);
         </script>
 
-    </dom-module>
+</dom-module>

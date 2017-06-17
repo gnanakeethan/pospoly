@@ -10,6 +10,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
 
@@ -88,6 +90,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             td.table__Total__currency__class {
                 width: 70px;
             }
+            td.ProductName{
+                width:225px;
+            }
 
         </style>
 
@@ -103,8 +108,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                    last-response="{{editResult}}"></iron-ajax>
 
         <iron-a11y-keys id="a11y" keys="enter" target="[[target]]" on-keys-pressed="onEnter"></iron-a11y-keys>
-        <iron-a11y-keys id="a11y" keys="a b c d e f g h i j k l m n o p q r s t u v w x y z" target="[[target]]"
-                        on-keys-pressed="onRandom"></iron-a11y-keys>
         <table>
             <thead>
             <tr class="alternate">
@@ -113,7 +116,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         style$="text-align:{{_isCurrency(col)}}">{{_getColName(col)}}
                     </th>
                 </template>
-                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -130,24 +132,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </paper-input>
 
                 </td>
-                <td></td>
-                <td></td>
-                <td></td>
             </tr>
 
-            <template is="dom-if" if="{{_isset(newProduct)}}">
+            <template is="dom-if" if="{{!newProduct}}">
 
                 <template is="dom-repeat" items="{{data}}" as="datum">
                     <tr class="alternate">
                         <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
                             <td data-id="{{_getCol(datum,idRow)}}"
-                                class$="table__{{col}}__class"
+                                class$="table__{{_getColName(col)}}__class"
                                 style$="text-align:{{_isCurrency(col)}};">
                                 <template is="dom-if" if="{{!_isEditable(col)}}">
                                     {{_getCol(datum,col)}}
                                 </template>
                                 <template is="dom-if" if="{{_isEditable(col)}}">
-                                    <input style$="text-align:{{_isNumber(col)}}" size=4 class$="table__{{col}}__class"
+                                    <input style$="text-align:{{_isNumber(col)}}" size=4 class$="table__{{_getColName(col)}}__class"
                                            data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{_filterColName(col)}}"
                                            value="{{_getCol(datum,col)}}" on-focusout="_editRequest"
                                            data-id="{{_getCol(datum,idRow)}}">
@@ -174,8 +173,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template is="dom-repeat" items="{{productList}}" as="datum">
                     <tr class="alternate">
                         <td>{{datum.ProductCode}}</td>
-                        <td>{{datum.Name}}</td>
-                        <td></td>
+                        <td class="ProductName">{{datum.Name}}</td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -200,150 +198,170 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
 
     <script>
+        class ProductDataTable extends Polymer.Element {
+            static get is() {
+                return 'product-data-table';
+            }
 
-        Polymer({
+            static get properties() {
+                return {
+                    url: {
+                        type: String,
+                        reflectToAttribute: true,
+                    },
+                    loading: {
+                        type: Boolean,
+                        value: true
+                    },
+                    quantity: {
+                        type: Number,
+                        value: 0,
+                        reflectToAttribute: true,
+                        notify: true,
+                    },
+                    quantityFocus: {
+                        type: Boolean,
+                        value: false,
+                        reflectToAttribute: true,
+                        notify: true,
+                        observer: '_quantityWatcher'
+                    },
 
-            is: 'product-data-table',
-            properties: {
-                url: {
-                    type: String,
-                    reflectToAttribute: true,
-                },
-                loading: {
-                    type: Boolean,
-                    value: true
-                },
-                quantity: {
-                    type: Number,
-                    value: 0,
-                    reflectToAttribute: true,
-                    notify: true,
-                },
-                quantityFocus: {
-                    type: Boolean,
-                    value: false,
-                    reflectToAttribute: true,
-                    notify: true,
-                    observer: '_quantityWatcher'
-                },
+                    target: {
+                        type: Object,
+                        value: function () {
+                            return document.body;
+                        }
+                    },
+                    newProduct: {
+                        type: String,
+                        notify: true,
+                        value: null,
+                        reflectToAttribute: true,
+                    },
+                    productIn: {
+                        type: Object,
+                        reflectToAttribute: true
+                    },
+                    billId: {
+                        type: Object,
+                        reflectToAttribute: true,
+                    },
+                    data: {
+                        type: Object,
+                    },
+                    editable: {
+                        type: Object,
+                    },
+                    productList: {
+                        type: Object,
+                    },
+                    inventoryList: {
+                        type: Object,
 
-                target: {
-                    type: Object,
-                    value: function () {
-                        return document.body;
+                    },
+                    cols: {
+                        type: Object,
+                        reflectToAttribute: true
+                    },
+                    editUrl: {
+                        type: String,
+                        reflectToAttribute: true
+                    },
+                    deleteUrl: {
+                        type: String,
+                        reflectToAttribute: true
+                    },
+                    postUrl: {
+                        type: String,
+                        reflectToAttribute: true
+                    },
+                    refresh: {
+                        type: Boolean,
+                        value: false,
+                        reflectToAttribute: true,
+                        notify: true,
+                        observer: "_refreshMain"
+                    },
+                    idRow: {
+                        type: String,
+                        reflectToAttribute: true
                     }
-                },
-                newProduct: {
-                    type: String,
-                    notify: true,
-                    reflectToAttribute: true,
-                },
-                productIn: {
-                    type: Object,
-                    reflectToAttribute: true
-                },
-                billId: {
-                    type: Object,
-                    reflectToAttribute: true,
-                },
-                data: {
-                    type: Object,
-                },
-                editable: {
-                    type: Object,
-                },
-                productList: {
-                    type: Object,
-                },
-                inventoryList: {
-                    type: Object,
+                };
+            }
 
-                },
-                cols: {
-                    type: Object,
-                    reflectToAttribute: true
-                },
-                editUrl: {
-                    type: String,
-                    reflectToAttribute: true
-                },
-                deleteUrl: {
-                    type: String,
-                    reflectToAttribute: true
-                },
-                postUrl: {
-                    type: String,
-                    reflectToAttribute: true
-                },
-                refresh: {
-                    type: Boolean,
-                    value: false,
-                    reflectToAttribute: true,
-                    notify: true,
-                    observer:"_refreshMain"
-                },
-                idRow: {
-                    type: String,
-                    reflectToAttribute: true
-                }
-            },
+            constructor() {
+                super();
+            }
 
-            _refreshMain: function () {
+            _refreshMain() {
                 if (this.refresh)
                     this.refresh = false;
-            },
-            _onRefresh: function () {
+            }
+
+            _onRefresh() {
                 this.refresh = true;
-            },
-            ready: function () {
-            },
-            onRandom: function (event) {
+            }
+
+            onRandom(event) {
+                event.preventDefault();
+                // this.$.product_identifier.focus();
                 key = event.detail.keyboardEvent.key;
+            }
 
+            onEnter() {
                 this.$.product_identifier.focus();
-            },
 
-            onEnter: function () {
-                this.$.product_identifier.focus();
-            },
-            _quantityWatcher: function () {
+            }
+
+            _quantityWatcher() {
                 this.$.product_identifier.focus();
                 if (this.quantityFocus) {
                     this.$.quantity_input.focus();
                 }
 
-            },
+            }
 
-            _getColName: function (col) {
+            _getColName(col) {
                 return this.cols[col];
-            },
-            _getCols: function (cols) {
+            }
+
+            _getCols(cols) {
+                console.log(
+                    'getCols'
+                )
                 return Object.keys(cols);
-            },
-            _filterColName: function (col) {
+            }
+
+            _filterColName(col) {
                 return col.split("__")[0];
-            },
-            _isEditable: function (col) {
+            }
+
+            _isEditable(col) {
                 return this.editable.indexOf(col.split("__")[0]) > 0;
-            },
-            _add: function (val1, val2) {
+            }
+
+            _add(val1, val2) {
                 return parseInt(val1) + parseInt(val2);
-            },
-            _isNumber: function (col) {
+            }
+
+            _isNumber(col) {
                 if (col.split("__").includes("number"))
                     return "right";
-            },
-            _isCurrency: function (col) {
+            }
+
+            _isCurrency(col) {
                 if (col.split("__").includes("currency"))
                     return "right";
-            },
-            _getCol: function (datum, col) {
-                formats = col.split("__");
-                col = formats[0]
-                formats = formats.slice(1)
-                search = ["currency"];
-                for (i = 0; i <= formats.length; i++) {
-                    format = formats[i];
+            }
+
+            _getCol(datum, col) {
+                var formats = col.split("__");
+                var col = formats[0]
+                var formats = formats.slice(1)
+                var search = ["currency"];
+                for (var i = 0; i <= formats.length; i++) {
+                    var format = formats[i];
                     switch (format) {
                         case "currency": {
                             return parseFloat(eval('datum.' + col)).toFixed(2);
@@ -354,9 +372,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
                 return eval('datum.' + col);
-            },
+            }
 
-            _editRequest: function (event) {
+            _editRequest(event) {
                 id = event.target.dataId;
                 params = {};
                 params[event.target.name] = event.target.value;
@@ -372,9 +390,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 sleep(200);
                 this.$.mainRequest.generateRequest();
                 this.refresh = true;
-            },
+            }
 
-            _deleteRequest: function (event) {
+            _deleteRequest(event) {
                 id = event.target.dataId;
                 if (this.deletePage) {
 
@@ -389,24 +407,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
                 this.refresh = true;
 
-            },
-            deletableLink: function (datum) {
+            }
+
+            deletableLink(datum) {
                 if (this.deleteUrl)
                     return this.deleteUrl.replace(":id:", eval('datum.' + this.idRow));
-            },
-            _getUpdateUrl: function (datum) {
-                return "/v1/sales/" + datum.Id;
-            },
+            }
 
-            _computeCurrency: function (x) {
+            _getUpdateUrl(datum) {
+                return "/v1/sales/" + datum.Id;
+            }
+
+            _computeCurrency(x) {
                 return parseFloat(x).toFixed(2);
-            },
-            _isset: function (value) {
+            }
+
+            _isset(value) {
 
                 return value === "";
-            },
-
-        });
+            }
+        }
+        window.customElements.define(ProductDataTable.is, ProductDataTable);
 
     </script>
 

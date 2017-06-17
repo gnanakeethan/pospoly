@@ -21,10 +21,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="my-icons.html">
-<link rel="lazy-import" href="my-view1.html">
-<link rel="lazy-import" href="my-view2.html">
-<link rel="lazy-import" href="my-view3.html">
-<link rel="lazy-import" href="my-view404.html">
 <dom-module id="my-app">
     <template>
         <style> :host {
@@ -81,11 +77,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </app-header>
                 <iron-pages role="main" selected="[[computePath(page,path)]]" attr-for-selected="name">
                     <dashboard-index name="dashboard-index"></dashboard-index>
-                    <products-index name="products-index"></products-index>
-                    <products-create name="products-create"></products-create>
-                    <products-edit name="products-edit" product-id="{{pathId}}"></products-edit>
-                    <purchases-index name="purchases-index"></purchases-index>
-                    <purchases-create name="purchases-create"></purchases-create>
                 </iron-pages>
             </app-header-layout>
         </app-drawer-layout>
