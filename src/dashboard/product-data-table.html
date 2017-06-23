@@ -393,13 +393,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _deleteRequest(event) {
-                id = event.target.dataId;
+                var id = event.target.dataId;
                 if (this.deletePage) {
 
                 }
                 else if (this.deleteUrl) {
 
-                    deleteUrl = this.deleteUrl.replace(":id:", id);
+                    var deleteUrl = this.deleteUrl.replace(":id:", id);
                     this.$.deleteRequest.url = deleteUrl;
                     this.$.deleteRequest.generateRequest();
                     sleep(200);

@@ -24,9 +24,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 /*padding: 10px;*/
             }
 
-            .productList {
-                padding: 0;
-            }
 
 
         </style>
@@ -34,10 +31,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <!-- .columns -->
         <div class="columns">
-
-            <template is="dom-if" if="{{!productIdentifier}}">
-                <iron-a11y-keys id="a11y" keys="ctrl+1 ctrl+2" target="[[target]]"
-                    on-keys-pressed="_setBill"></iron-a11y-keys>
+            <template is="dom-if" if="{{!_isset(productIdentifier)}}">
+                <iron-a11y-keys id="a11y" keys="1 2 3 4 5 6 7 8 9" target="[[target]]"
+                    on-keys-down="_setBill"></iron-a11y-keys>
             </template>
     <!-- .column -->
     <div class="column">
@@ -255,10 +251,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 }
                 _setBill(event) {
+                    this.productIdentifier = "";
 
                     if (event.target.dataId)
                         this.currentBill = event.target.dataId;
-                    if (key = parseInt(event.detail.keyboardEvent.key)) {
+                        console.log(this.currentBill)
+                        var key = parseInt(event.detail.keyboardEvent.key)
+                    if (key) {
                         if (key == 0)
                             key = 10;
                         this.currentBill = this.bills[key - 1].Id;
