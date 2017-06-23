@@ -1,0 +1,299 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="data-table">
+
+    <template>
+        <style>
+            :host {
+                display: block;
+                clear: both;
+                float: none;
+            }
+
+            table {
+                width: 100%;
+                border-spacing: 0px;
+                border-collapse: seperate;
+            }
+
+            table.card {
+                background: white;
+                @apply(--shadow-elevation-2dp);
+                border-radius: 2px;
+            }
+
+            th {
+                font-size: 12px;
+                color: rgba(0, 0, 0, .54);
+                @apply(--paper-font-common-base);
+                @apply(--paper-font-common-nowrap);
+                font-weight: 500;
+                text-align: left;
+                height: 56px;
+                padding-left: 26px;
+                padding-right: 26px;
+            }
+
+            th[data-sorted='asc']::after {
+                content: "(asc)";
+            }
+
+            th[data-sorted='desc']::after {
+                content: "(desc)";
+            }
+
+            tr {
+                height: 48px;
+            }
+
+            td {
+                font-size: 13px;
+                font-weight: normal;
+                color: rgba(0, 0, 0, .87);
+                padding-left: 26px;
+                padding-right: 26px;
+                border-top: 1px solid var(--paper-datatable-divider-color, --divider-color);
+            }
+
+            tr:hover td {
+                background: #ddd;
+            }
+
+        </style>
+
+        <iron-ajax
+            on-response="_checkData"
+            id="mainRequest"
+            auto url="{{url}}&offset={{offset}}&amp;limit={{limit}}&amp;{{sortString}}"
+            last-response="{{data}}"></iron-ajax>
+
+        <iron-ajax id="deleteRequest" method="DELETE"></iron-ajax>
+
+
+
+
+        <table>
+            <thead>
+                <tr>
+                    <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
+                        <th id="sortables" data-column="{{col}}" on-click="_sortToggle">{{_getColName(col)}}</th>
+                    </template>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <template is="dom-if" if="{{!data}}">
+                    <tr>
+                        <b>No Rows to Show</b>
+                    </tr>
+                </template>
+                <template is="dom-repeat" items="{{data}}" as="datum">
+                    <tr>
+                        <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
+                            <td>                            
+                                    {{_getCol(datum,col)}}
+                            </td>
+                        </template>
+                        <td>
+
+                            <paper-button style="background:red;color:white;" on-click="_deleteRequest"
+                                data-id="{{_getCol(datum,idRow)}}">DELETE
+                            </paper-button>
+                            <a href="{{editableLink(datum)}}">
+                                <paper-button>Edit</paper-button>
+                            </a>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+
+        <paper-dropdown-menu value="{{limit}}">
+            <paper-listbox class="dropdown-content">
+                <paper-item>10</paper-item>
+                <paper-item>20</paper-item>
+                <paper-item>50</paper-item>
+                <paper-item>100</paper-item>
+            </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-button on-click="_prevPage">Prev</paper-button>
+        <paper-button on-click="_nextPage">Next</paper-button>
+        Showing Rows from {{_add(offset,1)}} to {{_calculate(page,limit)}} at Page {{page}}
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'data-table',
+            properties: {
+                url: {
+                    type: String,
+                    reflectToAttribute: true
+                },
+                data: {
+                    type: Object,
+                },
+                limit: {
+                    type: Number,
+                    value: 10,
+                    observer: '_limitChanged',
+                },
+                sortString: {
+                    type: String,
+                },
+                sorted: {
+                    type: String,
+                    observer: '_sortedChanged',
+                    reflectToAttribute: true,
+                },
+                page: {
+                    value: 1,
+                    type: Number,
+                    observer: '_pageChanged'
+                },
+                sortables: {
+                    type: Array,
+                    reflectToAttribute: true
+                },
+                cols: {
+                    type: Object,
+                    reflectToAttribute: true
+                },
+                editUrl: {
+                    type: String,
+                    reflectToAttribute: true
+                },
+                deleteUrl: {
+                    type: String,
+                    reflectToAttribute: true
+                },
+                postUrl: {
+                    type: String,
+                    reflectToAttribute: true
+                },
+                sortMode: {
+                    type: String,
+                    reflectToAttribute: true,
+                    value: "asc",
+                },
+                idRow: {
+                    type: String,
+                    reflectToAttribute: true
+                }
+
+            },
+            ready: function () {
+                this._sortedChanged();
+            },
+            _sortedChanged: function () {
+                this.sortString = "order=" + this.sortMode + "&sortby=" + this.sorted;
+            },
+            _getColName: function (col) {
+                return this.cols[col];
+            },
+            _getCols: function (cols) {
+                return Object.keys(cols);
+            },
+            _sortToggle: function (col) {
+                if (sort = this.sortables.indexOf(col.target.dataColumn) >= 0) {
+                    this.sorted = (col.target.dataColumn);
+                    els = document.querySelectorAll('#sortables');
+                    for (var i = 0; i < els.length; i++) {
+                        els[i].removeAttribute("data-sorted");
+                    }
+                    if (this.sortMode == "asc") {
+                        col.target.setAttribute('data-sorted', "desc");
+                        this.sortMode = "desc";
+                    } else {
+                        col.target.setAttribute('data-sorted', "asc");
+                        this.sortMode = "asc";
+                    }
+                    this._sortedChanged();
+                }
+            },
+            _add: function (val1, val2) {
+                return parseInt(val1) + parseInt(val2);
+            },
+            _limitChanged: function (limit) {
+                if (isNaN(this.offset))
+                    this.offset = 0;
+                this.page = parseInt((parseInt(this.offset) + parseInt(this.limit)) / parseInt(this.limit));
+            },
+            _pageChanged: function (page) {
+                this.offset = parseInt(this.limit) * (parseInt(page) - 1);
+            },
+            _calculate: function (page, limit) {
+                return parseInt(page) * parseInt(limit);
+            },
+            _getCol: function (datum, col) {
+                return eval('datum.' + col);
+            },
+            _inCols: function (item) {
+                return this.cols.indexOf(item) >= 0;
+            },
+            _toArray: function (obj) {
+                return Object.keys(obj).map(function (key) {
+                    return {
+                        name: key,
+                        value: obj[key]
+                    };
+                });
+            },
+            _nextPage: function () {
+                if (this.data)
+                    this.page += 1;
+                if (this.page <= 0)
+                    this.page = 1;
+            },
+            _prevPage: function () {
+                this.page -= 1;
+
+                if (this.page <= 0)
+                    this.page = 1;
+            },
+            _deleteRequest: function (event) {
+                id = event.target.dataId;
+                if (this.deletePage) {
+
+                }
+                else if (this.deleteUrl) {
+                    deleteUrl = this.deleteUrl.replace(":id:", id);
+                    this.$.deleteRequest.url = deleteUrl;
+                    this.$.deleteRequest.generateRequest();
+                    this.$.mainRequest.generateRequest();
+                    this.$.mainRequest.generateRequest();
+                }
+
+            },
+            _refreshMain: function () {
+                this.$.mainRequest.generateRequest();
+            },
+
+            editableLink: function (datum) {
+                if (this.editUrl)
+                    return this.editUrl.replace(":id:", eval('datum.' + this.idRow));
+            },
+            deletableLink: function (datum) {
+                if (this.deleteUrl)
+                    return this.deleteUrl.replace(":id:", eval('datum.' + this.idRow));
+            },
+            _checkData: function () {
+
+            }
+        });
+
+    </script>
+
+</dom-module>

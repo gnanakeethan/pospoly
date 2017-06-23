@@ -15,6 +15,7 @@ module.exports = {
     '/index.html',
     '/manifest.json',
     '/bower_components/webcomponentsjs/*',
+    '/bower_components/bulma/css/*'
   ],
   navigateFallback: 'index.html',
 };
