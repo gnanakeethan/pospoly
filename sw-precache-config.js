@@ -14,8 +14,7 @@ module.exports = {
   staticFileGlobs: [
     '/index.html',
     '/manifest.json',
-    '/bower_components/webcomponentsjs/*',
-    '/bower_components/bulma/css/*'
+    '/bower_components/webcomponentsjs/*'
   ],
   navigateFallback: 'index.html',
 };

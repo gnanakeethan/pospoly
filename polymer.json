@@ -8,6 +8,9 @@
     "src/dashboard/product-data-table.html"
 
   ],
+  "sources":[
+    "bower_components/**/*"  
+  ],
   "builds": [
     {
       "name": "bundled",
