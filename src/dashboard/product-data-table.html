@@ -148,7 +148,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <template is="dom-if" if="{{_isEditable(col)}}">
                                     <input style$="text-align:{{_isNumber(col)}}" size=4 class$="table__{{_getColName(col)}}__class"
                                            data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{_filterColName(col)}}"
-                                           value="{{_getCol(datum,col)}}" on-focusout="_editRequest"
+                                           value="{{_getCol(datum,col)}}"
+                                           on-focusout="_editRequest"
                                            data-id="{{_getCol(datum,idRow)}}">
                                     <iron-ajax auto
                                                content-type="application/json"
@@ -338,7 +339,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _isEditable(col) {
-                return this.editable.indexOf(col.split("__")[0]) > 0;
+                // console.log(this.editable.indexOf(col.split("__")[0])>= 0);
+                return this.editable.indexOf(col.split("__")[0]) >= 0;
             }
 
             _add(val1, val2) {
@@ -375,14 +377,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _editRequest(event) {
-                id = event.target.dataId;
-                params = {};
+                var id = event.target.dataId;
+                var params = {};
                 params[event.target.name] = event.target.value;
                 if (!isNaN(event.target.value)) {
                     params[event.target.name] = parseFloat(event.target.value);
                 }
                 if (this.postUrl) {
-                    postUrl = this.postUrl.replace(":id:", id);
+                    var postUrl = this.postUrl.replace(":id:", id);
                     this.$.editRequest.url = postUrl;
                     this.$.editRequest.body = params;
                     this.$.editRequest.generateRequest();

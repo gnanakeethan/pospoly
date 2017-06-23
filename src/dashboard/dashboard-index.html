@@ -39,7 +39,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div class="column">
 
         <product-data-table id="productdatatable"
-            url="https://localhost:8443/v1/sales?query=BillId.Id:{{currentBill}}&limit=100&sortby=Id&order=desc"
+            url="/v1/sales?query=BillId.Id:{{currentBill}}&limit=100&sortby=Id&order=desc"
             bill-id="{{currentBill}}"
             cold='["Pcode","PName","]'
             cols='{"InventoryId.ProductId.ProductCode":"PCode" ,"InventoryId.ProductId.Name":"Product Name","InventoryId.ProductId.Name":"Product Name","InventoryId.InventoryScale[0].Price__currency":"Price","Units__number":"Qty","InventoryId.InventoryScale[0].ScaleId.Unit":"Unit","Total__currency":"Total"}'
@@ -53,9 +53,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             quantity-focus="{{quantityFocus}}"
             new-product="{{productIdentifier}}"
             quantity="{{quantity}}"
-            get-url="https://localhost:8443/v1/sales/:id:/"
-            post-url="https://localhost:8443/v1/sales/:id:/"
-            delete-url="https://localhost:8443/v1/sales/:id:/">
+            get-url="/v1/sales/:id:/"
+            post-url="/v1/sales/:id:/"
+            delete-url="/v1/sales/:id:/">
         </product-data-table>
 
     </div>
@@ -75,7 +75,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         method="get"
         debounce-duration="200"
         id="billRequest"
-        url="https://localhost:8443/v1/bills/payable?refresh={{refresh}}"
+        url="/v1/bills/payable?refresh={{refresh}}"
         last-response="{{bills}}">
         <iron-ajax content-type="application/json"
             method="post"
@@ -83,15 +83,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             id="createBill"
             body="{{billBody}}"
             on-response="_refreshBill"
-            url="https://localhost:8443/v1/bills/">
+            url="/v1/bills/">
         </iron-ajax>
-        <iron-ajax url="https://localhost:8443/v1/products/bill/?{{searchInput}}"
+        <iron-ajax url="/v1/products/bill/?{{searchInput}}"
             auto
             on-response="_singleProduct"
             last-response="{{productList}}">
         </iron-ajax>
         <iron-ajax id="inventoryRequest"
-            url="https://localhost:8443/v1/inventories?query=ProductId:{{productList.0.Id}}&limit=100"
+            url="/v1/inventories?query=ProductId:{{productList.0.Id}}&limit=100"
             on-response="_putRecord"
             last-response="{{inventoryList}}">
         </iron-ajax>
@@ -139,7 +139,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         },
                         postUrl: {
                             type: "String",
-                            value: "https://localhost:8443/v1/sales/:id:/"
+                            value: "/v1/sales/:id:/"
                         },
                         target: {
                             type: Object,
