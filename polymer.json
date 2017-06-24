@@ -9,7 +9,10 @@
 
   ],
   "sources":[
-    "bower_components/**/*"  
+    "bower_components/**/*",
+    "manifest.json",
+    "sw-precache-config.js"
+
   ],
   "builds": [
     {

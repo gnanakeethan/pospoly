@@ -109,16 +109,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <iron-a11y-keys id="a11y" keys="enter" target="[[target]]" on-keys-pressed="onEnter"></iron-a11y-keys>
         <table>
-            <thead>
+
             <tr class="alternate">
                 <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
                     <th id="sortables" data-column="{{col}}" on-click="_sortToggle"
                         style$="text-align:{{_isCurrency(col)}}">{{_getColName(col)}}
                     </th>
                 </template>
+
             </tr>
-            </thead>
-            <tbody>
             <tr class="alternate">
                 <td>
                 </td>
@@ -132,6 +131,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </paper-input>
 
                 </td>
+                <td></td>
+
+
+                <td></td>
+                <td></td>
             </tr>
 
             <template is="dom-if" if="{{!newProduct}}">
@@ -159,7 +163,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 </template>
 
                             </td>
-
                         </template>
                         <td>
                             <paper-button tabindex="-1" data-id="{{datum.Id}}" on-click="_deleteRequest">Delete
@@ -194,7 +197,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </template>
             </template>
 
-            </tbody>
+
         </table>
     </template>
 
@@ -296,12 +299,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _refreshMain() {
-                if (this.refresh)
-                    this.refresh = false;
+                if (this.refresh){
+                    console.log(this.refresh)
+                        this.refresh = false;
+                }
             }
 
             _onRefresh() {
                 this.refresh = true;
+                sleep(500);
             }
 
             onRandom(event) {
