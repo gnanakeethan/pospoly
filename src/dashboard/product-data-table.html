@@ -142,6 +142,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 <template is="dom-repeat" items="{{data}}" as="datum">
                     <tr class="alternate">
+
                         <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
                             <td data-id="{{_getCol(datum,idRow)}}"
                                 class$="table__{{_getColName(col)}}__class"
@@ -163,6 +164,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 </template>
 
                             </td>
+
                         </template>
                         <td>
                             <paper-button tabindex="-1" data-id="{{datum.Id}}" on-click="_deleteRequest">Delete
@@ -299,15 +301,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _refreshMain() {
-                if (this.refresh){
-                    console.log(this.refresh)
-                        this.refresh = false;
-                }
+                if (this.refresh)
+                    this.refresh = false;
             }
 
             _onRefresh() {
                 this.refresh = true;
-                sleep(500);
             }
 
             onRandom(event) {
