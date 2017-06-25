@@ -45,7 +45,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 padding: 5px;
                 vertical-align: middle;
                 font-weight: 900;
-                height: 30px;
+                height: 25px;
                 /*transform: translate(0,0) rotate(270deg);*/
             }
 
@@ -90,8 +90,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             td.table__Total__currency__class {
                 width: 70px;
             }
-            td.ProductName{
-                width:225px;
+
+            td.ProductName {
+                width: 225px;
             }
 
         </style>
@@ -122,18 +123,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <td>
                 </td>
                 <td>
-                    <paper-input no-label-float style="" id="product_identifier" value="{{newProduct}}" autofocus>
-                    </paper-input>
+                    <paper-input no-label-float style="" id="product_identifier" value="{{newProduct}}" autofocus></paper-input>
                 </td>
                 <td></td>
                 <td>
-                    <paper-input id="quantity_input" no-label-float value="{{quantity}}">
-                    </paper-input>
-
+                    <paper-input id="quantity_input" no-label-float value="{{quantity}}"></paper-input>
                 </td>
                 <td></td>
-
-
                 <td></td>
                 <td></td>
             </tr>
@@ -151,7 +147,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     {{_getCol(datum,col)}}
                                 </template>
                                 <template is="dom-if" if="{{_isEditable(col)}}">
-                                    <input style$="text-align:{{_isNumber(col)}}" size=4 class$="table__{{_getColName(col)}}__class"
+                                    <input style$="text-align:{{_isNumber(col)}}" size=4
+                                           class$="table__{{_getColName(col)}}__class"
                                            data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{_filterColName(col)}}"
                                            value="{{_getCol(datum,col)}}"
                                            on-focusout="_editRequest"
@@ -301,8 +298,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _refreshMain() {
-                if (this.refresh)
-                    this.refresh = false;
             }
 
             _onRefresh() {
