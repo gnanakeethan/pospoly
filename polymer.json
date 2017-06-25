@@ -9,7 +9,7 @@
 
   ],
   "sources":[
-    "bower_components/**/*",
+    "bower_components/bulma/**/*",
     "manifest.json",
     "sw-precache-config.js"
 
