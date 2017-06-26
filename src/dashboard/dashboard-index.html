@@ -39,9 +39,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 <product-data-table id="productdatatable"
                                     url="/v1/sales?query=BillId.Id:{{currentBill}}&limit=100&sortby=Id&order=desc"
-                                    bill-id="{{currentBill}}"
+                                    bill="{{bill}}"
                                     cold='["Pcode","PName","]'
-                                    cols='{"InventoryId.ProductId.ProductCode":"PCode" ,"InventoryId.ProductId.Name":"Product Name","InventoryId.ProductId.Name":"Product Name","UnitPrice__currency":"Price","Units__number":"Qty","InventoryId.InventoryScale[0].ScaleId.Unit":"Unit","Discount__currency":"Discount","Total__currency":"Total"}'
+                                    cols='{"InventoryId.ProductId.ProductCode":"PCode" ,"InventoryId.ProductId.Name":"Name","UnitPrice__currency":"Price","Units__number":"Qty","InventoryId.InventoryScale[0].ScaleId.Unit":"Unit","Total__currency":"Total","Discount__currency":"Discount","Amount__currency":"Net"}'
                                     editable='["Units","UnitPrice"]'
                                     refresh="{{refresh}}"
                                     id-row="Id"
@@ -52,7 +52,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     new-product="{{productIdentifier}}"
                                     quantity="{{quantity}}"
                                     get-url="/v1/sales/:id:/"
-                                    post-url="/v1/sales/:id:/"
+                                    post-url="/v1/sales/sqlput/:id:/"
                                     delete-url="/v1/sales/:id:/">
                 </product-data-table>
 
@@ -73,7 +73,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <iron-ajax auto
                    content-type="application/json"
                    method="get"
-                   debounce-duration="200"
+                   debounce-duration="500"
                    id="billRequest"
                    url="/v1/bills/payable?refresh={{refresh}}"
                    last-response="{{bills}}">
@@ -89,6 +89,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </iron-ajax>
         <iron-ajax url="/v1/products/bill/?{{searchInput}}"
                    auto
+                   debounce-duration="50"
                    on-response="_singleProduct"
                    last-response="{{productList}}">
         </iron-ajax>
@@ -200,6 +201,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _refreshBill() {
 
                 this.refresh = false;
+                if(!this.$.billRequest.activeRequests)
                 this.$.billRequest.generateRequest();
             }
 

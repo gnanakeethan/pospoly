@@ -87,13 +87,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 border: none;
             }
 
-            td.table__Total__currency__class {
-                width: 70px;
+            td.table__Total__class {
+                width: 20px;
             }
 
-            td.ProductName {
-                width: 225px;
-            }
 
         </style>
 
@@ -152,12 +149,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                            data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{_filterColName(col)}}"
                                            value="{{_getCol(datum,col)}}"
                                            on-focusout="_editRequest"
+                                           on-load="_onRefresh"
                                            data-id="{{_getCol(datum,idRow)}}">
-                                    <iron-ajax auto
-                                               content-type="application/json"
-                                               url="{{_getUpdateUrl(datum)}}"
-                                               method="PUT"
-                                               on-response="_onRefresh"></iron-ajax>
                                 </template>
 
                             </td>
@@ -169,6 +162,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </td>
                     </tr>
                 </template>
+                <tr>
+                    <th>Total</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th>{{_computeCurrency(bill.GrossTotal)}}</th>
+                    <th>{{_computeCurrency(bill.Discount)}}</th>
+                </tr>
             </template>
 
             <template is="dom-if" if="{{!_isset(newProduct)}}">
@@ -176,7 +178,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template is="dom-repeat" items="{{productList}}" as="datum">
                     <tr class="alternate">
                         <td>{{datum.ProductCode}}</td>
-                        <td class="ProductName">{{datum.Name}}</td>
+                        <td class="table__Name__class">{{datum.Name}}</td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -246,7 +248,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: Object,
                         reflectToAttribute: true
                     },
-                    billId: {
+                    bill: {
                         type: Object,
                         reflectToAttribute: true,
                     },
@@ -382,6 +384,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 params[event.target.name] = event.target.value;
                 if (!isNaN(event.target.value)) {
                     params[event.target.name] = parseFloat(event.target.value);
+                    params["BillId"] = {};
+                    params["BillId"]["Id"] = parseInt(this.bill.Id);
                 }
                 if (this.postUrl) {
                     var postUrl = this.postUrl.replace(":id:", id);
