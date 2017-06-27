@@ -52,7 +52,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     new-product="{{productIdentifier}}"
                                     quantity="{{quantity}}"
                                     get-url="/v1/sales/:id:/"
-                                    post-url="/v1/sales/sqlput/:id:/"
+                                    post-url="/v1/sales/:id:/"
                                     delete-url="/v1/sales/:id:/">
                 </product-data-table>
 
@@ -251,8 +251,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _shortcutInventory(event) {
-                a = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
-                key = a.indexOf(event.detail.keyboardEvent.key);
+                var a = ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p']
+                var key = a.indexOf(event.detail.keyboardEvent.key);
                 if (key >= 0 && key <= 10) {
                     this.invId = this.inventoryList[key].Id;
                     this._inventoryWatcher();
