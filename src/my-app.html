@@ -64,9 +64,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <app-drawer-layout fullbleed force-narrow> <!-- Drawer content -->
             <app-drawer id="drawer" slot="drawer" swipe-open>
                 <app-toolbar>Menu</app-toolbar>
-                <iron-selector selected="{{page}}" attr-for-selected="name" class="drawer-list" role="navigation"><a
-                        name="dashboard" href="#/">View One</a> <a name="products" href="#/products">View Two</a> <a
-                        name="purchases" href="#/purchases">View Three</a></iron-selector>
+                <iron-selector selected="{{page}}" attr-for-selected="name" class="drawer-list" role="navigation">
+                    <a name="dashboard" href="#/">Dashboard</a>
+                    <a name="products" href="#/products">View Two</a>
+                    <a name="purchases" href="#/purchases">View Three</a>
+                </iron-selector>
             </app-drawer> <!-- Main content -->
             <app-header-layout has-scrolling-region>
                 <app-header>
