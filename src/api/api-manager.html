@@ -1,0 +1,59 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="api-manager">
+
+    <template>
+
+        <style></style>
+
+    </template>
+    <script>
+
+        class ApiManager extends Polymer.Element {
+
+            static get is() {
+                return 'api-manager'
+            }
+
+            static get properties() {
+                return {
+                    baseUrl: {
+                        type: String,
+                        reflectToAttribute: true,
+                        value: "http://code62.dev/"
+                    },
+                    dataType: {
+                        type: String,
+                        reflectToAttribute: true,
+                        observer: '_getType'
+                    },
+                    locationUrl: {
+                        type: String,
+                        readOnly: true,
+                        notify: true,
+                        reflectToAttribute: true,
+                    },
+                    locations: {
+                        type: Object,
+                        value: {
+                            "root": "",
+                            "company": "api/company/",
+                            "service_addon": "api/service-addon/",
+                            "service": "api/service/",
+                            "service_type": "api/service-type/",
+                        }
+                    }
+                };
+            }
+
+            _getType() {
+                this._setLocationUrl(this.baseUrl + eval('this.locations.' + this.dataType))
+            }
+            window.customElements.define(ApiManager.is, ApiManager);
+
+
+        }
+
+    </script>
+
+</dom-module>

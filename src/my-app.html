@@ -66,8 +66,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <app-toolbar>Menu</app-toolbar>
                 <iron-selector selected="{{page}}" attr-for-selected="name" class="drawer-list" role="navigation">
                     <a name="dashboard" href="#/">Dashboard</a>
-                    <a name="products" href="#/products">View Two</a>
-                    <a name="purchases" href="#/purchases">View Three</a>
+                    <a name="products" href="#/products">Products</a>
+                    <a name="purchases" href="#/purchases">Purchases</a>
+                    <a name="discounts" href="#/Discounts">Discounts</a>
                 </iron-selector>
             </app-drawer> <!-- Main content -->
             <app-header-layout has-scrolling-region>
@@ -75,10 +76,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <app-toolbar>
                         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
                         <div main-title>My App</div>
+                        <div style="float:right"> <a style="text-decoration: none;color:white;" href="#/account">Account</a>
+                        </div>
                     </app-toolbar>
                 </app-header>
                 <iron-pages role="main" selected="[[computePath(page,path)]]" attr-for-selected="name">
                     <dashboard-index name="dashboard-index"></dashboard-index>
+                    <account-index name="account-index"></account-index>
+                    <authentication-index name="authentication-index"></authentication-index>
                 </iron-pages>
             </app-header-layout>
         </app-drawer-layout>
@@ -162,7 +167,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 // If no page was found in the route data, page will be an empty string.
                 // resort to dashboard view
-                this.page = page || 'dashboard';
+                this.page = page || 'authentication';
 
                 // Close a non-persistent drawer when the page & route are changed.
                 if (!this.$.drawer.persistent) {
