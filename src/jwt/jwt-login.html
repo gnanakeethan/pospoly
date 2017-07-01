@@ -1,0 +1,178 @@
+<link rel="import"
+    href="../../bower_components/polymer/polymer.html">
+<link rel="import"
+    href="../../bower_components/paper-input/paper-input.html">
+<link rel="import"
+    href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import"
+    href="../../bower_components/paper-button/paper-button.html">
+
+<link rel="import"
+    href="../../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import"
+    href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import"
+    href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+
+<dom-module id="jwt-login">
+
+    <template>
+        <style></style>
+        <iron-ajax
+            id="refreshRequest"
+                content-type="application/json"
+                url="{{refreshUrl}}"
+                body='{{tokenObject}}'
+                method="post"
+                on-response="_refreshLogin"
+                last-response="{{tokenObject}}"
+                handle-as="json"></iron-ajax>
+
+        <iron-ajax
+            id="validationRequest"
+                url="{{validateUrl}}"
+                content-type="application/json"
+                body="{{tokenObject}}"
+                method="post"
+                bubbles="true"
+                verbose
+                on-response="_revalidateLogin"
+                last-response="{{tokenObject}}"
+                handle-as="json"></iron-ajax>
+        <iron-ajax
+                id="loginRequest"
+                debounce-duration="500"
+                url="{{authUrl}}"
+                body="{{loginDetails}}"
+                content-type="application/json"
+                method="post"
+                handle-as="json"
+                on-error="_loginError"
+                on-response="_loginSuccess"
+                last-response="{{tokenObject}}">
+        </iron-ajax>
+        <paper-dialog
+
+                id="loginBox"
+                modal
+                always-on-top
+                restore-focus-on-close
+                auto-fit-on-attach>
+
+            <h1>Login Form</h1>
+            <paper-input autofocus id="username" type="text" label="Username" value="{{username}}"></paper-input>
+            <paper-input id="password" type="password" label="Password" value="{{password}}"></paper-input>
+
+            <div style="margin-top:20px;" class="buttons">
+                <a href="#!/register" target="_top">
+                    <paper-button raised>Register</paper-button>
+                </a>
+                <paper-button
+                        on-click="submitLogin"
+                        raised>
+                    Login
+                </paper-button>
+            </div>
+        </paper-dialog>
+    </template>
+    <script>
+        Polymer({
+
+            is: 'jwt-login',
+            properties: {
+                authUrl: {
+                    type: String
+                },
+                username: {
+                    type: String,
+                    value: "gnanakeethan"
+                },
+                password: {
+                    type: String,
+                    value: "JuPo"
+                },
+
+                loginPopup: {
+                    type: Boolean,
+                    reflectToAttribute: true,
+                    value: true
+                },
+                validateUrl: {
+                    type: String
+                },
+                refreshUrl: {
+                    type: String
+                },
+                token: {
+                    type: String,
+                },
+                tokenObject: {
+                    type: Object,
+                    notify: true,
+                    observer: '_putToken',
+                    reflectToAttribute: true,
+                },
+                loginDetails: {
+                    type: Object,
+                    computed: '_getParams(username,password)'
+                },
+
+            },
+            attributeChanged: function() {
+                if (this.tokenObject.success)
+                    this.$.validationRequest.generateRequest();
+                    this._showLogin();
+            },
+            attached: function() {
+                this.$.validationRequest.generateRequest();
+                this._refreshLogin();
+            },
+            _revalidateLogin: function(e, request) {
+                this.debounce('validationRequest', this._validationRequest, 3000);
+            },
+            _refreshLogin: function() {
+                this.debounce('refreshRequest', this._refreshRequest, 120000);
+            },
+            _refreshRequest: function() {
+                this.$.refreshRequest.generateRequest();
+            },
+            _validationRequest: function() {
+                if (this.tokenObject.success)
+                    this.$.validationRequest.generateRequest();
+            },
+            _showLogin: function() {
+                if (!this.tokenObject.success) {
+                    this.$.loginBox.open();
+                } else {
+                    this.$.loginBox.close();
+                }
+            },
+            submitLogin: function() {
+                this.$.loginRequest.generateRequest();
+            },
+            _loginError: function() {
+                this.loginError = true;
+            },
+            _loginSuccess: function() {
+                console.log('done');
+                this.password = "";
+                this.$.loginBox.close();
+                this._revalidateLogin();
+            },
+            _putToken: function() {
+                this.token = this.tokenObject.token;
+                if (!this.tokenObject.success) {
+                    this._showLogin();
+                }
+            },
+            _getParams: function(username, password) {
+                ko = {
+                    "username": username,
+                    "password": password
+                };
+                return ko;
+            },
+        });
+    </script>
+
+</dom-module>

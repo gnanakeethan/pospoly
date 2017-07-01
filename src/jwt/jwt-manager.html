@@ -1,0 +1,82 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+
+<link rel="import" href="./jwt-login.html">
+
+<dom-module id="jwt-manager">
+
+  <template>
+
+    <style></style>
+    <jwt-login
+      id="{{loginId}}"
+      login-popup="{{loginPopup}}"
+      validate-url="{{validateUrl}}"
+      refresh-url="{{refreshUrl}}"
+      auth-url="{{authUrl}}"
+      token-object="{{tokenObject}}"></jwt-login>
+    <app-localstorage-document key="tokenObject" data="{{tokenObject}}"></app-localstorage-document>
+
+  </template>
+  <script>
+
+    Polymer({
+
+      is: 'jwt-manager',
+      properties: {
+        loginId:{
+          type:String,
+          value:"jwtChildLogin"
+        },
+        authUrl:{
+          type: String,
+          value:"/v1/auth/"
+        },
+        validateUrl:{
+          type:String,
+          value:"/v1/auth/validate"
+        },
+        refreshUrl:{
+          type:String,
+          value:"/v1/auth/refresh"
+        },
+        loginPopup:{
+          type:Boolean,
+          reflectToAttribute:true,
+          value:false
+        },
+        token: {
+          type: String,
+          reflectToAttribute: true,
+          readOnly:true,
+          value:'null',
+          notify:true
+        },
+        headers:{
+          type:Object,
+          notify:true,
+          reflectToAttribute: true,
+          readOnly:true
+        },
+        tokenObject:{
+          type:Object,
+          notify:true,
+          reflectToAttribute: true,
+          observer: '_TokenChanged'
+        }
+
+      },
+      _TokenChanged: function(){
+        headers = {
+          "Authorization":this.tokenObject.token
+        };
+        this._setHeaders(headers);
+        this._setToken(this.tokenObject.token);
+      },
+
+
+    });
+
+  </script>
+
+</dom-module>

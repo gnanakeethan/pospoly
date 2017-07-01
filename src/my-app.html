@@ -21,6 +21,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="my-icons.html">
+<link rel="import"      href="jwt/jwt-manager.html">
+<link rel="import"      href="jwt/jwt-detail.html">
 <dom-module id="my-app">
     <template>
         <style> :host {
@@ -54,6 +56,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             color: black;
             font-weight: bold;
         } </style>
+
+        <jwt-manager
+                id="jwtRoot"
+                login-id="jwtRootLogin"
+                login-popup="true">
+        </jwt-manager>
+        <jwt-detail token-object={{tokenObject}}></jwt-detail>
+
         <app-location route="{{route}}" use-hash-as-path></app-location>
         <app-route use-hash-as-path route="{{route}}" pattern="/:page" data="{{routeData}}"
                    tail="{{subroute}}"></app-route>
@@ -113,6 +123,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         reflectToAttribute: false,
                         observer: '_pathIdChanged'
                     },
+                    tokenObject:{
+                        type:Object,
+                        reflectToAttribute:false,
+                        observer:'_tokenChanged'
+                    },
+
+
                     /* Overriden from AppLocalizeBehavior */
                     language: {
                         value: 'en',
@@ -167,7 +184,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 // If no page was found in the route data, page will be an empty string.
                 // resort to dashboard view
-                this.page = page || 'authentication';
+                this.page = page || 'dashboard';
 
                 // Close a non-persistent drawer when the page & route are changed.
                 if (!this.$.drawer.persistent) {
@@ -220,6 +237,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 // load page import on demand.
                 Polymer.importHref(
                     this.resolveUrl(this.page + '/' + this.page + '-' + this.path + '.html'), null, null, true);
+            }
+            _tokenChanged(){
             }
         }
 
