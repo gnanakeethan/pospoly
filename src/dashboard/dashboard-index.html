@@ -28,7 +28,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         </style>
 
-        <jwt-detail headers="{{headers}}"></jwt-detail>
+        <jwt-detail headers="{{headers}}" token-object="{{tokenObject}}"></jwt-detail>
 
         <template is="dom-if" if="{{!_isset(productIdentifier)}}">
             <iron-a11y-keys id="a11y" keys="1 2 3 4 5 6 7 8 9" target="[[target]]"

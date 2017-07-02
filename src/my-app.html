@@ -20,6 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/f-jwt-decode/f-jwt-decode.html">
 <link rel="import" href="my-icons.html">
 <link rel="import"      href="jwt/jwt-manager.html">
 <link rel="import"      href="jwt/jwt-detail.html">
@@ -63,6 +64,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 login-popup="true">
         </jwt-manager>
         <jwt-detail token-object={{tokenObject}}></jwt-detail>
+        <f-jwt-decode token="{{tokenObject.token}}" value="{{decoded}}"></f-jwt-decode>
+
 
         <app-location route="{{route}}" use-hash-as-path></app-location>
         <app-route use-hash-as-path route="{{route}}" pattern="/:page" data="{{routeData}}"
@@ -85,8 +88,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <app-header style="height:72px" condenses reveals slot="header" effects="waterfall">
                     <app-toolbar  style="height:48px">
                         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-                        <div main-title>My App</div>
-                        <div style="float:right"> <a style="text-decoration: none;color:white;" href="#/account">Account</a>
+                        <div main-title>My App
+                        </div>
+                        <div style="float:right"> <a style="text-decoration: none;color:white;" href="#/account">Account
+                        {{decoded.exp}}</a>
                         </div>
                     </app-toolbar>
                 </app-header>
