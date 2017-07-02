@@ -1,35 +1,37 @@
 <link rel="import"
-    href="../../bower_components/polymer/polymer.html">
+      href="../../bower_components/polymer/polymer.html">
 <link rel="import"
-    href="../../bower_components/paper-input/paper-input.html">
+      href="../../bower_components/paper-input/paper-input.html">
 <link rel="import"
-    href="../../bower_components/paper-dialog/paper-dialog.html">
+      href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import"
-    href="../../bower_components/paper-button/paper-button.html">
+      href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="/bower_components/f-jwt-decode/f-jwt-decode.html">
 
+<script src="/bower_components/moment/moment.js"></script>
+<script src="/bower_components/moment-timezone/moment-timezone.js"></script>
 <link rel="import"
-    href="../../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
+      href="../../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
 <link rel="import"
-    href="../../bower_components/iron-ajax/iron-ajax.html">
+      href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import"
-    href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+      href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 
 <dom-module id="jwt-login">
 
     <template>
         <style></style>
         <iron-ajax
-            id="refreshRequest"
+                id="refreshRequest"
                 content-type="application/json"
                 url="{{refreshUrl}}"
                 body='{{tokenObject}}'
                 method="post"
-                on-response="_refreshLogin"
                 last-response="{{tokenObject}}"
                 handle-as="json"></iron-ajax>
 
         <iron-ajax
-            id="validationRequest"
+                id="validationRequest"
                 url="{{validateUrl}}"
                 content-type="application/json"
                 body="{{tokenObject}}"
@@ -49,6 +51,8 @@
                 on-response="_loginSuccess"
                 last-response="{{tokenObject}}">
         </iron-ajax>
+        <f-jwt-decode token="{{tokenObject.token}}" value="{{decoded}}"></f-jwt-decode>
+
         <paper-dialog
 
                 id="loginBox"
@@ -109,7 +113,7 @@
                     notify: true,
                     observer: '_putToken',
                     reflectToAttribute: true,
-                    value:{success:false,token:""}
+                    value: {success: false, token: ""}
                 },
                 loginDetails: {
                     type: Object,
@@ -117,53 +121,56 @@
                 },
 
             },
-            attributeChanged: function() {
+            attributeChanged: function () {
                 if (this.tokenObject.success) {
                     this.$.validationRequest.generateRequest();
                     this._showLogin();
                 }
             },
-            attached: function() {
+            attached: function () {
                 this.$.validationRequest.generateRequest();
-                this._refreshLogin();
             },
-            _revalidateLogin: function(e, request) {
-                this.debounce('validationRequest', this._validationRequest, 10000);
+            _revalidateLogin: function (e, request) {
+                if(this.tokenObject.success){
+                    var current=Date.now() / 1000 | 0;
+                    var valid_for = this.decoded.exp - this.decoded.nbf;
+
+                    this.debounce('validationRequest', this._validationRequest, (valid_for/10)*1000);
+                    if(this.decoded.exp-(valid_for/5) <= current){
+                        this.$.refreshRequest.generateRequest();
+                    }
+                }
             },
-            _refreshLogin: function() {
-                this.debounce('refreshRequest', this._refreshRequest, 120000);
-            },
-            _refreshRequest: function() {
-                this.$.refreshRequest.generateRequest();
-            },
-            _validationRequest: function() {
-                if (this.tokenObject.success)
+            _validationRequest: function () {
+                if (this.tokenObject.success){
                     this.$.validationRequest.generateRequest();
+                }
+
             },
-            _showLogin: function() {
+            _showLogin: function () {
                 if (!this.tokenObject.success) {
                     this.$.loginBox.open();
                 } else {
                     this.$.loginBox.close();
                 }
             },
-            submitLogin: function() {
+            submitLogin: function () {
                 this.$.loginRequest.generateRequest();
             },
-            _loginError: function() {
+            _loginError: function () {
                 this.loginError = true;
             },
-            _loginSuccess: function() {
+            _loginSuccess: function () {
                 console.log('done');
                 this.password = "";
                 this.$.loginBox.close();
                 this._revalidateLogin();
             },
-            _putToken: function() {
+            _putToken: function () {
                 this.token = this.tokenObject.token;
-                    this._showLogin();
+                this._showLogin();
             },
-            _getParams: function(username, password) {
+            _getParams: function (username, password) {
                 ko = {
                     "username": username,
                     "password": password
