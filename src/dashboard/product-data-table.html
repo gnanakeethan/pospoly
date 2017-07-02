@@ -8,12 +8,19 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import"
+    href="../../bower_components/polymer/polymer.html">
+<link rel="import"
+    href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import"
+    href="../../bower_components/paper-input/paper-input.html">
+<link rel="import"
+    href="../../bower_components/paper-button/paper-button.html">
+<link rel="import"
+    href="../jwt/jwt-detail.html">
 
-<link rel="import" href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import"
+    href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
 
 <dom-module id="product-data-table">
 
@@ -90,16 +97,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 width: 20px;
             }
         </style>
+        <jwt-detail headers="{{headers}}"></jwt-detail>
 
         <iron-ajax
+            auto
                 id="mainRequest"
                 debounce-duration="100"
-                auto url="{{url}}&refresh={{refresh}}"
+                url="{{url}}&refresh={{refresh}}"
+                headers="{{headers}}"
                 last-response="{{data}}"></iron-ajax>
 
-        <iron-ajax id="deleteRequest" method="DELETE"></iron-ajax>
+        <iron-ajax
+        headers="{{headers}}"
+        id="deleteRequest" method="DELETE"></iron-ajax>
         <iron-ajax content-type="application/json" id="editRequest" method="PUT"
                    debounce-duration="300"
+                   headers="{{headers}}"
                    last-response="{{editResult}}"></iron-ajax>
 
         <iron-a11y-keys id="a11y" keys="enter" target="[[target]]" on-keys-pressed="onEnter"></iron-a11y-keys>
@@ -112,23 +125,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </th>
                 </template>
 
-            </tr>
-            <tr class="alternate">
-                <td>
-                </td>
-                <td>
-                    <paper-input no-label-float style="" id="product_identifier" value="{{newProduct}}" autofocus></paper-input>
-                </td>
-                <td></td>
-                <td>
-                    <paper-input id="quantity_input" no-label-float value="{{quantity}}"></paper-input>
-                </td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
+    </tr>
+    <tr class="alternate">
+        <td>
+        </td>
+        <td>
+            <paper-input no-label-float
+                style=""
+                id="product_identifier"
+                value="{{newProduct}}"
+                autofocus></paper-input>
+        </td>
+        <td></td>
+        <td>
+            <paper-input id="quantity_input"
+                no-label-float
+                value="{{quantity}}"></paper-input>
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
 
-            <template is="dom-if" if="{{!newProduct}}">
+    <template is="dom-if"
+        if="{{!newProduct}}">
 
                 <template is="dom-repeat" items="{{data}}" as="datum">
                     <tr class="alternate">
@@ -140,7 +160,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <template is="dom-if" if="{{!_isEditable(col)}}">
                                     {{_getCol(datum,col)}}
                                 </template>
-                                <template is="dom-if" if="{{_isEditable(col)}}">
+    <template is="dom-if"
+        if="{{_isEditable(col)}}">
                                     <input style$="text-align:{{_isNumber(col)}}" size=4
                                            class$="table__{{_getColName(col)}}__class"
                                            data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{_filterColName(col)}}"
@@ -150,27 +171,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                            data-id="{{_getCol(datum,idRow)}}">
                                 </template>
 
-                            </td>
+    </td>
 
-                        </template>
-                        <td>
-                            <paper-button tabindex="-1" data-id="{{datum.Id}}" on-click="_deleteRequest">Delete
-                            </paper-button>
-                        </td>
-                    </tr>
-                </template>
-                <tr>
-                    <th>Total</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th>{{_computeCurrency(bill.GrossTotal)}}</th>
-                    <th>{{_computeCurrency(bill.Discount)}}</th>
-                </tr>
-            </template>
+    </template>
+    <td>
+        <paper-button tabindex="-1"
+            data-id="{{datum.Id}}"
+            on-click="_deleteRequest">Delete
+        </paper-button>
+    </td>
+    </tr>
+    </template>
+    <tr>
+        <th>Total</th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th>{{_computeCurrency(bill.GrossTotal)}}</th>
+        <th>{{_computeCurrency(bill.Discount)}}</th>
+    </tr>
+    </template>
 
-            <template is="dom-if" if="{{!_isset(newProduct)}}">
+    <template is="dom-if"
+        if="{{!_isset(newProduct)}}">
 
                 <template is="dom-repeat" items="{{productList}}" as="datum">
                     <tr class="alternate">
@@ -182,7 +206,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <td class="delete-button"></td>
                     </tr>
                 </template>
-                <template is="dom-repeat" items="{{inventoryList}}" as="datum">
+    <template is="dom-repeat"
+        items="{{inventoryList}}"
+        as="datum">
                     <tr class="alternate">
                         <td></td>
                         <td>{{datum.BatchNo}}</td>
@@ -193,10 +219,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <td class="delete-button"></td>
                     </tr>
                 </template>
-            </template>
+    </template>
 
 
-        </table>
+    </table>
     </template>
 
     <script>
@@ -231,7 +257,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                     target: {
                         type: Object,
-                        value: function () {
+                        value: function() {
                             return document.body;
                         }
                     },
@@ -296,8 +322,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 super();
             }
 
-            _refreshMain() {
-            }
+            _refreshMain() {}
 
             _onRefresh() {
                 this.refresh = true;
@@ -364,10 +389,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 for (var i = 0; i <= formats.length; i++) {
                     var format = formats[i];
                     switch (format) {
-                        case "currency": {
-                            return parseFloat(eval('datum.' + col)).toFixed(2);
-                            break;
-                        }
+                        case "currency":
+                            {
+                                return parseFloat(eval('datum.' + col)).toFixed(2);
+                                break;
+                            }
                     }
                 }
 
@@ -399,8 +425,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 var id = event.target.dataId;
                 if (this.deletePage) {
 
-                }
-                else if (this.deleteUrl) {
+                } else if (this.deleteUrl) {
 
                     var deleteUrl = this.deleteUrl.replace(":id:", id);
                     this.$.deleteRequest.url = deleteUrl;
@@ -431,7 +456,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
         }
         window.customElements.define(ProductDataTable.is, ProductDataTable);
-
     </script>
 
 </dom-module>

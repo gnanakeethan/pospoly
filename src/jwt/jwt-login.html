@@ -34,8 +34,6 @@
                 content-type="application/json"
                 body="{{tokenObject}}"
                 method="post"
-                bubbles="true"
-                verbose
                 on-response="_revalidateLogin"
                 last-response="{{tokenObject}}"
                 handle-as="json"></iron-ajax>
@@ -111,6 +109,7 @@
                     notify: true,
                     observer: '_putToken',
                     reflectToAttribute: true,
+                    value:{success:false,token:""}
                 },
                 loginDetails: {
                     type: Object,
@@ -119,9 +118,10 @@
 
             },
             attributeChanged: function() {
-                if (this.tokenObject.success)
+                if (this.tokenObject.success) {
                     this.$.validationRequest.generateRequest();
                     this._showLogin();
+                }
             },
             attached: function() {
                 this.$.validationRequest.generateRequest();
@@ -131,7 +131,7 @@
                 this.debounce('validationRequest', this._validationRequest, 3000);
             },
             _refreshLogin: function() {
-                this.debounce('refreshRequest', this._refreshRequest, 120000);
+                this.debounce('refreshRequest', this._refreshRequest, 9000);
             },
             _refreshRequest: function() {
                 this.$.refreshRequest.generateRequest();
@@ -161,9 +161,7 @@
             },
             _putToken: function() {
                 this.token = this.tokenObject.token;
-                if (!this.tokenObject.success) {
                     this._showLogin();
-                }
             },
             _getParams: function(username, password) {
                 ko = {

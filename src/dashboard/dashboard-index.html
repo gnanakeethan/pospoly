@@ -13,6 +13,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import"
       href="./product-data-table.html">
+      <link rel="import" href="../jwt/jwt-detail.html">
 
 <dom-module id="dashboard-index">
 
@@ -27,6 +28,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         </style>
 
+        <jwt-detail headers="{{headers}}"></jwt-detail>
 
         <!-- .columns -->
         <div class="columns">
@@ -69,8 +71,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <iron-ajax content-type="application/json"
                    id="createRequest"
                    method="POST"
+                   headers="{{headers}}"
+
+
                    last-response="{{createResult}}"></iron-ajax>
         <iron-ajax auto
+        headers="{{headers}}"
+
                    content-type="application/json"
                    method="get"
                    debounce-duration="500"
@@ -81,6 +88,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <iron-ajax content-type="application/json"
                    method="post"
+                   headers="{{headers}}"
                    debounce-duration="200"
                    id="createBill"
                    body="{{billBody}}"
@@ -90,16 +98,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <iron-ajax url="/v1/products/bill/?{{searchInput}}"
                    auto
                    debounce-duration="50"
+                   headers="{{headers}}"
                    on-response="_singleProduct"
                    last-response="{{productList}}">
         </iron-ajax>
         <iron-ajax id="inventoryRequest"
                    url="/v1/inventories?query=ProductId:{{productList.0.Id}}&limit=100"
+                   headers="{{headers}}"
                    on-response="_putRecord"
                    last-response="{{inventoryList}}">
         </iron-ajax>
         <paper-input hidden
                      id="product_identifier"
+                     headers="{{headers}}"
                      value="{{productIdentifier}}"
                      autofocus>
         </paper-input>
@@ -125,7 +136,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             static get properties() {
                 return {
-
                     productIdentifier: {
                         type: String,
                         observer: '_searchInput'

@@ -1,9 +1,11 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import"
+    href="../../bower_components/polymer/polymer.html">
+<link rel="import"
+    href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 
 <dom-module id="jwt-detail">
 
-  <template>
+    <template>
 
     <style>
       :host {
@@ -38,55 +40,55 @@
     <app-localstorage-document key="tokenObject" data="{{tokenObj}}"></app-localstorage-document>
   </template>
 
-  <script>
+    <script>
+        Polymer({
 
-    Polymer({
+            is: 'jwt-detail',
+            properties: {
+                token: {
+                    type: String,
+                    reflectToAttribute: true,
+                    readOnly: true,
+                    value: null,
+                    notify: true
+                },
+                headers: {
+                    type: Object,
+                    notify: true,
+                    reflectToAttribute: true,
+                    readOnly: true
+                },
 
-      is: 'jwt-detail',
-      properties: {
-        token: {
-          type: String,
-          reflectToAttribute: true,
-          readOnly:true,
-          value:'null',
-          notify:true
-        },
-        headers:{
-          type:Object,
-          notify:true,
-          reflectToAttribute: true,
-          readOnly:true
-        },
+                tokenObj: {
+                    type: Object,
+                    observer: '_tokenObjChanged',
+                    value: null
+                },
 
-        tokenObj:{
-          type:Object,
-          observer: '_tokenObjChanged',
-          value:{"token":null}
-        },
+                tokenObject: {
+                    type: Object,
+                    notify: true,
+                    readOnly: true,
+                    reflectToAttribute: true,
+                    observer: '_tokenChanged',
+                    value: null,
+                },
 
-        tokenObject:{
-          type:Object,
-          notify:true,
-          readOnly:true,
-          reflectToAttribute: true,
-          observer: '_tokenChanged',
-          value:{"token":null}
-        },
+            },
+            _tokenObjChanged: function() {
+                this._setTokenObject(this.tokenObj);
+            },
+            _tokenChanged: function() {
+                headers = {
+                    "Authorization": this.tokenObject.token
+                };
+                if (this.token != this.tokenObj.token)
+                    this._setHeaders(headers);
+                    this._setToken(this.tokenObj.token);
 
-      },
-      _tokenObjChanged:function(){
-        this._setTokenObject(this.tokenObj);
-      },
-      _tokenChanged: function(){
-        headers = {
-          "Authorization":this.tokenObject.token
-        };
-        this._setHeaders(headers);
-        this._setToken(this.tokenObject.token);
-      },
+            },
 
-    });
-
-  </script>
+        });
+    </script>
 
 </dom-module>
