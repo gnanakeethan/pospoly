@@ -131,7 +131,7 @@
                 this.debounce('validationRequest', this._validationRequest, 3000);
             },
             _refreshLogin: function() {
-                this.debounce('refreshRequest', this._refreshRequest, 9000);
+                this.debounce('refreshRequest', this._refreshRequest, 120000);
             },
             _refreshRequest: function() {
                 this.$.refreshRequest.generateRequest();
