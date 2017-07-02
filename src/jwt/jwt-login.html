@@ -128,10 +128,10 @@
                 this._refreshLogin();
             },
             _revalidateLogin: function(e, request) {
-                this.debounce('validationRequest', this._validationRequest, 3000);
+                this.debounce('validationRequest', this._validationRequest, 10000);
             },
             _refreshLogin: function() {
-                this.debounce('refreshRequest', this._refreshRequest, 120000);
+                this.debounce('refreshRequest', this._refreshRequest, 1200000);
             },
             _refreshRequest: function() {
                 this.$.refreshRequest.generateRequest();
