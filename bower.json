@@ -26,7 +26,8 @@
     "paper-styles": "*",
     "app-storage": "2.0-preview",
     "paper-dialog-scrollable": "2.0-preview",
-    "f-jwt-decode": "^2.0.2"
+    "f-jwt-decode": "^2.0.2",
+    "moment-timezone": "^0.5.13"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0-prerelease.7"

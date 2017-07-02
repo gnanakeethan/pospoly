@@ -24,6 +24,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="my-icons.html">
 <link rel="import"      href="jwt/jwt-manager.html">
 <link rel="import"      href="jwt/jwt-detail.html">
+<script src="../bower_components/moment/moment.js"></script>
+<script src="../bower_components/moment-timezone/moment-timezone.js"></script>
 <dom-module id="my-app">
     <template>
         <style> :host {
@@ -91,7 +93,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <div main-title>My App
                         </div>
                         <div style="float:right"> <a style="text-decoration: none;color:white;" href="#/account">Account
-                        {{decoded.exp}}</a>
+                        {{_getTime(decoded.exp)}}</a>
                         </div>
                     </app-toolbar>
                 </app-header>
@@ -244,6 +246,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.resolveUrl(this.page + '/' + this.page + '-' + this.path + '.html'), null, null, true);
             }
             _tokenChanged(){
+            }
+            _getTime(exp){
+                if(exp){
+                var momentd = moment.unix(exp).toString();
+                console.log(momentd)
+            }
+
             }
         }
 
