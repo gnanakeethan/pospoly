@@ -81,9 +81,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <a name="discounts" href="#/Discounts">Discounts</a>
                 </iron-selector>
             </app-drawer> <!-- Main content -->
-            <app-header-layout has-scrolling-region>
-                <app-header>
-                    <app-toolbar>
+            <app-header-layout fullbleed has-scrolling-region>
+                <app-header style="height:72px" condenses reveals slot="header" effects="waterfall">
+                    <app-toolbar  style="height:48px">
                         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
                         <div main-title>My App</div>
                         <div style="float:right"> <a style="text-decoration: none;color:white;" href="#/account">Account</a>

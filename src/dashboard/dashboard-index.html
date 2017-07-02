@@ -13,12 +13,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import"
       href="./product-data-table.html">
-      <link rel="import" href="../jwt/jwt-detail.html">
-
+<link rel="import" href="../jwt/jwt-detail.html">
+<link rel="import" href="/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <dom-module id="dashboard-index">
-
     <template>
-
+        <!-- import classes in an element -->
+        <style include="iron-flex iron-flex-alignment"></style>
         <style>
             :host {
                 display: block;
@@ -30,14 +30,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <jwt-detail headers="{{headers}}"></jwt-detail>
 
+        <template is="dom-if" if="{{!_isset(productIdentifier)}}">
+            <iron-a11y-keys id="a11y" keys="1 2 3 4 5 6 7 8 9" target="[[target]]"
+                            on-keys-down="_setBill"></iron-a11y-keys>
+        </template>
         <!-- .columns -->
-        <div class="columns">
-            <template is="dom-if" if="{{!_isset(productIdentifier)}}">
-                <iron-a11y-keys id="a11y" keys="1 2 3 4 5 6 7 8 9" target="[[target]]"
-                                on-keys-down="_setBill"></iron-a11y-keys>
-            </template>
+        <div class="layout horizontal">
             <!-- .column -->
-            <div class="column">
+            <div class="flex">
 
                 <product-data-table id="productdatatable"
                                     url="/v1/sales?query=BillId.Id:{{currentBill}}&limit=100&sortby=Id&order=desc"
@@ -57,15 +57,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                     post-url="/v1/sales/:id:/"
                                     delete-url="/v1/sales/:id:/">
                 </product-data-table>
-
             </div>
-            <div class="column is-half">
+            <!--.column-->
+            <!-- .column -->
+            <div class="flex">
 
                 Bill Details {{_computeCurrency(bill.NetTotal)}} {{_computeCurrency(bill.Discount)}}
                 {{_computeCurrency(bill.GrossTotal)}} {{_computeCurrency(bill.Cost)}} {{_computeCurrency(bill.Balance)}}
 
             </div>
-            <!--.column-->
             <!--.column-->
         </div>
         <iron-ajax content-type="application/json"
@@ -76,7 +76,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                    last-response="{{createResult}}"></iron-ajax>
         <iron-ajax auto
-        headers="{{headers}}"
+                   headers="{{headers}}"
 
                    content-type="application/json"
                    method="get"
@@ -95,7 +95,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                    on-response="_refreshBill"
                    url="/v1/bills/">
         </iron-ajax>
-        <iron-ajax url="/v1/products/bill/?{{searchInput}}"
+        <iron-ajax url="/v1/products/bill/?{{searchInput}}&limit=20"
                    auto
                    debounce-duration="50"
                    headers="{{headers}}"
@@ -172,7 +172,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     quantity: {
                         type: Number,
-                        value: 0,
+                        value: null,
                         observer: '_quantityChanged'
                     },
                     quantityFocus: {
