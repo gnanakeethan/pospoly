@@ -8,25 +8,50 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
-<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
-<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
-<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
-<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
-<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
-<link rel="import" href="../bower_components/app-route/app-location.html">
-<link rel="import" href="../bower_components/app-route/app-route.html">
-<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
-<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/f-jwt-decode/f-jwt-decode.html">
+<link rel="import"
+      href="../bower_components/polymer/polymer-element.html">
+<link rel="import"
+      href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import"
+      href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import"
+      href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import"
+      href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import"
+      href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import"
+      href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import"
+      href="../bower_components/app-route/app-location.html">
+<link rel="import"
+      href="../bower_components/app-route/app-route.html">
+<link rel="import"
+      href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import"
+      href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import"
+      href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import"
+      href="../bower_components/f-jwt-decode/f-jwt-decode.html">
+<link rel="import"
+      href="../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import"
+      href="../bower_components/paper-material/paper-material.html">
+<link rel="import"
+      href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import"
+      href="../bower_components/paper-item/paper-item.html">
+
 
 <script src="../bower_components/moment/moment.js"></script>
 <script src="../bower_components/moment-timezone/moment-timezone.js"></script>
-<link rel="import" href="my-icons.html">
-<link rel="import"      href="jwt/jwt-manager.html">
-<link rel="import"      href="jwt/jwt-detail.html">
+<link rel="import"
+      href="my-icons.html">
+<link rel="import"
+      href="jwt/jwt-manager.html">
+<link rel="import"
+      href="jwt/jwt-detail.html">
 <dom-module id="my-app">
     <template>
         <style> :host {
@@ -66,6 +91,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 login-id="jwtRootLogin"
                 login-popup="true">
         </jwt-manager>
+        <app-localstorage-document key="tokenObject" data="{{tokenObject}}"></app-localstorage-document>
         <jwt-detail token-object={{tokenObject}}></jwt-detail>
         <f-jwt-decode token="{{tokenObject.token}}" value="{{decoded}}"></f-jwt-decode>
 
@@ -89,13 +115,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </app-drawer> <!-- Main content -->
             <app-header-layout fullbleed has-scrolling-region>
                 <app-header style="height:72px" condenses reveals slot="header" effects="waterfall">
-                    <app-toolbar  style="height:48px">
+                    <app-toolbar style="height:48px">
                         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
                         <div main-title>My App
                         </div>
-                        <div style="float:right"> <a style="text-decoration: none;color:white;" href="#/account">Account
-                        {{_getTime(decoded.exp)}}</a>
-                        </div>
+
+                        <paper-menu-button vertical-align="top" horizontal-align="right" vertical-offset="50">
+                            <paper-icon-button icon="my-icons:more-vert" slot="dropdown-trigger" alt="bottom align"></paper-icon-button>
+
+                            <paper-material slot="dropdown-content" elevation="1" style="background: #fff;color:black;width:200px;">
+                                <paper-listbox>
+                                    <paper-item on-click="_logout">Logout</paper-item>
+                                </paper-listbox>
+
+                            </paper-material>
+                        </paper-menu-button>
                     </app-toolbar>
                 </app-header>
                 <iron-pages role="main" selected="[[computePath(page,path)]]" attr-for-selected="name">
@@ -105,6 +139,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </iron-pages>
             </app-header-layout>
         </app-drawer-layout>
+
+
     </template>
     <script>
         class MyApp extends Polymer.Element {
@@ -131,10 +167,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         reflectToAttribute: false,
                         observer: '_pathIdChanged'
                     },
-                    tokenObject:{
-                        type:Object,
-                        reflectToAttribute:false,
-                        observer:'_tokenChanged'
+                    tokenObject: {
+                        type: Object,
+                        reflectToAttribute: false,
+                        observer: '_tokenChanged'
                     },
 
 
@@ -246,11 +282,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 Polymer.importHref(
                     this.resolveUrl(this.page + '/' + this.page + '-' + this.path + '.html'), null, null, true);
             }
-            _tokenChanged(){
+            _logout(){
+                this.tokenObject = {};
+
             }
-            _getTime(exp){
-                if(exp){
-                return moment.unix(exp).toString();
+
+            _tokenChanged() {
+            }
+
+            _getTime(exp) {
+                if (exp) {
+                    return moment.unix(exp).toString();
                 }
             }
         }

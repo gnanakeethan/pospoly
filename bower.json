@@ -23,14 +23,30 @@
     "iron-icons": "2.0-preview",
     "app-localize-behavior": "2.0-preview",
     "bulma": "^0.4.2",
-    "paper-styles": "*",
+    "paper-styles": "^2.0.0",
     "app-storage": "2.0-preview",
     "paper-dialog-scrollable": "2.0-preview",
     "f-jwt-decode": "^2.0.2",
-    "moment-timezone": "^0.5.13"
+    "moment-timezone": "^0.5.13",
+    "paper-menu-button": "^2.0.0",
+    "paper-item": "^2.0.0",
+    "paper-listbox": "^2.0.0",
+    "paper-material": "^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0-prerelease.7"
   },
-  "private": true
+  "private": true,
+  "resolutions": {
+    "iron-flex-layout": "^2.0.0",
+    "paper-styles": "^2.0.0",
+    "iron-resizable-behavior": "1 - 2",
+    "iron-meta": "2.0-preview",
+    "iron-selector": "1 - 2",
+    "iron-behaviors": "1 - 2",
+    "iron-a11y-keys-behavior": "1 - 2",
+    "neon-animation": "1 - 2",
+    "iron-overlay-behavior": "1 - 2",
+    "iron-fit-behavior": "1 - 2"
+  }
 }

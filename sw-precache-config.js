@@ -11,10 +11,29 @@
 /* eslint-env node */
 
 module.exports = {
-  staticFileGlobs: [
-    '/index.html',
-    '/manifest.json',
-    '/bower_components/webcomponentsjs/*'
-  ],
-  navigateFallback: 'index.html',
+    staticFileGlobs: [
+
+
+        '/index.html',
+        '/manifest.json',
+        '/src/**/*.html',
+        '/bower_components/webcomponentsjs/*'
+    ],
+    runtimeCaching: [
+
+        {
+            urlPattern: /\/v1\/bills\/*/,
+            handler: 'networkOnly'
+        }, {
+            urlPattern: /\/v1\/sales*/,
+            handler: 'networkOnly'
+        },
+        {
+            urlPattern: /\/v1\/*/,
+            handler: 'fastest'
+        }
+    ],
+    skipWaiting: true,
+    clientsClaim: true,
+    navigateFallback: 'index.html',
 };

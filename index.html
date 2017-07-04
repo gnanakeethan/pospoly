@@ -10,7 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="generator" content="Polymer Starter Kit">
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
@@ -54,15 +54,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta name="msapplication-tap-highlight" content="no">
 
     <script>
-      // Register the base URL
-      const baseUrl = document.querySelector('base').href;
+        // Register the base URL
+        const baseUrl = document.querySelector('base').href;
 
-      // Load and register pre-caching Service Worker
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register(baseUrl + 'service-worker.js');
-        });
-      }
+        // Load and register pre-caching Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register(baseUrl + 'service-worker.js', {scope: '/'});
+            });
+        }
     </script>
 
     <!-- Load webcomponents-loader.js to check and load any polyfills your browser needs -->
@@ -73,32 +73,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <!-- Add any global styles for body, document, etc. -->
     <style>
-      body {
-        margin: 0;
-        font-family: 'Roboto', 'Noto', sans-serif;
-        line-height: 1.5;
-        min-height: 100vh;
-        background-color: #ddd;
-      }
+        body {
+            margin: 0;
+            font-family: 'Roboto', 'Noto', sans-serif;
+            line-height: 1.5;
+            min-height: 100vh;
+            background-color: #ddd;
+        }
     </style>
-  </head>
-  <body>
-    <my-app></my-app>
-    <noscript>
-      Please enable JavaScript to view this website.
-    </noscript>
-    <script>
 
-        function sleep(milliseconds) {
-            var start = new Date().getTime();
-            for (var i = 0; i < 1e7; i++) {
-                if ((new Date().getTime() - start) > milliseconds) {
-                    break;
-                }
+</head>
+<body>
+
+<style is="custom-style">
+    iron-overlay-backdrop {
+        --iron-overlay-backdrop-opacity: 1;
+        --iron-overlay-backdrop-background-color: #999;
+    }
+</style>
+<my-app></my-app>
+<noscript>
+    Please enable JavaScript to view this website.
+</noscript>
+<script>
+
+    function sleep(milliseconds) {
+        var start = new Date().getTime();
+        for (var i = 0; i < 1e7; i++) {
+            if ((new Date().getTime() - start) > milliseconds) {
+                break;
             }
         }
-    </script>
+    }
+</script>
 
-    <!-- Built with love using Polymer Starter Kit -->
-  </body>
+<!-- Built with love using Polymer Starter Kit -->
+</body>
 </html>

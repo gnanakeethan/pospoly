@@ -9,12 +9,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import"
-      href="../../bower_components/polymer/polymer.html">
+    href="../../bower_components/polymer/polymer.html">
 
 <link rel="import"
-      href="./product-data-table.html">
-<link rel="import" href="../jwt/jwt-detail.html">
-<link rel="import" href="/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+    href="./product-data-table.html">
+<link rel="import"
+    href="../jwt/jwt-detail.html">
+<link rel="import"
+    href="/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <dom-module id="dashboard-index">
     <template>
         <!-- import classes in an element -->
@@ -31,97 +33,98 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <jwt-detail headers="{{headers}}" token-object="{{tokenObject}}"></jwt-detail>
 
         <template is="dom-if" if="{{!_isset(productIdentifier)}}">
-            <iron-a11y-keys id="a11y" keys="1 2 3 4 5 6 7 8 9" target="[[target]]"
-                            on-keys-down="_setBill"></iron-a11y-keys>
+            <iron-a11y-keys id="a11y" keys="ctrl+shift+q ctrl+shift+w ctrl+shift+e ctrl+shift+r ctrl+shift+t ctrl+shift+y ctrl+shift+u ctrl+shift+i ctrl+shift+o ctrl+shift+p" target="[[target]]"
+                            on-keys-pressed="_setBill"></iron-a11y-keys>
         </template>
-        <!-- .columns -->
-        <div class="layout horizontal">
-            <!-- .column -->
-            <div class="flex">
+    <!-- .columns -->
+    <div class="layout horizontal">
+        <!-- .column -->
+        <div class="flex">
+            <product-data-table id="productdatatable"
+                url="/v1/sales?query=BillId.Id:{{bill.Id}}&limit=100&sortby=Id&order=desc"
+                bill="{{bill}}"
+                cold='["Pcode","PName","]'
+                cols='{"InventoryId.ProductId.ProductCode":"PCode" ,"InventoryId.ProductId.Name":"Name","UnitPrice__currency":"Price","Units__number":"Qty","InventoryId.InventoryScale[0].ScaleId.Unit":"Unit","Total__currency":"Total","Discount__currency":"Discount","Amount__currency":"Net"}'
 
-                <product-data-table id="productdatatable"
-                                    url="/v1/sales?query=BillId.Id:{{currentBill}}&limit=100&sortby=Id&order=desc"
-                                    bill="{{bill}}"
-                                    cold='["Pcode","PName","]'
-                                    cols='{"InventoryId.ProductId.ProductCode":"PCode" ,"InventoryId.ProductId.Name":"Name","UnitPrice__currency":"Price","Units__number":"Qty","InventoryId.InventoryScale[0].ScaleId.Unit":"Unit","Total__currency":"Total","Discount__currency":"Discount","Amount__currency":"Net"}'
-                                    editable='["Units","UnitPrice"]'
-                                    refresh="{{refresh}}"
-                                    id-row="Id"
-                                    product-in="{{productList.0}}"
-                                    product-list="{{productList}}"
-                                    inventory-list="{{inventoryList}}"
-                                    quantity-focus="{{quantityFocus}}"
-                                    new-product="{{productIdentifier}}"
-                                    quantity="{{quantity}}"
-                                    get-url="/v1/sales/:id:/"
-                                    post-url="/v1/sales/:id:/"
-                                    delete-url="/v1/sales/:id:/">
-                </product-data-table>
-            </div>
-            <!--.column-->
-            <!-- .column -->
-            <div class="flex">
-
-                Bill Details {{_computeCurrency(bill.NetTotal)}} {{_computeCurrency(bill.Discount)}}
-                {{_computeCurrency(bill.GrossTotal)}} {{_computeCurrency(bill.Cost)}} {{_computeCurrency(bill.Balance)}}
-
-            </div>
-            <!--.column-->
+                editable='["Units","UnitPrice"]'
+                refresh="{{refresh}}"
+                id-row="Id"
+                product-in="{{productList.0}}"
+                product-list="{{productList}}"
+                inventory-list="{{inventoryList}}"
+                inventory-index="{{inventoryIndex}}"
+                quantity-focus="{{quantityFocus}}"
+                new-product="{{productIdentifier}}"
+                quantity="{{quantity}}"
+                get-url="/v1/sales/:id:/"
+                post-url="/v1/sales/:id:/"
+                delete-url="/v1/sales/:id:/">
+            </product-data-table>
         </div>
-        <iron-ajax content-type="application/json"
-                   id="createRequest"
-                   method="POST"
-                   headers="{{headers}}"
+        <!--.column-->
+    </div>
+    <!-- Sales Creator -->
+    <iron-ajax content-type="application/json"
+        id="createRequest"
+        method="POST"
+        on-response="_refreshRequest"
+        headers="{{headers}}"
+        last-response="{{createResult}}"></iron-ajax>
 
+    <!-- Bills Fetcher -->
+    <iron-ajax auto
+        headers="{{headers}}"
+        content-type="application/json"
+        method="get"
+        debounce-duration="500"
+        id="billRequest"
+        on-response="_reloadBill"
+        url="/v1/bills/payable?refresh={{refresh}}"
+        last-response="{{bills}}">
+    </iron-ajax>
+    <!-- Bill Creator -->
+    <iron-ajax id="createBill"
+        content-type="application/json"
+        method="post"
+        headers="{{headers}}"
+        debounce-duration="200"
+        body="{{billBody}}"
+        on-response="_refreshRequest"
+        url="/v1/bills/">
+    </iron-ajax>
 
-                   last-response="{{createResult}}"></iron-ajax>
-        <iron-ajax auto
-                   headers="{{headers}}"
+    <!-- Product Acquirer -->
+    <iron-ajax url="/v1/products/bill/?{{searchInput}}&limit=20"
+        auto
+        debounce-duration="50"
+        headers="{{headers}}"
+        on-response="_singleProduct"
+        last-response="{{productList}}">
+    </iron-ajax>
 
-                   content-type="application/json"
-                   method="get"
-                   debounce-duration="500"
-                   id="billRequest"
-                   url="/v1/bills/payable?refresh={{refresh}}"
-                   last-response="{{bills}}">
-        </iron-ajax>
+    <!-- Inventory Acquirer -->
+    <iron-ajax id="inventoryRequest"
+        url="/v1/inventories?query=ProductId:{{productList.0.Id}}&limit=100"
+        headers="{{headers}}"
+        on-response="_putRecord"
+        last-response="{{inventoryList}}">
+    </iron-ajax>
 
-        <iron-ajax content-type="application/json"
-                   method="post"
-                   headers="{{headers}}"
-                   debounce-duration="200"
-                   id="createBill"
-                   body="{{billBody}}"
-                   on-response="_refreshBill"
-                   url="/v1/bills/">
-        </iron-ajax>
-        <iron-ajax url="/v1/products/bill/?{{searchInput}}&limit=20"
-                   auto
-                   debounce-duration="50"
-                   headers="{{headers}}"
-                   on-response="_singleProduct"
-                   last-response="{{productList}}">
-        </iron-ajax>
-        <iron-ajax id="inventoryRequest"
-                   url="/v1/inventories?query=ProductId:{{productList.0.Id}}&limit=100"
-                   headers="{{headers}}"
-                   on-response="_putRecord"
-                   last-response="{{inventoryList}}">
-        </iron-ajax>
-        <paper-input hidden
-                     id="product_identifier"
-                     headers="{{headers}}"
-                     value="{{productIdentifier}}"
-                     autofocus>
-        </paper-input>
-        <template is="dom-if"
-                  if="{{_hasMany(productList)}}">
+    <!-- Masked mirror input -->
+    <paper-input hidden
+        id="product_identifier"
+        headers="{{headers}}"
+        value="{{productIdentifier}}"
+        autofocus>
+    </paper-input>
+    <template is="dom-if"
+        if="{{_hasMany(productList)}}">
             <iron-a11y-keys id="a11y"
                             keys="ctrl+q ctrl+w ctrl+e ctrl+r ctrl+t ctrl+y ctrl+u ctrl+i ctrl+o ctrl+p ctrl+[ ctrl+]"
                             target="[[target]]" on-keys-pressed="_shortcutProduct"></iron-a11y-keys>
         </template>
-        <template is="dom-if"
-                  if="{{_hasMany(inventoryList)}}">
+    <template is="dom-if"
+        if="{{_hasMany(inventoryList)}}">
             <iron-a11y-keys id="a11y"
                             keys="ctrl+q ctrl+w ctrl+e ctrl+r ctrl+t ctrl+y ctrl+u ctrl+i ctrl+o ctrl+p ctrl+[ ctrl+]"
                             target="[[target]]" on-keys-pressed="_shortcutInventory"></iron-a11y-keys>
@@ -140,6 +143,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: String,
                         observer: '_searchInput'
                     },
+                    bill: {
+                        type: Object,
+                    },
                     bills: {
                         type: Object,
                         observer: '_setLastBill'
@@ -148,8 +154,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         type: Number,
                         observer: '_inventoryWatcher'
                     },
-                    currentBill: {
+                    inventoryIndex: {
                         type: Number,
+                        observer: '_invIndex'
                     },
                     refresh: {
                         type: Boolean,
@@ -162,7 +169,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     },
                     target: {
                         type: Object,
-                        value: function () {
+                        value: function() {
                             return document.body;
                         }
                     },
@@ -198,6 +205,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             "TerminalId": {
                                 "Id": 3,
                             },
+                            "StoreId": {
+                                "Id": 1
+                            }
                         }
                     }
 
@@ -207,7 +217,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             constructor() {
                 super();
             }
-
+            _refreshRequest() {
+                this.$.billRequest.generateRequest();
+            }
             _refreshBill() {
 
                 this.refresh = false;
@@ -242,12 +254,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _setLastBill() {
                 if (!this.bills) {
                     this.$.createBill.generateRequest();
-                } else {
-
-                    this.currentBill = this.bills[0].Id;
+                } else if (!this.bill) {
                     this.bill = this.bills[0];
                 }
 
+            }
+            _reloadBill() {
+                for (var i = 1; i < this.bills.length; i++) {
+                    if (this.bills[i - 1].Id == this.bill.Id) {
+                        this.bill = this.bills[i - 1];
+                    }
+                }
+
+            }
+
+            _createBill() {
+                // console.log(this.$.createBill)
+                this.$.createBill.generateRequest();
             }
 
             _inventoryWatcher() {
@@ -258,6 +281,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _quantityChanged() {
                 if (this.quantity > 0 && this.invId)
                     this._putRecordPost(this.invId, parseFloat(this.quantity).toFixed(3));
+            }
+            _invIndex() {
+                console.log(this.inventoryIndex)
+
+                if ((this.inventoryIndex != null) && (this.inventoryIndex >= 0)) {
+                    this.invId = this.inventoryList[this.inventoryIndex].Id;
+                    this.quantityFocus = true;
+                }
             }
 
             _shortcutInventory(event) {
@@ -280,17 +311,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _setBill(event) {
+                // var key = parseInt(event.detail.keyboardEvent.key)
+
+                var a = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'];
+                var key = a.indexOf(event.detail.keyboardEvent.key);
+
                 this.productIdentifier = "";
 
-                if (event.target.dataId)
-                    this.currentBill = event.target.dataId;
-                console.log(this.currentBill)
-                var key = parseInt(event.detail.keyboardEvent.key)
-                if (key) {
-                    if (key == 0)
-                        key = 10;
-                    this.currentBill = this.bills[key - 1].Id;
+                console.log(key);
+                if (key >= 0 && key <= 10) {
+
+                    this.bill = this.bills[key];
                 }
+
                 this.productIdentifier = "";
                 this.quantity = "";
             }
@@ -320,7 +353,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _putRecordPost(invId, units = 1.000) {
 
-                var id = this.currentBill;
+                var id = this.bill.Id;
 
                 var params = {}
                 params["InventoryId"] = {};
@@ -338,12 +371,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.productList = [];
                     this.inventoryList = [];
                     this.productIdentifier = "";
-                    this.$.product_identifier.focus();
-                    //                    this.$.inventoryDialog.close();
                     this.quantity = "";
                     this.quantity = "";
                     this.quantity = "";
-                    this.quantityFocus = false;
 
                 }
             }
