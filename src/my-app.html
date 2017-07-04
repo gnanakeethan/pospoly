@@ -8,56 +8,40 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<link rel="import"
-      href="../bower_components/polymer/polymer-element.html">
-<link rel="import"
-      href="../bower_components/app-layout/app-drawer/app-drawer.html">
-<link rel="import"
-      href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
-<link rel="import"
-      href="../bower_components/app-layout/app-header/app-header.html">
-<link rel="import"
-      href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
-<link rel="import"
-      href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
-<link rel="import"
-      href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
-<link rel="import"
-      href="../bower_components/app-route/app-location.html">
-<link rel="import"
-      href="../bower_components/app-route/app-route.html">
-<link rel="import"
-      href="../bower_components/iron-pages/iron-pages.html">
-<link rel="import"
-      href="../bower_components/iron-selector/iron-selector.html">
-<link rel="import"
-      href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import"
-      href="../bower_components/f-jwt-decode/f-jwt-decode.html">
-<link rel="import"
-      href="../bower_components/paper-menu-button/paper-menu-button.html">
-<link rel="import"
-      href="../bower_components/paper-material/paper-material.html">
-<link rel="import"
-      href="../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import"
-      href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/f-jwt-decode/f-jwt-decode.html">
+<link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="my-icons.html">
+<link rel="import" href="jwt/jwt-manager.html">
+<link rel="import" href="jwt/jwt-detail.html">
 
 
-<script src="../bower_components/moment/moment.js"></script>
-<script src="../bower_components/moment-timezone/moment-timezone.js"></script>
-<link rel="import"
-      href="my-icons.html">
-<link rel="import"
-      href="jwt/jwt-manager.html">
-<link rel="import"
-      href="jwt/jwt-detail.html">
+<script src="../bower_components/moment/moment.js" async defer></script>
+<script src="../bower_components/moment-timezone/moment-timezone.js" async defer></script>
 <dom-module id="my-app">
     <template>
         <style> :host {
             --app-primary-color: #4285f4;
             --app-secondary-color: black;
             display: block;
+        }
+        :host > * {
+            font-family: "Noto Mono";
+            font-weight: 500;
         }
 
         app-header {
@@ -84,7 +68,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .drawer-list a.iron-selected {
             color: black;
             font-weight: bold;
-        } </style>
+        }
+        </style>
 
         <jwt-manager
                 id="jwtRoot"
@@ -121,9 +106,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </div>
 
                         <paper-menu-button vertical-align="top" horizontal-align="right" vertical-offset="50">
-                            <paper-icon-button icon="my-icons:more-vert" slot="dropdown-trigger" alt="bottom align"></paper-icon-button>
+                            <paper-icon-button icon="my-icons:more-vert" slot="dropdown-trigger"
+                                               alt="bottom align"></paper-icon-button>
 
-                            <paper-material slot="dropdown-content" elevation="1" style="background: #fff;color:black;width:200px;">
+                            <paper-material slot="dropdown-content" elevation="1"
+                                            style="color:black;width:200px;">
+
                                 <paper-listbox>
                                     <paper-item on-click="_logout">Logout</paper-item>
                                 </paper-listbox>
@@ -137,7 +125,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <account-index name="account-index"></account-index>
                     <authentication-index name="authentication-index"></authentication-index>
                 </iron-pages>
+
+                <app-toolbar style="height:24px;position:fixed;bottom:0;background:#999;width:100%;font-size:11px;">
+                    <div main-title>Developed by GTech Software Solutions</div>
+                    <div style="float:right;position:fixed;right:0;">Login Valid for {{_getTime(decoded.exp)}}</div>
+                </app-toolbar>
             </app-header-layout>
+
         </app-drawer-layout>
 
 
@@ -282,17 +276,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 Polymer.importHref(
                     this.resolveUrl(this.page + '/' + this.page + '-' + this.path + '.html'), null, null, true);
             }
-            _logout(){
+
+            _logout() {
                 this.tokenObject = {};
 
             }
 
             _tokenChanged() {
+                console.log(this.tokenObject)
             }
 
             _getTime(exp) {
                 if (exp) {
-                    return moment.unix(exp).toString();
+                    return moment.unix(exp).toNow(true);
                 }
             }
         }

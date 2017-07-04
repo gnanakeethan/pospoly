@@ -135,7 +135,7 @@
                     var current=Date.now() / 1000 | 0;
                     var valid_for = this.decoded.exp - this.decoded.nbf;
 
-                    this.debounce('validationRequest', this._validationRequest, (valid_for/10)*1000);
+                    this.debounce('validationRequest', this._validationRequest, (valid_for/20)*1000);
                     if(this.decoded.exp-(valid_for/5) <= current){
                         this.$.refreshRequest.generateRequest();
                     }

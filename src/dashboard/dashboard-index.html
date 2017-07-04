@@ -20,7 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <dom-module id="dashboard-index">
     <template>
         <!-- import classes in an element -->
-        <style include="iron-flex iron-flex-alignment"></style>
+        <style include="iron-flex iron-flex-alignment iron-flex-factors"></style>
         <style>
             :host {
                 display: block;
@@ -39,7 +39,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <!-- .columns -->
     <div class="layout horizontal">
         <!-- .column -->
-        <div class="flex">
+        <div class="flex flex-10">
             <product-data-table id="productdatatable"
                 url="/v1/sales?query=BillId.Id:{{bill.Id}}&limit=100&sortby=Id&order=desc"
                 bill="{{bill}}"
@@ -60,6 +60,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 post-url="/v1/sales/:id:/"
                 delete-url="/v1/sales/:id:/">
             </product-data-table>
+        </div>
+        <div class="flex flex-2">
+            Testing Out
         </div>
         <!--.column-->
     </div>

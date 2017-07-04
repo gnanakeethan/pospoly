@@ -9,20 +9,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import"
-    href="../../bower_components/polymer/polymer.html">
+      href="../../bower_components/polymer/polymer.html">
 <link rel="import"
-    href="../../bower_components/iron-ajax/iron-ajax.html">
+      href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import"
-    href="../../bower_components/paper-input/paper-input.html">
+      href="../../bower_components/paper-input/paper-input.html">
 <link rel="import"
-    href="../../bower_components/iron-input/iron-input.html">
+      href="../../bower_components/iron-input/iron-input.html">
 <link rel="import"
-    href="../../bower_components/paper-button/paper-button.html">
+      href="../../bower_components/paper-button/paper-button.html">
 <link rel="import"
-    href="../jwt/jwt-detail.html">
+      href="../jwt/jwt-detail.html">
 
 <link rel="import"
-    href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+      href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+
+<link rel="import"
+      href="/bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <dom-module id="product-data-table">
 
@@ -32,7 +35,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 display: block;
             }
 
-            * {
+            :host > * {
                 font-family: "Noto Mono";
                 font-weight: 500;
             }
@@ -44,41 +47,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             table {
-                margin: 0;
+                width: 100%;
                 background: #fff;
             }
 
             tr {
-                margin: 0;
-                border-spacing:0;
                 background: #ccc;
             }
 
             th {
-                font-size: 11px;
-                color: #000;
+                font-size: 12px;
                 @apply(--paper-font-common-nowrap);
-                margin: 0;
-                padding: 5px;
-                vertical-align: middle;
                 font-weight: 900;
-                height: 25px;
-                /*transform: translate(0,0) rotate(270deg);*/
-            }
-
-            tr {
-                margin: 0;
-                height: 40px;
-                vertical-align: middle;
             }
 
             td {
                 font-size: 11px;
-                margin: 0;
-                margin: 0;
-
-                vertical-align: middle;
-                color: rgba(0, 0, 0, .67);
+                color: rgba(0, 0, 0, .86);
             }
 
             tr.alternate:hover td {
@@ -96,13 +81,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 color: #000;
             }
 
-            td, th {
-                width: 1px !important;
-                margin: 0;
-                padding: 0;
-
-            }
-
             input.table__Price__class, input.table__Qty__class, #quantity_input {
                 padding: 5px;
                 text-align: center;
@@ -115,7 +93,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             #quantity_input {
                 --paper-input-container: {
                     padding: 0;
-
+                    margin: 0;
                 };
                 --paper-input-container-color: #fff;
                 width: 20px;
@@ -128,41 +106,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             }
 
-            input.table__Price__class {
-                text-align: right;
-            }
-
-            .PCode,
-            .Price {
+            .PCode, .Price, .Qty, .Net, .Total, .Discount, .Unit {
                 padding: 5px;
+                @apply(--paper-font-common-nowrap);
                 text-align: center;
-                width: 70px !important;
+                width: 65px;
             }
 
             .Unit {
-                width: 20px;
+                width: 30px;
             }
 
-            .Name {
-                padding: 5px;
-                width: 150px !important;
+            .Qty {
+                width: 30px;
             }
 
             .Delete {
+                width: 65px;
+                padding:0;
+                margin:0;
                 text-align: center;
-                width: 75px !important;
             }
 
-            .Qty, .quantity_input {
-                text-align: center;
-                padding-right: 5px;
-                padding-left: 5px;
+            .Delete > a {
+                text-transform: uppercase;
+                text-decoration: none;
+                border: 1px solid #999;
+                border-radius: 2px;
+                /*padding:2px;*/
+            }
+
+            .Name {
+                width: 50%;
+            }
+
+            .quantity_input {
+                padding: 10px;
             }
 
             .Total, .Discount, .Net {
                 padding-right: 5px;
                 text-align: right;
-                width: 70px !important;
             }
 
             .center {
@@ -195,35 +179,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         class$="{{_getColName(col)}} center">{{_getColName(col)}}
                     </th>
                 </template>
-    <th class="Delete"></th>
-    </tr>
-    <tr class="alternate">
-        <td class="PCode">
-        </td>
-        <td>
-            <paper-input no-label-float
-                style=""
-                id="product_identifier"
-                value="{{newProduct}}"
-                autofocus></paper-input>
-        </td>
-        <td></td>
-        <td class="quantity_input">
-            <paper-input id="quantity_input"
-                no-label-float
-                value="{{quantity}}"></paper-input>
-            <!--<iron-input bind-value="{{quantity}}" slot="input">-->
-            <!--</iron-input>-->
-        </td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td class="Net"></td>
-        <td class="Delete"></td>
-    </tr>
+                <th class="Delete"></th>
+            </tr>
+            <tr class="alternate">
+                <td class="PCode">
+                </td>
+                <td style="padding-left:5px;">
+                    <paper-input no-label-float
+                                 style=""
+                                 id="product_identifier"
+                                 value="{{newProduct}}"
+                                 autofocus></paper-input>
+                </td>
+                <td></td>
+                <td class="quantity_input">
+                    <paper-input id="quantity_input"
+                                 no-label-float
+                                 value="{{quantity}}"></paper-input>
+                    <!--<iron-input bind-value="{{quantity}}" slot="input">-->
+                    <!--</iron-input>-->
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="Net"></td>
+                <td class="Delete"></td>
+            </tr>
 
-    <template is="dom-if"
-        if="{{!newProduct}}">
+            <template is="dom-if"
+                      if="{{!newProduct}}">
 
                 <template is="dom-repeat" items="{{data}}" as="datum">
                     <tr class="alternate">
@@ -234,8 +218,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <template is="dom-if" if="{{!_isEditable(col)}}">
                                     {{_getCol(datum,col)}}
                                 </template>
-    <template is="dom-if"
-        if="{{_isEditable(col)}}">
+                                <template is="dom-if"
+                                          if="{{_isEditable(col)}}">
                                     <input size=4
                                            class$="table__{{_getColName(col)}}__class"
                                            data-bill-id='{{_getCol(datum,"BillId.Id")}}' name="{{_filterColName(col)}}"
@@ -245,33 +229,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                            data-id="{{_getCol(datum,idRow)}}">
                                 </template>
 
-    </td>
+                            </td>
 
-    </template>
-    <td class="Delete">
-        <paper-button tabindex="-1"
-            data-id="{{datum.Id}}"
-            on-click="_deleteRequest">Delete
-        </paper-button>
-    </td>
-    </tr>
-    </template>
-    <tr>
-        <th class="PCode">Total</th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th class="Total">{{_computeCurrency(bill.GrossTotal)}}</th>
-        <th class="Discount">{{_computeCurrency(bill.Discount)}}</th>
-        <th class="Net">{{_computeCurrency(bill.NetTotal)}}</th>
-        <th class="Delete"></th>
+                        </template>
+                        <td class="Delete">
+                            <!--<a href="#" tabindex="-1"-->
+                               <!--data-id="{{datum.Id}}"-->
+                               <!--on-click="_deleteRequest">Delete-->
+                            <!--</a>-->
+                        </td>
+                    </tr>
+                </template>
+                <tr>
+                    <th class="PCode">Total</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th class="Total">{{_computeCurrency(bill.GrossTotal)}}</th>
+                    <th class="Discount">{{_computeCurrency(bill.Discount)}}</th>
+                    <th class="Net">{{_computeCurrency(bill.NetTotal)}}</th>
+                    <th class="Delete"></th>
 
-    </tr>
-    </template>
+                </tr>
+            </template>
 
-    <template is="dom-if"
-        if="{{!_isset(newProduct)}}">
+            <template is="dom-if"
+                      if="{{!_isset(newProduct)}}">
 
                 <template is="dom-repeat" items="{{productList}}" as="datum" index="index">
                     <tr class="alternate" on-click="_searchInput" data-name="{{datum.Barcode}}">
@@ -282,15 +266,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <td class="Unit"></td>
                         <td class="Total"></td>
                         <td class="Discount"></td>
-                        <td class="Net"><paper-button on-click="_searchInput" >{{datum.Name}}</paper-button></td>
+                        <td class="Net"></td>
                         <td class="Delete"></td>
 
                     </tr>
                 </template>
-    <template is="dom-repeat"
-        items="{{inventoryList}}"
-        as="datum"
-        index="index">
+                <template is="dom-repeat"
+                          items="{{inventoryList}}"
+                          as="datum"
+                          index="index">
                     <tr class="alternate" on-click="_setInventory" data-index="{{index}}">
                         <td class="Pcode"></td>
                         <td class="Name">{{datum.BatchNo}}</td>
@@ -303,10 +287,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <td class="Delete"></td>
                     </tr>
                 </template>
-    </template>
+            </template>
 
 
-    </table>
+        </table>
     </template>
 
     <script>
@@ -330,7 +314,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         value: null,
                         reflectToAttribute: true,
                         notify: true,
-                        observer:'_quantityWatcher'
+                        observer: '_quantityWatcher'
                     },
                     quantityFocus: {
                         type: Boolean,
@@ -342,7 +326,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                     target: {
                         type: Object,
-                        value: function() {
+                        value: function () {
                             return document.body;
                         }
                     },
@@ -412,7 +396,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 super();
             }
 
-            _refreshMain() {}
+            _refreshMain() {
+            }
 
             _onRefresh() {
                 this.refresh = true;
@@ -484,11 +469,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 for (var i = 0; i <= formats.length; i++) {
                     var format = formats[i];
                     switch (format) {
-                        case "currency":
-                            {
-                                return parseFloat(eval('datum.' + col)).toFixed(2);
-                                break;
-                            }
+                        case "currency": {
+                            return parseFloat(eval('datum.' + col)).toFixed(2);
+                            break;
+                        }
                     }
                 }
 
@@ -553,6 +537,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _searchInput(event) {
                 this.$.product_identifier.value = event.target.parentNode.dataName
             }
+
             _setInventory(event) {
                 this.inventoryIndex = null;
                 this.inventoryIndex = event.target.parentNode.dataIndex;
