@@ -39,10 +39,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             --app-secondary-color: black;
             display: block;
         }
-        :host > * {
-            font-family: "Noto Mono";
-            font-weight: 500;
-        }
 
         app-header {
             color: #fff;
@@ -99,7 +95,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </iron-selector>
             </app-drawer> <!-- Main content -->
             <app-header-layout fullbleed has-scrolling-region>
-                <app-header style="height:72px" condenses reveals slot="header" effects="waterfall">
+                <app-header style="height:48px" condenses reveals slot="header" effects="waterfall">
                     <app-toolbar style="height:48px">
                         <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
                         <div main-title>My App
@@ -121,9 +117,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </app-toolbar>
                 </app-header>
                 <iron-pages role="main" selected="[[computePath(page,path)]]" attr-for-selected="name">
-                    <dashboard-index name="dashboard-index"></dashboard-index>
+                    <dashboard-index name="dashboard-index" bill-id="{{pathId}}"></dashboard-index>
                     <account-index name="account-index"></account-index>
-                    <authentication-index name="authentication-index"></authentication-index>
+                    <products-index name="products-index"></products-index>
+                    <products-edit name="products-edit" product-id="{{pathId}}"></products-edit>
                 </iron-pages>
 
                 <app-toolbar style="height:24px;position:fixed;bottom:0;background:#999;width:100%;font-size:11px;">

@@ -10,6 +10,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../jwt/jwt-detail.html">
 
 <dom-module id="data-table">
 
@@ -75,8 +78,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <iron-ajax
             on-response="_checkData"
             id="mainRequest"
+            headers="{{headers}}"
             auto url="{{url}}&offset={{offset}}&amp;limit={{limit}}&amp;{{sortString}}"
             last-response="{{data}}"></iron-ajax>
+            <jwt-detail headers="{{headers}}"></jwt-detail>
 
         <iron-ajax id="deleteRequest" method="DELETE"></iron-ajax>
 
@@ -101,7 +106,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <template is="dom-repeat" items="{{data}}" as="datum">
                     <tr>
                         <template is="dom-repeat" items="{{_getCols(cols)}}" as="col">
-                            <td>                            
+                            <td>
                                     {{_getCol(datum,col)}}
                             </td>
                         </template>
@@ -120,7 +125,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </table>
 
         <paper-dropdown-menu value="{{limit}}">
-            <paper-listbox class="dropdown-content">
+            <paper-listbox slot="dropdown-content">
                 <paper-item>10</paper-item>
                 <paper-item>20</paper-item>
                 <paper-item>50</paper-item>
