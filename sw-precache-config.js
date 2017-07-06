@@ -22,14 +22,14 @@ module.exports = {
     runtimeCaching: [
 
         {
-            urlPattern: /\/v1\/bills\/*/,
+            urlPattern: /\/v1\/bills*/,
             handler: 'networkOnly'
         }, {
             urlPattern: /\/v1\/sales*/,
             handler: 'networkOnly'
         },
         {
-            urlPattern: /\/v1\/*/,
+            urlPattern: /\/v1*/,
             handler: 'fastest'
         }
     ],
