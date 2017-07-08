@@ -4,12 +4,15 @@
   "fragments": [
 
     "src/products/products-index.html",
+    "src/products/products-edit.html",
+    "src/purchases/purchases-create.html",
+    "src/purchases/purchases-index.html",
     "src/dashboard/dashboard-index.html",
     "src/dashboard/product-data-table.html"
 
   ],
   "sources":[
-    "bower_components/bulma/**/*",
+
     "manifest.json",
     "sw-precache-config.js"
 

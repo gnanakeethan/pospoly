@@ -126,7 +126,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             AverageCost: null,
                             InventoryId: {Id: null},
                             Units: null,
-                            StoreId: {Id:1},
+                            StoreId: {Id: 1},
                             CreatedAt: "0001-01-01T00:00:00Z",
                             UpdatedAt: "0001-01-01T00:00:00Z"
                         }
@@ -140,12 +140,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _put() {
-                for (i=0;i<this.purchases.length;i++){
-                    var purchase  = this.purchases[i];
+                for (i = 0; i < this.purchases.length; i++) {
+                    var purchase = this.purchases[i];
                     purchase.AverageCost = parseFloat(purchase.AverageCost);
                     purchase.Units = parseFloat(purchase.Units);
-                    console.log(purchase);
-
                     this.$.putSet.body = purchase;
                     this.$.putSet.generateRequest();
                 }

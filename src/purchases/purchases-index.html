@@ -60,9 +60,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                          value="{{product_code}}"></paper-input>
                          <jwt-detail headers="{{headers}}"></jwt-detail>
 
-            <data-table url="/v1/purchases?{{searchInput}}{{productCode}}"
+            <data-table url="/v1/purchases?{{searchInput}}{{productCode}}&amp;orderby=id&amp;sort=asc"
                         cols='{"Id":"ID","InventoryId.BatchNo":"Batch Name","InventoryId.ProductId.Name":"Product Name","CreatedAt":"Bought On","AverageCost":"Average Cost","Units":"Units Purchased"}'
-                        sorted="CreatedAt"
+                        sorted="Id"
                         sortables='["CreatedAt","Id"]'
                         sort-mode="asc"
                         id-row="Id"
