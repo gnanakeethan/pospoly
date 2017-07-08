@@ -9,12 +9,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
 <link rel="import" href="../data-table/data-table.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 
-<dom-module id="products-index">
+<dom-module id="purchases-index">
 
     <template>
 
@@ -24,55 +22,75 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 padding: 10px;
             }
 
-            paper-input.filter {
-                --paper-input-container: {
+            .card {
+                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+                padding: 16px;
+                margin: 24px;
+                border-radius: 5px;
+                background-color: #fff;
+                color: #757575;
+            }
 
-                    width: 50%;
-                    display: block;
-                    float: left;: left;
-                };
+            .circle {
+                display: inline-block;
+                height: 64px;
+                width: 64px;
+                border-radius: 50%;
+                background: #ddd;
+                line-height: 64px;
+                font-size: 30px;
+                color: #555;
+                text-align: center;
+            }
 
+            h1 {
+                font-size: 22px;
+                margin: 16px 0;
+                color: #212121;
             }
         </style>
-        <paper-input class="filter"
-                     label="Product Name / Barcode"
-                     value="{{search_field}}"></paper-input>
-        <paper-input class="filter"
-                     label="Product Code"
-                     value="{{product_code}}"></paper-input>
-        <jwt-detail headers="{{headers}}"></jwt-detail>
-        <data-table url="/v1/products?{{searchInput}}{{productCode}}"
-                    cols='{"Id":"Id","ProductCode":"ProductCode","Name":"Name"}'
-                    sorted="Id"
-                    sortables='["Barcode"]'
-                    id-row="Id"
-                    headers="{{headers}}"
-                    get-url="/v1/products/:id/"
-                    post-url="/v1/products/:id/"
-                    edit-url="#/products/edit/:id:/"
-                    delete-url="/v1/products/:id:/">
-        </data-table>
-        <a style="position:fixed;bottom:10%;right:10%;"
-           href="#/products/create">
-            <paper-fab icon="add">add</paper-fab>
-        </a>
+
+        <div class="card">
+            <paper-button on-click="_gotoCreate" colored="">Create</paper-button>
+            <paper-input class="filter"
+                         label="Product Name / Barcode"
+                         value="{{search_field}}"></paper-input>
+            <paper-input class="filter"
+                         label="Product Code"
+                         value="{{product_code}}"></paper-input>
+                         <jwt-detail headers="{{headers}}"></jwt-detail>
+
+            <data-table url="/v1/purchases?{{searchInput}}{{productCode}}"
+                        cols='{"Id":"ID","InventoryId.BatchNo":"Batch Name","InventoryId.ProductId.Name":"Product Name","CreatedAt":"Bought On","AverageCost":"Average Cost","Units":"Units Purchased"}'
+                        sorted="CreatedAt"
+                        sortables='["CreatedAt","Id"]'
+                        sort-mode="asc"
+                        id-row="Id"
+                            headers="{{headers}}"
+
+                        get-url="http://localhost:8080/v1/purchases/:id/"
+                        post-url="http://localhost:8080/v1/purchases/:id/"
+                        edit-url="#/purchases/edit/:id:/"
+                        delete-url="//localhost:8080/v1/purchases/:id:/"
+                        delete-page="//localhost:8080/v1/purchases/:id:/"
+            ></data-table>
+        </div>
+
+
     </template>
 
     <script>
 
         Polymer({
 
-            is: 'products-index',
-            behaviors: [
-                Polymer.AppLocalizeBehavior
-            ],
-
+            is: 'purchases-index',
+            _gotoCreate: function (event) {
+                event.target.addEventListener('transitionend', function (e) {
+                    location.href = '#/purchases/create';
+                });
+            },
             properties: {
-                /* Overriden from AppLocalizeBehavior */
-                language: {
-                    value: 'en',
-                    type: String
-                },
+
                 search_field: {
                     type: String,
                     observer: '_classifySearch'
@@ -81,16 +99,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     type: String,
                     observer: '_productCode'
                 },
-                /* Overriden from AppLocalizeBehavior */
-                formats: {
-                    type: Object,
-                    value: function () {
-                        return {
-                            number: {USD: {style: 'currency', currency: 'USD'}}
-                        };
-                    }
-                }
             },
+
             _productCode: function (input) {
                 if (input) {
                     this.productCode = ",ProductCode:" + input;
@@ -98,16 +108,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             },
             _classifySearch: function (input) {
                 if (isBarcode(input)) {
-                    this.searchInput = "query=Barcode:" + input;
+                    this.searchInput = "query=InventoryId.ProductId.Barcode:" + input;
                 }
                 else if (!isNaN(input)) {
-                    this.searchInput = "query=Barcode:" + input;
+                    this.searchInput = "query=InventoryId.ProductId.Barcode:" + input;
                 }
                 else {
-                    this.searchInput = "query=Name:" + input;
+                    this.searchInput = "query=InventoryId.ProductId.Name:" + input;
                 }
-            }
+            },
+
         });
+
         function isBarcode(barcode) {
             // check length
             if (barcode.length < 8 || barcode.length > 18 ||

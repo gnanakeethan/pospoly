@@ -16,12 +16,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
 <link rel="import" href="../jwt/jwt-detail.html">
 
 <dom-module id="products-edit">
 
     <template>
+        <style include="iron-flex iron-flex-alignment iron-flex-factors"></style>
 
         <style>
             :host {
@@ -49,28 +51,65 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 color: #555;
                 text-align: center;
             }
+
+            dom-repeat, dom-if, dom-bind {
+                display: none;
+                margin: 0;
+                border: none;
+            }
+
+            table {
+                width: 100%;
+                background: #fff;
+            }
+
+            tr {
+                background: #ccc;
+            }
+
+            th {
+                @apply(--paper-font-common-nowrap);
+                font-weight: 900;
+            }
+
+            td {
+                color: rgba(0, 0, 0, .86);
+            }
+
+            tr.alternate:hover td {
+                background: #777;
+                color: #fff;
+            }
+
+            tr.alternate {
+                height: 33px;
+            }
+
+            tr.alternate:nth-child(odd) {
+                background: #ccc;
+                color: #000;
+            }
+
+            tr.alternate:nth-child(even) {
+                background: #ddd;
+                color: #000;
+            }
+            th,td {
+                text-align: center;
+                vertical-align: middle;
+            }
+
         </style>
-        <jwt-detail headers="{{headers}}"></jwt-detail>
-        <iron-ajax url="/v1/products/{{productId}}"
+
+        <iron-ajax id="initProduct"
+                   on-response="_logProduct"
+                   url="/v1/products/"
+                   method="POST"
+                   headers="{{headers}}"
+                   body="{{productIn}}"
                    last-response="{{product}}"
-                   headers="{{headers}}"
-                   debounce-duration="200"
-                   auto></iron-ajax>
-        <iron-ajax id="putProduct"
-                   headers="{{headers}}"
-                   url="/v1/products/{{productId}}"
-                   method="PUT"
-                   debounce-duration="2000"
-                   body="{{product}}"
+                   verbose
                    content-type="application/json"></iron-ajax>
-
-
-        <iron-ajax url="/v1/inventories/?query=ProductId.Id:{{productId}}&limit=0"
-                   last-response="{{inventories}}"
-                   headers="{{headers}}"
-                   id="inventories"
-                   on-response="_checkInv"
-                   auto></iron-ajax>
 
         <template is="dom-repeat" items="{{inventories}}" as="inventory">
             <iron-ajax
@@ -86,32 +125,55 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                    auto></iron-ajax>
 
         <div class="card">
-            <paper-input label="Product Name" value="{{product.Name}}"></paper-input>
-            <paper-input label="Product Code" value="{{product.ProductCode}}"></paper-input>
-            <paper-input label="Barcode" value="{{product.Barcode}}"></paper-input>
+            <div class="layout horizontal wrap">
+                <div class="flex flex-6">
+                    <paper-input label="Product Name" value="{{product.Name}}" on-focus="_initProduct"></paper-input>
+                </div>
+                <div class="flex flex-1">
+                    <paper-input label="Product Code" value="{{product.ProductCode}}"></paper-input>
+                </div>
+                <div class="flex flex-3">
+                    <paper-input label="Barcode" value="{{product.Barcode}}"></paper-input>
+                </div>
+                <div class="flex flex-1">
+                    <paper-dropdown-menu label="Master Scale">
+                        <paper-listbox slot="dropdown-content" selected="{{product.ScaleId.Id}}"
+                                       attr-for-selected="data-value"
+                                       class="dropdown-content">
+                            <template is="dom-repeat" items="{{scales}}" as="scale">
+                                <paper-item data-value="{{scale.Id}}">{{scale.Description}}</paper-item>
+                            </template>
+                        </paper-listbox>
+                    </paper-dropdown-menu>
 
+                </div>
 
-            <paper-dropdown-menu label="Master Scale">
-                <paper-listbox  slot="dropdown-content" selected="{{product.ScaleId.Id}}" attr-for-selected="data-value"
-                               class="dropdown-content">
-                    <template is="dom-repeat" items="{{scales}}" as="scale">
-                        <paper-item data-value="{{scale.Id}}">{{scale.Description}}</paper-item>
-                    </template>
-                </paper-listbox>
-            </paper-dropdown-menu>
+            </div>
             <table>
+                <tr>
+                    <th colspan="2"><h3>Inventories</h3></th>
+                    <th>
+                        <paper-button on-click="_addInventory">Add</paper-button>
+                    </th>
+                </tr>
+                <tr>
+                    <th>Name</th>
+                    <th>Expiry Date</th>
+                    <th></th>
+                </tr>
+
+
                 <template is="dom-repeat" items="{{inventories}}" as="inventory">
                     <tr>
-                        <td>{{inventory.Id}}</td>
+
                         <td>
                             <paper-input on-blur="invChanged"
                                          data-id="{{index}}"
                                          value="{{inventory.BatchNo}}"></paper-input>
                         </td>
                         <td>
-                            <paper-input on-blur="invChanged"
-                                         data-id="{{index}}"
-                                         value="{{inventory.Expiry}}"></paper-input>
+                            <vaadin-date-picker auto-validate="false"
+                                                value="{{inventory.Expiry}}"></vaadin-date-picker>
                         </td>
                         <td>
                             <paper-button on-click="_addIns" data-id="{{inventory.Id}}">Add Scale
@@ -123,24 +185,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </tr>
                 </template>
 
-                <iron-ajax
-                        id="invChange"
-                        body="{{inventoryChanged}}"
-                        headers="{{headers}}"
-                        method="PUT"
-                        on-response="updateInventory"
-                        content-type="application/json"
-                        url="/v1/inventories/{{inventoryChanged.Id}}"
-                        verbose>
-                </iron-ajax>
             </table>
-            <paper-button on-click="_addInventory">Add</paper-button>
 
-
+            <br><br>
             <table>
+                <tr>
+                    <th>Units</th>
+                    <th>Price per Unit</th>
+                    <th>Batch No</th>
+                    <th>Scale Mode</th>
+                    <th></th>
+                </tr>
                 <template is="dom-repeat" items="{{ins}}" as="inid">
                     <tr>
-                        <td>{{inid.Id}}</td>
+
                         <td>
                             <paper-input type="Number" value="{{inid.Units}}"></paper-input>
                         </td>
@@ -152,7 +210,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </td>
                         <td>
                             <paper-dropdown-menu label="Child Scale">
-                                <paper-listbox (iron-select)="_insChanged($event,'d')" data-id="{{inid.Id}}" slot="dropdown-content" selected="{{inid.ScaleId.Id}}" attr-for-selected="data-value">
+                                <paper-listbox (iron-select)="_insChanged($event,'d')" data-id="{{inid.Id}}"
+                                               slot="dropdown-content" selected="{{inid.ScaleId.Id}}"
+                                               attr-for-selected="data-value">
                                     <template is="dom-repeat" items="{{scales}}" as="scale">
                                         <paper-item data-value="{{scale.Id}}">{{scale.Description}}</paper-item>
                                     </template>
@@ -165,18 +225,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     </tr>
                     <iron-ajax
                             auto
-                            url="/v1/inventory_scale/{{inid.Id}}?{{inid.ScaleId.Id}}"
+                            url="/v1/inventory_scale/{{inid.Id}}?{{inid.ScaleId.Id}}&amp;{{inid.Price}}&amp;{{inid.Units}}"
                             method="PUT"
                             verbose
                             headers="{{headers}}"
                             body="{{inid}}"
                             content-type="application/json"
-                            on-response="updateInventory"></iron-ajax>
-                                        </template>
+                            on-response="updateInventory">
+
+                    </iron-ajax>
+                </template>
             </table>
         </div>
 
 
+        <jwt-detail headers="{{headers}}"></jwt-detail>
+
+        <iron-ajax id="invChange"
+                   body="{{inventoryChanged}}"
+                   headers="{{headers}}"
+                   method="PUT"
+                   on-response="updateInventory"
+                   content-type="application/json"
+                   url="/v1/inventories/{{inventoryChanged.Id}}"
+                   verbose>
+        </iron-ajax>
+        <iron-ajax id="putProduct"
+                   headers="{{headers}}"
+                   url="/v1/products/{{productId}}"
+                   method="PUT"
+                   debounce-duration="2000"
+                   body="{{product}}"
+                   content-type="application/json"></iron-ajax>
+        <iron-ajax url="/v1/inventories/?query=ProductId.Id:{{productId}}&limit=0"
+                   last-response="{{inventories}}"
+                   headers="{{headers}}"
+                   id="inventories"
+                   on-response="_checkInv"
+                   auto></iron-ajax>
         <iron-ajax
                 id="insChange"
                 url="/v1/inventory_scale/{{insChanged.Id}}"
@@ -197,10 +283,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             properties: {
                 productId: {
                     type: String,
+                    value:null,
                     reflectToAttribute: true,
                 },
-                products: {
+                productIn: {
                     type: Object,
+                    reflectToAttribute: true,
+                    value: {
+                        "Id": null,
+                        "ProductCode": "",
+                        "Barcode": "",
+                        "Name": "",
+                        "Singular": 1,
+                        "Priority": 0,
+                        "Ordering": 0,
+                        "Image": "",
+                        "ImageType": "",
+                        "ScaleId": {
+                            "Id": 3
+                        },
+                        "StoreId":{
+                            "Id":1
+                        },
+                        "CreatedAt": "0001-01-01T00:00:00Z",
+                        "UpdatedAt": "0001-01-01T00:00:00Z",
+                        "Service": 0
+                    },
+                },
+                product: {
+                    type: Object,
+                    observer:'_setProductId',
                     reflectToAttribute: true,
                 },
                 ins: {
@@ -227,9 +339,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 'productChanged(product.*)',
                 //                'invChanged(inventories.*)',
                 'productChanged(product.ScaleId.*)',
+                '_formatDate(inventories.*)',
                 '_insChange(ins.*)'
             ],
+            _initProduct:function(){
+                if(!this.productId){
+                    this.$.initProduct.generateRequest();
+                }
+
+            },
             productChanged: function (changed) {
+                this.productId = this.product.Id;
                 this.product.ScaleId.Id = parseInt(this.product.ScaleId.Id);
                 this.$.putProduct.generateRequest();
             }
@@ -238,8 +358,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 id = event.target.dataId;
                 //                id = changed.path.slice(13);
                 //                id = id.slice(0, id.indexOf('.'));
+                this._formatCDate(id);
                 path = eval('this.inventories[' + id + ']');
                 this.inventoryChanged = path;
+                console.log(this.inventoryChanged)
                 this.$.invChange.method = "PUT";
                 this.$.invChange.generateRequest();
             }
@@ -271,7 +393,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.insChanged = {Id: invId};
                 this.$.insChange.method = "DELETE";
                 this.$.insChange.generateRequest();
-                this.ins=[];
+                this.ins = [];
                 this.inventories = [];
                 this.$.inventories.generateRequest();
             },
@@ -320,7 +442,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 for (i = 0; i < this.inventories.length; i++) {
                     req = eval('this.$.insLoader' + this.inventories[i].Id);
                 }
-                //                this.$.inventories.generateRequest();
+            },
+            _formatDate: function () {
+                for (i = 0; i < this.inventories.length; i++) {
+                    momentd = moment(this.inventories[i].Expiry)
+                    console.log(this.inventories[i].Expiry)
+                    console.log(momentd.isValid())
+                    if (momentd.isValid())
+                        this.inventories[i].Expiry = momentd.format("YYYY-MM-DD")
+                }
+                console.log(this.inventories)
+            },
+
+            _formatCDate: function (id) {
+                momentd = moment(this.inventories[id].Expiry)
+                console.log(this.inventories[id].Expiry)
+                console.log(momentd.isValid())
+                if (momentd.isValid())
+                    this.inventories[id].Expiry = momentd.format("YYYY-MM-DDT00:00:00Z")
+                console.log(this.inventories)
             }
         })
         ;

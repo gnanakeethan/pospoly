@@ -1,0 +1,175 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../products/products-edit.html">
+
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<dom-module id="purchases-create">
+
+    <template>
+        <style include="iron-flex iron-flex-alignment iron-flex-factors"></style>
+
+        <style>
+            :host {
+                display: block;
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 22px;
+                margin: 16px 0;
+                color: #212121;
+            }
+
+        </style>
+        <paper-button on-click="_openProductDialog">ADD PRODUCT</paper-button>
+        <paper-dialog id="addProductDialog">
+            <paper-dialog-scrollable style="width:100%;">
+                <products-edit></products-edit>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+        <template is="dom-repeat" items="{{purchases}}" as="purchasd">
+            <div class="layout horizontal">
+                <div class="flex-2">
+                    <paper-dropdown-menu id='ddl-node' label="Select Product" style="width:100%;">
+                        <paper-listbox slot="dropdown-content" attr-for-selected="data-value"
+                                       style="width:100%;height:100px;"
+                                       selected="{{purchasd.InventoryId.Id}}">
+                            <paper-item data-value="{{products.0.Inventory.0.Id}}" style="width:400px;">
+
+                                <paper-input class="filter"
+                                             label="Product Name / Barcode / Product Code"
+                                             value="{{product_name}}"></paper-input>
+                            </paper-item>
+                            <template is="dom-repeat" items="{{products}}" as="product">
+                                <template is="dom-repeat" items="{{product.Inventory}}" as="inventory">
+                                    <paper-item data-value="{{inventory.Id}}" style="width:100%;">
+                                        {{product.Name}} - {{inventory.BatchNo}}
+                                    </paper-item>
+                                </template>
+                            </template>
+                            <iron-ajax url="/v1/inventories/{{purchasd.InventoryId.Id}}"
+                                       auto
+                                       debounce-duration="50"
+                                       headers="{{headers}}"
+                                       last-response="{{inventoryd}}">
+                            </iron-ajax>
+                            <template is="dom-if" if="{{purchasd.InventoryId.Id}}">
+
+                                <paper-item data-value="{{inventoryd.Id}}" style="width:100%;">
+                                    {{inventoryd.ProductId.Name}} - {{inventoryd.BatchNo}}
+                                </paper-item>
+                            </template>
+                        </paper-listbox>
+                    </paper-dropdown-menu>
+                </div>
+                <div class="flex">
+                    <paper-input label="AverageCost" value="{{purchasd.AverageCost}}"></paper-input>
+                </div>
+                <div class="flex">
+                    <paper-input label="Units" value="{{purchasd.Units}}"></paper-input>
+                </div>
+            </div>
+        </template>
+        <paper-button on-click="_put">PutaAll</paper-button>
+        <jwt-detail headers="{{headers}}"></jwt-detail>
+        <!-- Product Acquirer -->
+        <iron-ajax url="/v1/products/bill/?{{searchInput}}"
+                   auto
+                   debounce-duration="50"
+                   headers="{{headers}}"
+                   last-response="{{products}}">
+        </iron-ajax>
+        <iron-ajax url="/v1/purchases/"
+                   id="putSet"
+                   content-type="application/json"
+                   method="POST"
+                   headers="{{headers}}">
+        </iron-ajax>
+
+    </template>
+
+    <script>
+        class PurchasesCreate extends Polymer.Element {
+            static get is() {
+                return "purchases-create"
+            }
+
+            static get properties() {
+                return {
+                    product_name: {
+                        type: String,
+                        value: null,
+                        observer: '_searchInput'
+                    },
+                    purchases: {
+                        type: Object,
+                        value: []
+                    },
+                    purchase: {
+                        type: Object,
+                        value: {
+                            AverageCost: null,
+                            InventoryId: {Id: null},
+                            Units: null,
+                            StoreId: {Id:1},
+                            CreatedAt: "0001-01-01T00:00:00Z",
+                            UpdatedAt: "0001-01-01T00:00:00Z"
+                        }
+                    }
+                };
+            }
+
+            constructor() {
+                super();
+                this.purchases = [this.purchase]
+            }
+
+            _put() {
+                for (i=0;i<this.purchases.length;i++){
+                    var purchase  = this.purchases[i];
+                    purchase.AverageCost = parseFloat(purchase.AverageCost);
+                    purchase.Units = parseFloat(purchase.Units);
+                    console.log(purchase);
+
+                    this.$.putSet.body = purchase;
+                    this.$.putSet.generateRequest();
+                }
+
+            }
+
+            _searchInput() {
+
+                if (!isNaN(this.productIdentifier)) {
+                    this.searchInput = "query=Barcode:" + this.product_name;
+                } else {
+                    this.searchInput = "query=Name:" + this.product_name;
+                }
+            }
+
+            _openProductDialog() {
+
+                this.$.addProductDialog.open();
+            }
+
+        }
+        window.customElements.define(PurchasesCreate.is, PurchasesCreate);
+
+
+    </script>
+
+</dom-module>

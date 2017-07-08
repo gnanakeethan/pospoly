@@ -83,7 +83,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             last-response="{{data}}"></iron-ajax>
             <jwt-detail headers="{{headers}}"></jwt-detail>
 
-        <iron-ajax id="deleteRequest" method="DELETE"></iron-ajax>
+        <iron-ajax id="deleteRequest"
+                   headers="{{headers}}"
+                   method="DELETE"></iron-ajax>
 
 
 
