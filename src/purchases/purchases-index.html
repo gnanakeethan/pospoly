@@ -63,10 +63,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <data-table url="/v1/purchases?{{searchInput}}{{productCode}}&amp;orderby=id&amp;sort=asc"
                         cols='{"Id":"ID","InventoryId.BatchNo":"Batch Name","InventoryId.ProductId.Name":"Product Name","CreatedAt":"Bought On","AverageCost":"Average Cost","Units":"Units Purchased"}'
                         sorted="Id"
-                        sortables='["CreatedAt","Id"]'
-                        sort-mode="asc"
+                        sortables='["CreatedAt","Id","AverageCost"]'
+                        sort-mode="desc"
                         id-row="Id"
-                            headers="{{headers}}"
+                        headers="{{headers}}"
 
                         get-url="http://localhost:8080/v1/purchases/:id/"
                         post-url="http://localhost:8080/v1/purchases/:id/"
