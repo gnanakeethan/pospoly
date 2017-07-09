@@ -110,6 +110,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                    last-response="{{product}}"
                    verbose
                    content-type="application/json"></iron-ajax>
+        <iron-ajax auto
+                   on-response="_logProduct"
+                   url="/v1/products/{{productId}}"
+                   method="GET"
+                   headers="{{headers}}"
+                   last-response="{{product}}"
+                   verbose></iron-ajax>
 
         <template is="dom-repeat" items="{{inventories}}" as="inventory">
             <iron-ajax
@@ -284,6 +291,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 productId: {
                     type: String,
                     value:null,
+                    observer:'_onChange',
                     reflectToAttribute: true,
                 },
                 productIn: {

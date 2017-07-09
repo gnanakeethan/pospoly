@@ -1,0 +1,250 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<link rel="import" href="../../bower_components/paper-chip/paper-chip-input-autocomplete.html">
+<link rel="import" href="../../bower_components/paper-chip/paper-chip.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../../bower_components/paper-chip/paper-chip-input.html">
+
+<dom-module id="discounts-edit">
+
+    <template>
+        <style include="iron-flex iron-flex-alignment iron-flex-factors"></style>
+
+        <style>
+            vaadin-text-field {
+                vertical-align: middle;
+            }
+        </style>
+        <dom-if if="{{discount}}">
+            <template>
+
+                <div class="layout vertical">
+                    <div class="layout horizontal" style="vertical-align: middle;">
+                        <paper-input
+                                autofocus
+                                on-focus="_initDiscount"
+                                class="flex"
+                                on-change="_discountEdit"
+                                label="Name" value="{{discount.Name}}"></paper-input>
+                        <vaadin-date-picker
+                                class="flex"
+                                on-change="_discountEdit"
+                                auto-validate="false" value="{{discount.From}}"></vaadin-date-picker>
+                        <vaadin-date-picker
+                                class="flex"
+                                on-change="_discountEdit"
+                                auto-validate="false" value="{{discount.To}}"></vaadin-date-picker>
+                        <paper-dropdown-menu
+                                class="flex"
+                                on-change="_discountEdit"
+                                label="Type">
+                            <paper-listbox slot="dropdown-content" attr-for-selected="name"
+                                           selected="{{discount.Type}}">
+                                <paper-item name="value">Value</paper-item>
+                                <paper-item name="percentage">Percentage</paper-item>
+                            </paper-listbox>
+                        </paper-dropdown-menu>
+
+                        <paper-input
+                                label="Value" value="{{discount.Value}}"></paper-input>
+                    </div>
+                </div>
+                <div class="layout horizontal">
+                    <paper-chip-input-autocomplete id="paper-chip-input-autocomplete"
+                                                   class="flex"
+                                                   label="+Add (Enter) -Delete (Backspace)"
+                                                   source="{{inventories}}"
+                                                   input-value="{{p_name}}"
+                                                   on-change="_discountEdit"
+                                                   items="{{invSelected}}"
+                                                   closable>
+                    </paper-chip-input-autocomplete>
+                    <paper-chip-input-autocomplete id="paper-chip-input-autocomplete"
+                                                   label="+Add (Enter) -Delete (Backspace)"
+                                                   on-change="_discountEdit"
+                                                   class="flex"
+                                                   source="{{products}}"
+                                                   input-value="{{p_name}}"
+                                                   items="{{prodSelected}}"
+                                                   closable>
+                    </paper-chip-input-autocomplete>
+                </div>
+
+            </template>
+        </dom-if>
+        <div class="layout horizontal">
+            <paper-button on-click="_discountEdit">edit</paper-button>
+        </div>
+        </div>
+        <jwt-detail headers="{{headers}}"></jwt-detail>
+        <iron-ajax
+                auto
+                id="setDiscount"
+                url="/v1/discounts/{{discountId}}"
+                headers="{{headers}}"
+                last-response="{{discount}}"></iron-ajax>
+        <iron-ajax
+                url="/v1/discounts/{{discountId}}"
+                id="putSet"
+                debounce-duration="200"
+                body="{{discount}}"
+                content-type="application/json"
+                method="PUT"
+                last-response="{{discount}}"
+                headers="{{headers}}"></iron-ajax>
+
+
+        <iron-ajax
+                url="/v1/discounts/"
+                id="initDiscount"
+                debounce-duration="200"
+                body="{{discountBody}}"
+                content-type="application/json"
+                method="POST"
+                on-response="_setDiscount"
+                last-response="{{discount}}"
+                headers="{{headers}}"></iron-ajax>
+
+
+        <iron-ajax
+                auto
+                debounce-duration="100"
+                url="/v1/products/bill/?query=Name:{{p_name}}&limit=100"
+                content-type="application/json"
+                on-response="_processProduct"
+                last-response="{{rawProducts}}"
+                headers="{{headers}}"></iron-ajax>
+
+
+        {{discountId}}
+    </template>
+
+
+    <script>
+        class DiscountsEdit extends Polymer.Element {
+            static get is() {
+                return "discounts-edit"
+            }
+
+            static get properties() {
+                return {
+                    discountId: {
+                        type: Number,
+                        value: null,
+                        reflectToAttribute: true,
+                        notify: true,
+                    },
+                    discountBody: {
+                        Type: Object,
+                        value: {
+                            Id: null,
+                            Value: null,
+                            Type: null,
+                            Name: null,
+                            From: "2015-02-02T00:00:00Z",
+                            To: "2015-03-02T00:00:00Z",
+                            StoreId: {Id: 1}
+                        }
+                    },
+                    discount: {
+                        Type: Object,
+                        value: null
+                    },
+                    invSelected: {
+                        Type: Object,
+                        observer: "_INv"
+                    }
+                };
+            }
+
+            static get observers() {
+                return ['_formatDate(discount.*)'];
+            }
+
+            constructor() {
+                super();
+
+//                this.$.setDiscount.generateRequest();
+            }
+
+
+            _INv() {
+                console.log(this.invSelected)
+            }
+
+            _initDiscount() {
+                if (!this.discountId)
+                    this.$.initDiscount.generateRequest();
+            }
+
+            _setDiscount() {
+                this.discountId = this.discount.Id;
+            }
+
+            _processProduct() {
+                this.inventories = [];
+                this.products = [];
+                for (var i = 0; i < this.rawProducts.length; i++) {
+                    this.products.push({"text": this.rawProducts[i].Name, "value": this.rawProducts[i].Id});
+                    for (var p = 0; p < this.rawProducts[i].Inventory.length; p++) {
+                        this.inventories.push({
+                            "text": this.rawProducts[i].Name + " Batch:" + this.rawProducts[i].Inventory[p].BatchNo,
+                            "value": this.rawProducts[i].Inventory[p].Id
+                        });
+                    }
+                }
+                this.notifyPath('products');
+
+            }
+
+            _formatDate() {
+                var from = moment(this.discount.From);
+                if (from.isValid())
+                    this.discount.From = from.format("YYYY-MM-DD");
+                var to = moment(this.discount.To);
+                if (to.isValid())
+                    this.discount.To = to.format("YYYY-MM-DD");
+            }
+
+            _formatCDate() {
+
+                console.log(this.discount)
+                this.discount.Value = parseFloat(this.discount.Value)
+
+                var from = moment(this.discount.From);
+                if (from.isValid())
+                    this.discount.From = from.format("YYYY-MM-DDT00:00:00Z");
+                var to = moment(this.discount.To);
+                if (to.isValid())
+                    this.discount.To = to.format("YYYY-MM-DDT00:00:00Z");
+            }
+
+            _discountEdit() {
+                this._formatCDate();
+                this.$.putSet.generateRequest();
+            }
+        }
+        window.customElements.define(DiscountsEdit.is, DiscountsEdit);
+
+
+    </script>
+
+</dom-module>

@@ -90,7 +90,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <a name="dashboard" href="#/">Dashboard</a>
                     <a name="products" href="#/products">Products</a>
                     <a name="purchases" href="#/purchases">Purchases</a>
-                    <a name="discounts" href="#/Discounts">Discounts</a>
+                    <a name="discounts" href="#/discounts">Discounts</a>
                 </iron-selector>
             </app-drawer> <!-- Main content -->
             <app-header-layout fullbleed has-scrolling-region>
@@ -124,6 +124,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <purchases-index name="purchases-index"></purchases-index>
                     <purchases-create name="purchases-create"></purchases-create>
                     <scales-create name="scales-create"></scales-create>
+                    <discounts-index name="discounts-index"></discounts-index>
+                    <discounts-create name="discounts-create"></discounts-create>
+                    <discounts-edit name="discounts-edit" discount-id="{{pathId}}"></discounts-edit>
                 </iron-pages>
 
                 <app-toolbar style="height:24px;position:fixed;bottom:0;background:#999;width:100%;font-size:11px;">
