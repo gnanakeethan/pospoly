@@ -240,7 +240,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             "CardPaid": 0,
                             "CashPaid": 0,
                             "UserId": {
-                                "Id": 3,
+                                "Id": 1,
                             },
                             "TerminalId": {
                                 "Id": 1,
@@ -402,6 +402,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             _singleProduct(productList) {
                 if (productList.length === 1) {
                     this.$.inventoryRequest.generateRequest();
+                } else {
+                    this.inventoryList = [];
                 }
 
 
