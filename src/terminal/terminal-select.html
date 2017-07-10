@@ -1,0 +1,174 @@
+<link rel="import"
+      href="../../bower_components/polymer/polymer.html">
+<link rel="import"
+      href="../../bower_components/paper-input/paper-input.html">
+<link rel="import"
+      href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import"
+      href="../../bower_components/paper-button/paper-button.html">
+
+<script src="/bower_components/moment/moment.js"></script>
+<script src="/bower_components/moment-timezone/moment-timezone.js"></script>
+<link rel="import"
+      href="../../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import"
+      href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import"
+      href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import" href="../../bower_components/f-jwt-decode/f-jwt-decode.html">
+
+<dom-module id="terminal-select">
+
+    <template>
+        <style></style>
+        <iron-ajax auto
+                   last-response="{{terminals}}"
+                   url="/v1/terminals/empty/"></iron-ajax>
+        <jwt-detail token-object="{{tokenObject}}" headers="{{headers}}"></jwt-detail>
+        <f-jwt-decode token="{{tokenObject.token}}" value="{{decoded}}"></f-jwt-decode>
+
+        <iron-ajax auto
+                   on-response="_setTerminal"
+                   last-response="{{terminals_logged}}"
+                   url="/v1/terminals/?query=UserId.Id:{{decoded.UserId}},StoreId.Id:{{decoded.StoreId}}&limit=1">
+        </iron-ajax>
+        <iron-ajax auto
+                   method="PUT"
+                   on-response="_setTerminal"
+                   content-type="application/json"
+                   body="{{terminal}}"
+                   last-response="{{terminal_logged}}"
+                   url="/v1/terminals/{{terminalId}}">
+        </iron-ajax>
+        <dom-if if="{{reset}}">
+            <template>
+                <iron-ajax auto
+                           last-response="{{terminals}}"
+                           url="/v1/terminals/empty/?logout={{UserId}}"></iron-ajax>
+            </template>
+        </dom-if>
+        <app-localstorage-document key="terminalId" data="{{terminalId}}"></app-localstorage-document>
+
+
+        <paper-dialog
+                id="terminalBox"
+                modal
+                always-on-top
+                restore-focus-on-close
+                auto-fit-on-attach>
+            <div>
+                <paper-dropdown-menu label="Child ">
+                    <paper-listbox
+                            slot="dropdown-content" selected="{{terId}}"
+                            attr-for-selected="data-id">
+                        <template is="dom-repeat" items="{{terminals}}" as="terminal">
+                            <paper-item data-id="{{terminal.Id}}">{{terminal.Machine}}-{{terminal.Printer}}</paper-item>
+                        </template>
+                        <paper-item data-id=""></paper-item>
+
+                    </paper-listbox>
+                </paper-dropdown-menu>
+            </div>
+        </paper-dialog>
+    </template>
+    <script>
+        class TerminalSelect extends Polymer.Element {
+            static get is() {
+                return "terminal-select"
+            }
+
+            static get properties() {
+                return {
+                    reset:{
+                        Type: Boolean,
+                        value: null,
+                        reflectToAttribute: true,
+                        notify: true,
+                    },
+                    decoded: {
+                        type: Object,
+                        value: null,
+                    },
+                    terId: {
+                        Type: Number,
+                        value: null,
+                        observer: "_selectTerminal"
+                    },
+                    terminalId: {
+                        Type: Number,
+                        value: null,
+                        reflectToAttribute: true,
+                        notify: true,
+                    },
+                    terminal: {
+                        Type: Object,
+                        value: {
+                            UserId: {Id: null},
+                        }
+                    },
+                    terminal_logged: {
+                        Type: Object,
+                        value: {
+                            Id: 0,
+                        }
+                    }
+                };
+            }
+
+            static get observers() {
+                return ['_setUser(decoded.*)',
+                '_reset(reset)']
+            }
+
+            constructor() {
+                super();
+            }
+
+            _selectTerminal() {
+                console.log(this.terId)
+                if (this.terId)
+                    this.terminalId = this.terId;
+            }
+
+            _setTerminal() {
+                if(!this.decoded.UserId){
+                    return;
+                }
+                if (this.terminal_logged || this.terminals_logged) {
+                    if (this.terminals_logged) {
+                        this.terminal_logged = this.terminals_logged[0];
+                    }
+                    console.log(this.terminals_logged);
+                    if (!this.terminal_logged.Id) {
+                        this.$.terminalBox.open();
+                    }
+                    else {
+                        this.$.terminalBox.close();
+                    }
+                }
+            }
+
+            _setUser() {
+                if (this.decoded) {
+                    this.UserId = this.decoded.UserId;
+                    this.terminal.UserId = {Id: this.decoded.UserId};
+                    this.terminalId = this.decoded.TerminalId;
+                    console.log(this.decoded.TerminalId)
+                }
+            }
+            _reset(){
+                if(this.reset){
+                    this.terminalId=0;
+                }
+            }
+        }
+        window.customElements.define(TerminalSelect.is, TerminalSelect);
+
+    </script>
+
+</dom-module>
