@@ -86,8 +86,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <dom-repeat items="{{discountable_inventories}}" as="discountable">
                             <template>
                                 <iron-ajax headers="{{headers}}" auto url="/v1/inventories/{{discountable.DiscountableId}}"
-                                           last-response="{{inv}}"></iron-ajax>
-                                <paper-chip label="{{inv.ProductId.Name}} - {{inv.BatchNo}}" closable slot="input"
+                                           last-response="{{discountable.inv}}"></iron-ajax>
+                                <paper-chip label="{{discountable.inv.ProductId.Name}} - {{discountable.inv.BatchNo}}" closable slot="input"
                                             on-chip-removed="_removeProduct"
                                             data-id="{{discountable.Id}}"></paper-chip>
                             </template>
