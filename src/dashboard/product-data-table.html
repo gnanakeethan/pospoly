@@ -295,7 +295,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <td class="Name">{{datum.BatchNo}}</td>
                         <td class="Price">{{_computeCurrency(datum.InventoryScale.0.Price)}}</td>
                         <td class="Qty">{{datum.InventoryScale.0.Units}}</td>
-                        <td class="Unit">                        </td>
+                        <td class="Unit"></td>
                         <td class="Total"></td>
                         <td class="Discount"></td>
                         <td class="Net"></td>
@@ -603,8 +603,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 this.inventoryIndex = event.target.parentNode.dataIndex;
 
             }
-
-
         }
         window.customElements.define(ProductDataTable.is, ProductDataTable);
     </script>
