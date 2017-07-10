@@ -44,14 +44,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 class="flex"
                                 on-change="_discountEdit"
                                 label="Name" value="{{discount.Name}}"></paper-input>
-                        <vaadin-date-picker
+
+                        <paper-input
                                 class="flex"
-                                on-change="_discountEdit"
-                                auto-validate="false" value="{{discount.From}}"></vaadin-date-picker>
-                        <vaadin-date-picker
-                                class="flex"
-                                on-change="_discountEdit"
-                                auto-validate="false" value="{{discount.To}}"></vaadin-date-picker>
+                                label="Value" value="{{discount.Value}}"></paper-input>
+
                         <paper-dropdown-menu
                                 class="flex"
                                 on-change="_discountEdit"
@@ -62,32 +59,58 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <paper-item name="percentage">Percentage</paper-item>
                             </paper-listbox>
                         </paper-dropdown-menu>
-
-                        <paper-input
-                                label="Value" value="{{discount.Value}}"></paper-input>
                     </div>
                 </div>
                 <div class="layout horizontal">
-                    <paper-chip-input-autocomplete id="paper-chip-input-autocomplete"
-                                                   class="flex"
-                                                   label="+Add (Enter) -Delete (Backspace)"
-                                                   source="{{inventories}}"
-                                                   input-value="{{p_name}}"
-                                                   on-change="_discountEdit"
-                                                   items="{{invSelected}}"
-                                                   closable>
+
+                    <vaadin-date-picker
+                            class="flex"
+                            label="From"
+                            on-change="_discountEdit"
+                            auto-validate="false" value="{{discount.From}}"></vaadin-date-picker>
+                    <vaadin-date-picker
+                            class="flex"
+                            label="To"
+                            on-change="_discountEdit"
+                            auto-validate="false" value="{{discount.To}}"></vaadin-date-picker>
+                </div>
+                    <div class="layout horizontal">
+                    <paper-chip-input-autocomplete
+                            class="flex"
+                            label="+Add (Enter) -Delete (Backspace)"
+                            source="{{inventories}}"
+                            input-value="{{i_name}}"
+                            items-selected="{{invSelected}}"
+                            closable>
+
+                        <dom-repeat items="{{discountable_inventories}}" as="discountable">
+                            <template>
+                                <iron-ajax headers="{{headers}}" auto url="/v1/inventories/{{discountable.DiscountableId}}"
+                                           last-response="{{inv}}"></iron-ajax>
+                                <paper-chip label="{{inv.ProductId.Name}} - {{inv.BatchNo}}" closable slot="input"
+                                            on-chip-removed="_removeProduct"
+                                            data-id="{{discountable.Id}}"></paper-chip>
+                            </template>
+                        </dom-repeat>
                     </paper-chip-input-autocomplete>
-                    <paper-chip-input-autocomplete id="paper-chip-input-autocomplete"
-                                                   label="+Add (Enter) -Delete (Backspace)"
-                                                   on-change="_discountEdit"
-                                                   class="flex"
-                                                   source="{{products}}"
-                                                   input-value="{{p_name}}"
-                                                   items="{{prodSelected}}"
-                                                   closable>
+
+                    <paper-chip-input-autocomplete
+                            label="+Add (Enter) -Delete (Backspace)"
+                            class="flex"
+                            source="{{products}}"
+                            input-value="{{p_name}}"
+                            items-selected="{{prodSelected}}"
+                            closable>
+                        <dom-repeat items="{{discountable_products}}">
+                            <template>
+                                <iron-ajax headers="{{headers}}" auto url="/v1/products/{{item.DiscountableId}}"
+                                           last-response="{{prod}}"></iron-ajax>
+                                <paper-chip label="{{prod.Name}}" closable slot="input" on-chip-removed="_removeProduct"
+                                            data-id="{{item.Id}}"></paper-chip>
+                            </template>
+                        </dom-repeat>
                     </paper-chip-input-autocomplete>
                 </div>
-
             </template>
         </dom-if>
         <div class="layout horizontal">
@@ -126,8 +149,50 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <iron-ajax
                 auto
+                url="/v1/discountables/?query=DiscountId:{{discountId}},DiscountableType:Products"
+                debounce-duration="200"
+                content-type="application/json"
+                method="GET"
+                last-response="{{discountable_products}}"
+                headers="{{headers}}"></iron-ajax>
+        <iron-ajax
+                auto
+                url="/v1/discountables/?query=DiscountId:{{discountId}},DiscountableType:Inventories"
+                debounce-duration="200"
+                content-type="application/json"
+                method="GET"
+                last-response="{{discountable_inventories}}"
+                headers="{{headers}}"></iron-ajax>
+
+        <iron-ajax
+                id="discountableDelete"
+                content-type="application/json"
+                method="DELETE"
+                headers="{{headers}}"></iron-ajax>
+
+
+        <iron-ajax
+                id="discountable"
+                url="/v1/discountables/"
+                debounce-duration="200"
+                content-type="application/json"
+                method="POST"
+                body="{{discountable}}"
+                headers="{{headers}}"></iron-ajax>
+
+
+        <iron-ajax
+                auto
                 debounce-duration="100"
                 url="/v1/products/bill/?query=Name:{{p_name}}&limit=100"
+                content-type="application/json"
+                on-response="_processProduct"
+                last-response="{{rawProducts}}"
+                headers="{{headers}}"></iron-ajax>
+        <iron-ajax
+                auto
+                debounce-duration="100"
+                url="/v1/products/bill/?query=Name:{{i_name}}&limit=100"
                 content-type="application/json"
                 on-response="_processProduct"
                 last-response="{{rawProducts}}"
@@ -164,19 +229,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             StoreId: {Id: 1}
                         }
                     },
+                    discountable: {
+                        type: Object,
+                        value: {
+                            DiscountId: null,
+                            DiscountableId: null,
+                            DiscountableType: null,
+                        }
+                    },
                     discount: {
                         Type: Object,
                         value: null
-                    },
-                    invSelected: {
-                        Type: Object,
-                        observer: "_INv"
                     }
                 };
             }
 
             static get observers() {
-                return ['_formatDate(discount.*)'];
+                return ['_formatDate(discount.*)',
+                '_discountEdit(invSelected.*,prodSelected.*)'];
             }
 
             constructor() {
@@ -216,12 +286,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             }
 
             _formatDate() {
-                var from = moment(this.discount.From);
-                if (from.isValid())
-                    this.discount.From = from.format("YYYY-MM-DD");
-                var to = moment(this.discount.To);
-                if (to.isValid())
-                    this.discount.To = to.format("YYYY-MM-DD");
+                if (this.discount) {
+
+                    var from = moment(this.discount.From);
+                    if (from.isValid())
+                        this.discount.From = from.format("YYYY-MM-DD");
+                    var to = moment(this.discount.To);
+                    if (to.isValid())
+                        this.discount.To = to.format("YYYY-MM-DD");
+                }
             }
 
             _formatCDate() {
@@ -237,9 +310,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.discount.To = to.format("YYYY-MM-DDT00:00:00Z");
             }
 
+            _filterDiscountableId(discountables) {
+                var filterlist = [];
+                for (var i = 0; i < discountables.length; i++) {
+                    filterlist.push(discountables[i].DiscountableId);
+                }
+                return filterlist;
+            }
+
+            _removeProduct(event) {
+                this.$.discountableDelete.url = "/v1/discountables/" + event.target.dataId;
+                this.$.discountableDelete.generateRequest();
+                console.log()
+
+            }
+
+            _testCC() {
+                console.log("Test succes;");
+            }
+
             _discountEdit() {
                 this._formatCDate();
+                for (var i = 0; i < this.prodSelected.length; i++) {
+                    this.discountable.DiscountableId = parseInt(this.prodSelected[i]);
+                    this.discountable.DiscountableType = "Products";
+                    this.discountable.DiscountId = {Id: parseInt(this.discountId)};
+                    console.log(this.discountable);
+                    this.$.discountable.generateRequest();
+                }
+                console.log(this.invSelected);
+                for (var i = 0; i < this.invSelected.length; i++) {
+                    this.discountable.DiscountableId = parseInt(this.invSelected[i]);
+                    this.discountable.DiscountableType = "Inventories";
+                    this.discountable.DiscountId = {Id: parseInt(this.discountId)};
+                    this.$.discountable.generateRequest();
+                }
+                console.log(this.prodSelected);
                 this.$.putSet.generateRequest();
+            }
+
+            _isEqual(a, b) {
+                return a === b;
             }
         }
         window.customElements.define(DiscountsEdit.is, DiscountsEdit);

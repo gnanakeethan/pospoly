@@ -217,7 +217,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </td>
                         <td>
                             <paper-dropdown-menu label="Child Scale">
-                                <paper-listbox (iron-select)="_insChanged($event,'d')" data-id="{{inid.Id}}"
+                                <paper-listbox on-iron-select="_insChanged($event,'d')" data-id="{{inid.Id}}"
                                                slot="dropdown-content" selected="{{inid.ScaleId.Id}}"
                                                attr-for-selected="data-value">
                                     <template is="dom-repeat" items="{{scales}}" as="scale">

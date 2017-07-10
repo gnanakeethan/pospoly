@@ -23,7 +23,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import"
       href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../products/products-edit.html">
 
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import"
       href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
@@ -168,6 +172,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <jwt-detail headers="{{headers}}"></jwt-detail>
 
+        <iron-ajax url="/v1/scales/"
+                   last-response="{{scales}}"
+                   auto></iron-ajax>
         <iron-ajax
                 auto
                 id="mainRequest"
@@ -256,6 +263,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             </a>
                         </td>
                     </tr>
+
+
                 </template>
             </template>
 
@@ -266,14 +275,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <tr class="alternate" on-click="_searchInput" data-name="{{datum.Barcode}}">
                         <td class="PCode">{{datum.ProductCode}}</td>
                         <td class="Name">{{datum.Name}}</td>
-                        <td class="Price"></td>
+                        <td class="Price">
+                        </td>
                         <td class="Qty"></td>
                         <td class="Unit"></td>
                         <td class="Total"></td>
                         <td class="Discount"></td>
                         <td class="Net"></td>
-                        <td class="Delete"></td>
-
+                        <td class="Delete">
+                        </td>
                     </tr>
                 </template>
                 <template is="dom-repeat"
@@ -285,7 +295,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <td class="Name">{{datum.BatchNo}}</td>
                         <td class="Price">{{_computeCurrency(datum.InventoryScale.0.Price)}}</td>
                         <td class="Qty">{{datum.InventoryScale.0.Units}}</td>
-                        <td class="Unit"></td>
+                        <td class="Unit">                        </td>
                         <td class="Total"></td>
                         <td class="Discount"></td>
                         <td class="Net"></td>
@@ -296,6 +306,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </tbody>
 
         </table>
+
+
         <table>
             <tbody>
             <tr style="position:fixed;bottom:24px;width:100%;">
@@ -310,6 +322,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </tr>
             </tbody>
         </table>
+
     </template>
 
     <script>

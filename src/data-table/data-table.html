@@ -79,7 +79,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             on-response="_checkData"
             id="mainRequest"
             headers="{{headers}}"
-            auto url="{{url}}&offset={{offset}}&amp;limit={{limit}}&amp;{{sortString}}"
+            auto
+            url="{{url}}&offset={{offset}}&amp;limit={{limit}}&amp;{{sortString}}"
             last-response="{{data}}"></iron-ajax>
             <jwt-detail headers="{{headers}}"></jwt-detail>
 
