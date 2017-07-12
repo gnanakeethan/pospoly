@@ -1,26 +1,28 @@
 <link rel="import"
-    href="../../bower_components/polymer/polymer.html">
+      href="../../bower_components/polymer/polymer.html">
 <link rel="import"
-    href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+      href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 
 <link rel="import"
-    href="./jwt-login.html">
+      href="./jwt-login.html">
 
 <dom-module id="jwt-manager">
 
     <template>
 
-    <style></style>
-    <jwt-login
-      id="{{loginId}}"
-      login-popup="{{loginPopup}}"
-      validate-url="{{validateUrl}}"
-      refresh-url="{{refreshUrl}}"
-      auth-url="{{authUrl}}"
-      token-object="{{tokenObject}}"></jwt-login>
-    <app-localstorage-document key="tokenObject" data="{{tokenObject}}"></app-localstorage-document>
+        <style></style>
+        <jwt-login
+                logout="{{logout}}"
+                id="{{loginId}}"
+                login-popup="{{loginPopup}}"
+                validate-url="{{validateUrl}}"
+                refresh-url="{{refreshUrl}}"
+                logout-url="{{logoutUrl}}"
+                auth-url="{{authUrl}}"
+                token-object="{{tokenObject}}"></jwt-login>
+        <app-localstorage-document key="tokenObject" data="{{tokenObject}}"></app-localstorage-document>
 
-  </template>
+    </template>
     <script>
         Polymer({
 
@@ -29,6 +31,12 @@
                 loginId: {
                     type: String,
                     value: "jwtChildLogin"
+                },
+                logout: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true,
+                    notify: true,
                 },
                 authUrl: {
                     type: String,
@@ -41,6 +49,10 @@
                 refreshUrl: {
                     type: String,
                     value: "/v1/auth/refresh"
+                },
+                logoutUrl: {
+                    type: String,
+                    value: "/v1/auth/logout"
                 },
                 loginPopup: {
                     type: Boolean,

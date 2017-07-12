@@ -68,6 +68,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
 
         <jwt-manager
+                logout="{{logout}}"
                 id="jwtRoot"
                 login-id="jwtRootLogin"
                 login-popup="true">
@@ -284,6 +285,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _logout() {
                 this._changeTerminal();
+                this.logout=true;
                 this.tokenObject = {};
 
 

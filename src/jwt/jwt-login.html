@@ -29,6 +29,14 @@
                 method="post"
                 last-response="{{tokenObject}}"
                 handle-as="json"></iron-ajax>
+        <iron-ajax
+                id="logoutRequest"
+                content-type="application/json"
+                url="{{logoutUrl}}"
+                body='{{tokenObject}}'
+                method="post"
+                last-response="{{tokenObject}}"
+                handle-as="json"></iron-ajax>
 
         <iron-ajax
                 id="validationRequest"
@@ -64,7 +72,6 @@
             <h1>Login Form</h1>
             <paper-input autofocus id="username" type="text" label="Username" value="{{username}}"></paper-input>
             <paper-input id="password" type="password" label="Password" value="{{password}}"></paper-input>
-
             <div style="margin-top:20px;" class="buttons">
                 <paper-button
                         on-click="submitLogin"
@@ -90,6 +97,13 @@
                     type: String,
                     value: "JuPo"
                 },
+                logout:{
+                    type:Boolean,
+                    value:false,
+                    reflectToAttribute:true,
+                    notify:true,
+                    observer:"_logout"
+                },
 
                 loginPopup: {
                     type: Boolean,
@@ -100,6 +114,9 @@
                     type: String
                 },
                 refreshUrl: {
+                    type: String
+                },
+                logoutUrl: {
                     type: String
                 },
                 token: {
@@ -132,8 +149,8 @@
                     var current=Date.now() / 1000 | 0;
                     var valid_for = this.decoded.exp - this.decoded.nbf;
 
-                    this.debounce('validationRequest', this._validationRequest, (valid_for/20)*1000);
-                    if(this.decoded.exp-(valid_for/5) <= current){
+                    this.debounce('validationRequest', this._validationRequest, 2000);
+                    if(this.decoded.exp-(valid_for/2) <= current){
                         this.$.refreshRequest.generateRequest();
                     }
                 }
@@ -174,6 +191,10 @@
                 };
                 return ko;
             },
+            _logout:function(){
+                this.$.logoutRequest.generateRequest();
+
+            }
         });
     </script>
 

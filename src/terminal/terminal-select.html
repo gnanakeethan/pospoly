@@ -84,7 +84,7 @@
 
             static get properties() {
                 return {
-                    reset:{
+                    reset: {
                         Type: Boolean,
                         value: null,
                         reflectToAttribute: true,
@@ -122,7 +122,7 @@
 
             static get observers() {
                 return ['_setUser(decoded.*)',
-                '_reset(reset)']
+                    '_reset(reset)']
             }
 
             constructor() {
@@ -136,7 +136,7 @@
             }
 
             _setTerminal() {
-                if(!this.decoded.UserId){
+                if (!this.decoded.UserId) {
                     return;
                 }
                 if (this.terminal_logged || this.terminals_logged) {
@@ -150,6 +150,10 @@
                     else {
                         this.$.terminalBox.close();
                     }
+                }else {
+
+                    this.terminal_logged = null;
+                    this.terminalId = null;
                 }
             }
 
@@ -161,9 +165,11 @@
                     console.log(this.decoded.TerminalId)
                 }
             }
-            _reset(){
-                if(this.reset){
-                    this.terminalId=0;
+
+            _reset() {
+                if (this.reset) {
+                    this.terminalId = 0;
+                    this.reset = false;
                 }
             }
         }
