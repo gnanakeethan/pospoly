@@ -14,7 +14,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import"
       href="./product-data-table.html">
 <link rel="import"
-      href="../jwt/jwt-detail.html">
+      href="../app-detail.html">
 <link rel="import"
       href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <dom-module id="dashboard-index">
@@ -29,7 +29,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
         </style>
-        <jwt-detail headers="{{headers}}" token-object="{{tokenObject}}"></jwt-detail>
+        <app-detail headers="{{headers}}" token-object="{{tokenObject}}"></app-detail>
 
         <template is="dom-if" if="{{!_isset(productIdentifier)}}">
             <iron-a11y-keys id="a11y"

@@ -86,7 +86,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </div>
         </template>
         <paper-button on-click="_put">PutaAll</paper-button>
-        <jwt-detail headers="{{headers}}"></jwt-detail>
+        <app-detail headers="{{headers}}"></app-detail>
         <!-- Product Acquirer -->
         <iron-ajax url="/v1/products/bill/?{{searchInput}}"
                    auto

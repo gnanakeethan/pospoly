@@ -1,0 +1,130 @@
+<link rel="import"
+      href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+
+<dom-module id="app-detail">
+
+    <template>
+
+        <style>
+            :host {
+                display: none;
+            }
+
+            .card {
+                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+                padding: 16px;
+                margin: 24px;
+                border-radius: 5px;
+                background-color: #fff;
+                color: #757575;
+            }
+
+            .circle {
+                display: inline-block;
+                height: 64px;
+                width: 64px;
+                border-radius: 50%;
+                background: #ddd;
+                line-height: 64px;
+                font-size: 30px;
+                color: #555;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 22px;
+                margin: 16px 0;
+                color: #212121;
+            }
+        </style>
+        <app-localstorage-document key="tokenObject" data="{{store.tokenObject}}"></app-localstorage-document>
+        <app-localstorage-document key="terminalId" data="{{store.terminalId}}"></app-localstorage-document>
+        <app-localstorage-document key="storeId" data="{{store.storeId}}"></app-localstorage-document>
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'app-detail',
+            properties: {
+                token: {
+                    type: String,
+                    reflectToAttribute: true,
+                    readOnly: true,
+                    value: null,
+                    notify: true
+                },
+
+                storeId: {
+                    type: Number,
+                    reflectToAttribute: true,
+                    observer: '_attrChanged',
+                    readOnly: true,
+                    value: null,
+                    notify: true
+                },
+                terminalId: {
+                    type: Number,
+                    reflectToAttribute: true,
+                    readOnly: true,
+                    observer: '_attrChanged',
+                    value: null,
+                    notify: true
+                },
+                headers: {
+                    type: Object,
+                    notify: true,
+                    reflectToAttribute: true,
+                    readOnly: true
+                },
+                store: {
+                    type: Object,
+                    value: {
+                        tokenObject:{},
+                        terminalId:null,
+                        storeId:null
+                    },
+                },
+                tokenObject: {
+                    type: Object,
+                    notify: true,
+                    readOnly: true,
+                    reflectToAttribute: true,
+                    observer: '_attrChanged',
+                    value: null,
+                },
+            },
+            observers: [
+                '_setAttr(store.*)',
+                '_attrChanged(tokenObject.*,terminalId,storeId)'
+            ],
+            _setAttr: function () {
+                if (this.store.tokenObject)
+                    this._setTokenObject(this.store.tokenObject);
+                if(this.store.terminalId)
+                    this._setTerminalId(this.store.terminalId);
+                if(this.store.storeId)
+                    this._setStoreId(this.store.storeId);
+            },
+            _attrChanged: function () {
+                var headers = {};
+                console.log(this.tokenObject);
+                if (this.tokenObject) {
+                    headers["Authorization"] = this.tokenObject.token;
+                }
+                if (this.storeId) {
+                    headers['store_id'] = this.storeId;
+                }
+                if (this.terminalId) {
+                    headers['Terminal_id'] = this.terminalId;
+                }
+                console.log(headers);
+                this._setHeaders(headers);
+
+            },
+
+        });
+    </script>
+
+</dom-module>

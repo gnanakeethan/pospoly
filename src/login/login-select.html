@@ -22,37 +22,45 @@
 <link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 <link rel="import" href="../../bower_components/f-jwt-decode/f-jwt-decode.html">
 
-<dom-module id="terminal-select">
+<dom-module id="login-select">
 
     <template>
         <style></style>
-        <iron-ajax auto
-                   last-response="{{terminals}}"
-                   url="/v1/terminals/empty/"></iron-ajax>
-        <jwt-detail token-object="{{tokenObject}}" headers="{{headers}}"></jwt-detail>
-        <f-jwt-decode token="{{tokenObject.token}}" value="{{decoded}}"></f-jwt-decode>
 
-        <iron-ajax auto
-                   on-response="_setTerminal"
-                   last-response="{{terminals_logged}}"
-                   url="/v1/terminals/?query=UserId.Id:{{decoded.UserId}},StoreId.Id:{{decoded.StoreId}}&limit=1">
-        </iron-ajax>
-        <iron-ajax auto
-                   method="PUT"
-                   on-response="_setTerminal"
-                   content-type="application/json"
-                   body="{{terminal}}"
-                   last-response="{{terminal_logged}}"
-                   url="/v1/terminals/{{terminalId}}">
-        </iron-ajax>
-        <dom-if if="{{reset}}">
+        <dom-if if="{{decoded.UserId}}">
             <template>
                 <iron-ajax auto
-                           last-response="{{terminals}}"
-                           url="/v1/terminals/empty/?logout={{UserId}}"></iron-ajax>
+                           on-response="_setTerminal"
+                           headers="{{headers}}"
+                           last-response="{{user}}"
+                           url="/v1/users/{{decoded.UserId}}"></iron-ajax>
             </template>
         </dom-if>
+        <dom-if if="{{storeId}}">
+            <template>
+                <!--Terminal Acquirer-->
+                <iron-ajax auto last-response="{{terminals}}"
+                           headers="{{headers}}"
+                           url="/v1/terminals/?query=StoreId:{{storeId}},UserId__isnull:true">
+                </iron-ajax>
+            </template>
+        </dom-if>
+        <dom-if if="{{reset}}">
+            <template>
+                <!--Logouts the Terminal-->
+                <iron-ajax auto
+                           headers="{{headers}}"
+                           last-response="{{terminals}}"
+                           url="/v1/terminals/empty/?logout=true"></iron-ajax>
+            </template>
+        </dom-if>
+
         <app-localstorage-document key="terminalId" data="{{terminalId}}"></app-localstorage-document>
+        <app-localstorage-document key="storeId" data="{{storeId}}"></app-localstorage-document>
+
+
+        <app-detail token-object="{{tokenObject}}" headers="{{headers}}"></app-detail>
+        <f-jwt-decode token="{{tokenObject.token}}" value="{{decoded}}"></f-jwt-decode>
 
 
         <paper-dialog
@@ -64,22 +72,30 @@
             <div>
                 <paper-dropdown-menu label="Child ">
                     <paper-listbox
-                            slot="dropdown-content" selected="{{terId}}"
+                            slot="dropdown-content" selected="{{storeId}}"
+                            attr-for-selected="data-id">
+                        <template is="dom-repeat" items="{{user.Stores}}" as="store">
+                            <paper-item data-id="{{store.Id}}">{{store.StoreName}} - {{store.Address}}</paper-item>
+                        </template>
+                    </paper-listbox>
+                </paper-dropdown-menu>
+                <paper-dropdown-menu label="Child ">
+                    <paper-listbox
+                            slot="dropdown-content" selected="{{terminalId}}"
                             attr-for-selected="data-id">
                         <template is="dom-repeat" items="{{terminals}}" as="terminal">
                             <paper-item data-id="{{terminal.Id}}">{{terminal.Machine}}-{{terminal.Printer}}</paper-item>
                         </template>
-                        <paper-item data-id=""></paper-item>
-
                     </paper-listbox>
                 </paper-dropdown-menu>
+                <paper-button on-click="_fix">Okay</paper-button>
             </div>
         </paper-dialog>
     </template>
     <script>
-        class TerminalSelect extends Polymer.Element {
+        class LoginSelect extends Polymer.Element {
             static get is() {
-                return "terminal-select"
+                return "login-select"
             }
 
             static get properties() {
@@ -129,41 +145,10 @@
                 super();
             }
 
-            _selectTerminal() {
-                console.log(this.terId)
-                if (this.terId)
-                    this.terminalId = this.terId;
-            }
-
             _setTerminal() {
-                if (!this.decoded.UserId) {
-                    return;
-                }
-                if (this.terminal_logged || this.terminals_logged) {
-                    if (this.terminals_logged) {
-                        this.terminal_logged = this.terminals_logged[0];
-                    }
-                    console.log(this.terminals_logged);
-                    if (!this.terminal_logged.Id) {
-                        this.$.terminalBox.open();
-                    }
-                    else {
-                        this.$.terminalBox.close();
-                    }
-                }else {
-
-                    this.terminal_logged = null;
-                    this.terminalId = null;
-                }
-            }
-
-            _setUser() {
-                if (this.decoded) {
-                    this.UserId = this.decoded.UserId;
-                    this.terminal.UserId = {Id: this.decoded.UserId};
-                    this.terminalId = this.decoded.TerminalId;
-                    console.log(this.decoded.TerminalId)
-                }
+                console.log(this.terminalId);
+                if (!this.storeId || !this.terminalId)
+                    this.$.terminalBox.open();
             }
 
             _reset() {
@@ -172,8 +157,15 @@
                     this.reset = false;
                 }
             }
+
+            _fix() {
+                if (this.terminalId && this.storeId){
+                    console.log(this.terminalId)
+                    this.$.terminalBox.close();
+                }
+            }
         }
-        window.customElements.define(TerminalSelect.is, TerminalSelect);
+        window.customElements.define(LoginSelect.is, LoginSelect);
 
     </script>
 

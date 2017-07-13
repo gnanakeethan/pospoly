@@ -40,7 +40,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-input class="filter"
                      label="Product Code"
                      value="{{product_code}}"></paper-input>
-        <jwt-detail headers="{{headers}}"></jwt-detail>
+        <app-detail headers="{{headers}}"></app-detail>
         <data-table url="/v1/products?{{searchInput}}{{productCode}}"
                     cols='{"Id":"Id","ProductCode":"ProductCode","Name":"Name"}'
                     sorted="Id"

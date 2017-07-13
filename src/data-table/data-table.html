@@ -12,7 +12,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../jwt/jwt-detail.html">
+<link rel="import" href="../app-detail.html">
 
 <dom-module id="data-table">
 
@@ -82,7 +82,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             auto
             url="{{url}}&offset={{offset}}&amp;limit={{limit}}&amp;{{sortString}}"
             last-response="{{data}}"></iron-ajax>
-            <jwt-detail headers="{{headers}}"></jwt-detail>
+            <app-detail headers="{{headers}}"></app-detail>
 
         <iron-ajax id="deleteRequest"
                    headers="{{headers}}"

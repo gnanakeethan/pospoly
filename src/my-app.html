@@ -26,8 +26,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="my-icons.html">
 <link rel="import" href="jwt/jwt-manager.html">
-<link rel="import" href="jwt/jwt-detail.html">
-<link rel="import" href="terminal/terminal-select.html">
+<link rel="import" href="app-detail.html">
+<link rel="import" href="login/login-select.html">
 
 
 <script src="../bower_components/moment/moment.js" async></script>
@@ -73,10 +73,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 login-id="jwtRootLogin"
                 login-popup="true">
         </jwt-manager>
-        <terminal-select terminal-id="{{terminalId}}" reset="{{resetTerminal}}"></terminal-select>
         <app-localstorage-document key="tokenObject" data="{{tokenObject}}"></app-localstorage-document>
-        <jwt-detail token-object={{tokenObject}}></jwt-detail>
+        <app-detail token-object={{tokenObject}}></app-detail>
         <f-jwt-decode token="{{tokenObject.token}}" value="{{decoded}}"></f-jwt-decode>
+        <login-select terminal-id="{{terminalId}}" reset="{{resetTerminal}}"></login-select>
 
 
         <app-location route="{{route}}" use-hash-as-path></app-location>
@@ -285,13 +285,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             _logout() {
                 this._changeTerminal();
-                this.logout=true;
+                this.logout = true;
                 this.tokenObject = {};
 
 
             }
-            _changeTerminal(){
-                this.resetTerminal=true;
+
+            _changeTerminal() {
+                this.resetTerminal = true;
             }
 
             _tokenChanged() {

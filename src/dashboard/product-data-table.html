@@ -161,10 +161,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 padding-right: 10px;
             }
         </style>
-        <jwt-detail headers="{{headers}}"></jwt-detail>
+        <app-detail headers="{{headers}}"></app-detail>
 
         <iron-ajax url="/v1/scales/"
                    last-response="{{scales}}"
+                   headers="{{headers}}"
                    auto></iron-ajax>
         <iron-ajax
                 auto

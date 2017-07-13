@@ -18,7 +18,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
-<link rel="import" href="../jwt/jwt-detail.html">
+<link rel="import" href="../app-detail.html">
 
 <dom-module id="products-edit">
 
@@ -246,7 +246,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
 
 
-        <jwt-detail headers="{{headers}}"></jwt-detail>
+        <app-detail headers="{{headers}}"></app-detail>
 
         <iron-ajax id="invChange"
                    body="{{inventoryChanged}}"

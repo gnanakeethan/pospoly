@@ -145,17 +145,24 @@
                 this.$.validationRequest.generateRequest();
             },
             _revalidateLogin: function (e, request) {
+                if(!this.tokenObject){
+                    this.tokenObject = {success: false, token: ""};
+                }
                 if(this.tokenObject.success){
                     var current=Date.now() / 1000 | 0;
                     var valid_for = this.decoded.exp - this.decoded.nbf;
 
-                    this.debounce('validationRequest', this._validationRequest, 2000);
+                    this.debounce('validationRequest', this._validationRequest, 4000);
                     if(this.decoded.exp-(valid_for/2) <= current){
                         this.$.refreshRequest.generateRequest();
                     }
                 }
             },
             _validationRequest: function () {
+                if(!this.tokenObject){
+                    this.tokenObject = {success: false, token: ""};
+                    this.$.loginBox.open();
+                }
                 if (this.tokenObject.success){
                     this.$.validationRequest.generateRequest();
                 }
