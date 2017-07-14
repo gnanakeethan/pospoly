@@ -1,0 +1,45 @@
+
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../data-table/data-table.html">
+
+<dom-module id="roles-index">
+
+    <template>
+
+        <style>
+
+        </style>
+
+        <data-table url="/v1/roles/?"
+                    cols='{"Id":"Id","DisplayName":"Name","Description":"Description"}'
+                    sorted="Id"
+                    id-row="Id"
+                    get-url="/v1/roles/:id/"
+                    post-url="/v1/roles/:id/"
+                    edit-url="#/roles/edit/:id:/"
+                    delete-url="/v1/roles/:id:/">
+        </data-table>
+    </template>
+
+    <script>
+        class RolesIndex extends Polymer.Element {
+            static get is() {
+                return "roles-index"
+            }
+        }
+        window.customElements.define(RolesIndex.is,RolesIndex);
+
+
+    </script>
+
+</dom-module>
