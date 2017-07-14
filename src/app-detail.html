@@ -38,9 +38,9 @@
                 color: #212121;
             }
         </style>
-        <app-localstorage-document key="tokenObject" data="{{store.tokenObject}}"></app-localstorage-document>
-        <app-localstorage-document key="terminalId" data="{{store.terminalId}}"></app-localstorage-document>
-        <app-localstorage-document key="storeId" data="{{store.storeId}}"></app-localstorage-document>
+        <app-localstorage-document key="tokenObject" data="{{tokenObjectLocal}}"></app-localstorage-document>
+        <app-localstorage-document key="terminalId" data="{{terminalIdLocal}}"></app-localstorage-document>
+        <app-localstorage-document key="storeId" data="{{storeIdLocal}}"></app-localstorage-document>
     </template>
 
     <script>
@@ -59,7 +59,6 @@
                 storeId: {
                     type: Number,
                     reflectToAttribute: true,
-                    observer: '_attrChanged',
                     readOnly: true,
                     value: null,
                     notify: true
@@ -68,60 +67,49 @@
                     type: Number,
                     reflectToAttribute: true,
                     readOnly: true,
-                    observer: '_attrChanged',
                     value: null,
                     notify: true
                 },
                 headers: {
                     type: Object,
-                    notify: true,
                     reflectToAttribute: true,
-                    readOnly: true
+                    readOnly: true,
+                    value: {},
+                    notify: true,
                 },
                 store: {
                     type: Object,
-                    value: {
-                        tokenObject:{},
-                        terminalId:null,
-                        storeId:null
-                    },
                 },
                 tokenObject: {
                     type: Object,
                     notify: true,
                     readOnly: true,
                     reflectToAttribute: true,
-                    observer: '_attrChanged',
                     value: null,
                 },
             },
             observers: [
-                '_setAttr(store.*)',
-                '_attrChanged(tokenObject.*,terminalId,storeId)'
+                '_setAttr(tokenObjectLocal,terminalIdLocal,storeIdLocal)',
             ],
             _setAttr: function () {
-                if (this.store.tokenObject)
-                    this._setTokenObject(this.store.tokenObject);
-                if(this.store.terminalId)
-                    this._setTerminalId(this.store.terminalId);
-                if(this.store.storeId)
-                    this._setStoreId(this.store.storeId);
-            },
-            _attrChanged: function () {
-                var headers = {};
-                console.log(this.tokenObject);
-                if (this.tokenObject) {
-                    headers["Authorization"] = this.tokenObject.token;
+                headers = [];
+                if (this.tokenObjectLocal) {
+                    this._setTokenObject(this.tokenObjectLocal);
+                    headers["Authorization"] = this.tokenObjectLocal.token;
                 }
-                if (this.storeId) {
-                    headers['store_id'] = this.storeId;
+                if (this.terminalIdLocal) {
+                    this._setTerminalId(this.terminalIdLocal);
+                    headers['terminal_id'] = this.terminalId
                 }
-                if (this.terminalId) {
-                    headers['Terminal_id'] = this.terminalId;
+                if (this.storeIdLocal) {
+                    this._setStoreId(this.storeIdLocal);
+                    headers['store_id'] = this.storeId
                 }
-                console.log(headers);
-                this._setHeaders(headers);
-
+                if (this.headers.Authorization !== headers.Authorization || this.headers.store_id !== headers.store_id
+                    || this.headers.terminal_id !== headers.terminal_id) {
+                    this._setHeaders(headers);
+                    this.notifyPath("headers");
+                }
             },
 
         });

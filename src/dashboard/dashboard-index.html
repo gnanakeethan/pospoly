@@ -31,6 +31,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </style>
         <app-detail headers="{{headers}}" token-object="{{tokenObject}}"></app-detail>
 
+        <f-jwt-decode token="{{tokenObject.token}}" value="{{decoded}}"></f-jwt-decode>
+        {{decoded.exp}}
         <template is="dom-if" if="{{!_isset(productIdentifier)}}">
             <iron-a11y-keys id="a11y"
                             keys="ctrl+shift+q ctrl+shift+w ctrl+shift+e ctrl+shift+r ctrl+shift+t ctrl+shift+y ctrl+shift+u ctrl+shift+i ctrl+shift+o ctrl+shift+p"
@@ -41,6 +43,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="layout horizontal">
             <!-- .column    -->
             <div class="flex flex-10">
+
                 <product-data-table id="productdatatable"
                                     url="/v1/sales?query=BillId.Id:{{bill.Id}}&sortby=Id&order=desc"
                                     bill="{{bill}}"

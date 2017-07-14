@@ -21,47 +21,23 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 <link rel="import" href="../../bower_components/f-jwt-decode/f-jwt-decode.html">
+<link rel="import" href="../jwt/jwt-detail.html">
+<link rel="import" href="../app-detail.html">
 
 <dom-module id="login-select">
 
     <template>
         <style></style>
 
-        <dom-if if="{{decoded.UserId}}">
-            <template>
-                <iron-ajax auto
-                           on-response="_setTerminal"
-                           headers="{{headers}}"
-                           last-response="{{user}}"
-                           url="/v1/users/{{decoded.UserId}}"></iron-ajax>
-            </template>
-        </dom-if>
-        <dom-if if="{{storeId}}">
-            <template>
-                <!--Terminal Acquirer-->
-                <iron-ajax auto last-response="{{terminals}}"
-                           headers="{{headers}}"
-                           url="/v1/terminals/?query=StoreId:{{storeId}},UserId__isnull:true">
-                </iron-ajax>
-            </template>
-        </dom-if>
-        <dom-if if="{{reset}}">
-            <template>
-                <!--Logouts the Terminal-->
-                <iron-ajax auto
-                           headers="{{headers}}"
-                           last-response="{{terminals}}"
-                           url="/v1/terminals/empty/?logout=true"></iron-ajax>
-            </template>
-        </dom-if>
 
         <app-localstorage-document key="terminalId" data="{{terminalId}}"></app-localstorage-document>
         <app-localstorage-document key="storeId" data="{{storeId}}"></app-localstorage-document>
+        <app-localstorage-document key="tokenObject" data="{{tokenObject}}"></app-localstorage-document>
 
 
-        <app-detail token-object="{{tokenObject}}" headers="{{headers}}"></app-detail>
+        <!--<jwt-detail headers="{{headers}}"></jwt-detail>-->
+        <app-detail headers="{{headers}}"></app-detail>
         <f-jwt-decode token="{{tokenObject.token}}" value="{{decoded}}"></f-jwt-decode>
-
 
         <paper-dialog
                 id="terminalBox"
@@ -91,6 +67,26 @@
                 <paper-button on-click="_fix">Okay</paper-button>
             </div>
         </paper-dialog>
+
+
+        <iron-ajax
+                auto
+                headers="{{headers}}"
+                on-response="_setTerminal"
+                last-response="{{user}}"
+                url="/v1/users/{{decoded.UserId}}"></iron-ajax>
+
+        <!--Terminal Acquirer-->
+        <iron-ajax auto last-response="{{terminals}}"
+                   headers="{{headers}}"
+                   url="/v1/terminals/?query=StoreId:{{storeId}},UserId__isnull:true">
+        </iron-ajax>
+        <!--Logouts the Terminal-->
+        <iron-ajax id="logoutRequest"
+                   headers="{{headers}}"
+                   last-response="{{terminals}}"
+                   url="/v1/terminals/empty/?logout=true"></iron-ajax>
+
     </template>
     <script>
         class LoginSelect extends Polymer.Element {
@@ -108,7 +104,15 @@
                     },
                     decoded: {
                         type: Object,
-                        value: null,
+                        value: null
+                    },
+                    headers: {
+                        type: Object,
+                        observer: "_Logged"
+                    },
+                    userId: {
+                        type: Number,
+                        value: null
                     },
                     terId: {
                         Type: Number,
@@ -127,6 +131,10 @@
                             UserId: {Id: null},
                         }
                     },
+                    tokenObject: {
+                        Type: Object,
+                        value: null
+                    },
                     terminal_logged: {
                         Type: Object,
                         value: {
@@ -137,7 +145,7 @@
             }
 
             static get observers() {
-                return ['_setUser(decoded.*)',
+                return [
                     '_reset(reset)']
             }
 
@@ -159,11 +167,15 @@
             }
 
             _fix() {
-                if (this.terminalId && this.storeId){
+                if (this.terminalId && this.storeId) {
                     console.log(this.terminalId)
                     this.$.terminalBox.close();
                 }
             }
+            _Logged(){
+                console.log(this.headers)
+            }
+
         }
         window.customElements.define(LoginSelect.is, LoginSelect);
 
