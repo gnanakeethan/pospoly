@@ -19,16 +19,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <style>
 
         </style>
+
+        <data-table url="/v1/scales/?"
+                    cols='{"Id":"Id","Unit":"Name","Description":"Description"}'
+                    sorted="Id"
+                    id-row="Id"
+                    get-url="/v1/scales/:id/"
+                    post-url="/v1/scales/:id/"
+                    edit-url="#/scales/edit/:id:/"
+                    delete-url="/v1/scales/:id:/">
+        </data-table>
     </template>
-    <data-table url="/v1/scales/?"
-                cols='{"Id":"Id"}'
-                sorted="Id"
-                id-row="Id"
-                get-url="/v1/scales/:id/"
-                post-url="/v1/scales/:id/"
-                edit-url="#/scales/edit/:id:/"
-                delete-url="/v1/scales/:id:/">
-    </data-table>
 
     <script>
         class ScalesIndex extends Polymer.Element {

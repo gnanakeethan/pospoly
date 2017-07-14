@@ -94,6 +94,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <a name="products" on-click="_setOff" href="#/products">Products</a>
                     <a name="purchases" on-click="_setOff" href="#/purchases">Purchases</a>
                     <a name="discounts" on-click="_setOff" href="#/discounts">Discounts</a>
+                    <a name="scales" on-click="_setOff" href="#/scales">Scales</a>
                 </iron-selector>
             </app-drawer> <!-- Main content -->
             <app-header-layout fullbleed has-scrolling-region>
@@ -121,12 +122,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <iron-pages role="main" selected="[[computePath(page,path)]]" attr-for-selected="name">
                     <dashboard-index name="dashboard-index" bill-id="{{pathId}}"></dashboard-index>
                     <account-index name="account-index"></account-index>
+
                     <products-index name="products-index"></products-index>
                     <products-edit name="products-create"></products-edit>
                     <products-edit name="products-edit" product-id="{{pathId}}"></products-edit>
+
                     <purchases-index name="purchases-index"></purchases-index>
                     <purchases-create name="purchases-create"></purchases-create>
+
+
+                    <scales-index name="scales-index"></scales-index>
                     <scales-create name="scales-create"></scales-create>
+                    <scales-edit name="scales-edit" scale-id="{{pathId}}"></scales-edit>
+
                     <discounts-index name="discounts-index"></discounts-index>
                     <discounts-create name="discounts-create"></discounts-create>
                     <discounts-edit name="discounts-edit" discount-id="{{pathId}}"></discounts-edit>
