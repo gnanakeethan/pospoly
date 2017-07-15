@@ -15,6 +15,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<link rel="import" href="../../bower_components/paper-chip/paper-chip-input-autocomplete.html">
+<link rel="import" href="../../bower_components/paper-chip/paper-chip.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../../bower_components/paper-chip/paper-chip-input.html">
+
 <dom-module id="roles-edit">
 
     <template>
@@ -33,6 +39,26 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </div>
             <div class="layout horizontal">
                 <paper-button on-click="_roleEdit">Edit</paper-button>
+            </div>
+            <div class="layout-horizontal">
+                <paper-chip-input-autocomplete
+                        class="flex"
+                        label="+Add (Enter) -Delete (Backspace)"
+                        source="{{inventories}}"
+                        input-value="{{i_name}}"
+                        items-selected="{{permissionSelected}}"
+                        closable>
+
+                    <dom-repeat items="{{role.Permissions}}" as="permission">
+                        <template>
+                            <paper-chip label="{{permission.DisplayName}} - {{permission.Description}}"
+                                        closable slot="input"
+                                        on-chip-removed="_removePermission"
+                                        perm-id="{{permission.Id}}"></paper-chip>
+                        </template>
+                    </dom-repeat>
+                </paper-chip-input-autocomplete>
+
             </div>
         </div>
 
