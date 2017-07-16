@@ -2,20 +2,30 @@
   "entrypoint": "index.html",
   "shell": "src/my-app.html",
   "fragments": [
-
-    "src/products/products-index.html",
+    "src/account/account-index.html",
+    "src/dashboard/dashboard-index.html",
+    "src/dashboard/product-data-table.html",
+    "src/data-table/data-table.html",
     "src/products/products-edit.html",
+    "src/products/products-index.html",
+    "src/products/products-create.html",
     "src/purchases/purchases-create.html",
     "src/purchases/purchases-index.html",
-    "src/dashboard/dashboard-index.html",
-    "src/dashboard/product-data-table.html"
-
+    "src/roles/roles-edit.html",
+    "src/roles/roles-index.html",
+    "src/roles/roles-create.html",
+    "src/scales/scales-edit.html",
+    "src/scales/scales-index.html",
+    "src/scales/scales-create.html",
+    "src/users/users-edit.html",
+    "src/users/users-index.html",
+    "src/users/users-create.html",
+    "src/app-detail.html",
+    "src/my-icons.html"
   ],
-  "sources":[
-
+  "sources": [
     "manifest.json",
     "sw-precache-config.js"
-
   ],
   "builds": [
     {
