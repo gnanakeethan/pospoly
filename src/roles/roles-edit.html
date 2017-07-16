@@ -44,7 +44,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <paper-chip-input-autocomplete
                         class="flex"
                         label="+Add (Enter) -Delete (Backspace)"
-                        source="{{inventories}}"
+                        source="{{permissions}}"
                         input-value="{{i_name}}"
                         items-selected="{{permissionSelected}}"
                         closable>
@@ -53,12 +53,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         <template>
                             <paper-chip label="{{permission.DisplayName}} - {{permission.Description}}"
                                         closable slot="input"
-                                        on-chip-removed="_removePermission"
-                                        perm-id="{{permission.Id}}"></paper-chip>
+                                        on-chip-removed="_removePerm"
+                                        data-ix="{{index}}"></paper-chip>
                         </template>
                     </dom-repeat>
                 </paper-chip-input-autocomplete>
-
             </div>
         </div>
 
@@ -72,6 +71,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 url="/v1/roles/{{role.Id}}"
                 last-response="{{role}}"
                 content-type="application/json">
+        </iron-ajax>
+        <iron-ajax
+                auto
+                headers="{{headers}}"
+                url="/v1/permissions/?limit=1000"
+                on-response="_processPermission"
+                last-response="{{rawPerms}}">
         </iron-ajax>
         <iron-ajax
                 auto
@@ -103,14 +109,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             Description: null,
                             StoreId: {Id: 1},
                         }
-                    }
+                    },
                 };
             }
 
+            static get observers() {
+                return [
+                    '_roleEdit(permissionSelected.*)'
+                ];
+            }
+
             _roleEdit() {
+                for (var p = 0; p < this.permissionSelected.length; p++) {
+                    this.role.Permissions.push({Id: this.permissionSelected[p]})
+                }
                 this.$.roleEdit.generateRequest();
             }
 
+
+            _removePerm() {
+                var ix = parseInt(event.target.dataIx);
+                console.log(ix);
+                delete this.role.Permissions[ix];
+                var perms = this.role.Permissions;
+                Object.keys(perms).forEach((key) => (perms[key] == null) && delete perms[key]);
+                this.role.Permissions = perms;
+
+                this._roleEdit();
+            }
+
+            _processPermission() {
+                if (!this.rawPerms)
+                    return
+                this.permissions = [];
+                for (var i = 0; i < this.rawPerms.length; i++) {
+                    this.permissions.push({
+                        "text": this.rawPerms[i].DisplayName,
+                        "value": this.rawPerms[i].Id
+                    });
+                }
+                this.notifyPath('permissions');
+            }
 
         }
         window.customElements.define(RolesEdit.is, RolesEdit);

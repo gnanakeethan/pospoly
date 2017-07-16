@@ -45,7 +45,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div class="flex flex-10">
 
                 <product-data-table id="productdatatable"
-                                    url="/v1/sales?query=BillId.Id:{{bill.Id}}&sortby=Id&order=desc"
+                                    url="/v1/sales/?query=BillId.Id:{{bill.Id}}&sortby=Id&order=desc"
                                     bill="{{bill}}"
                                     cold='["Pcode","PName"]'
                                     cols='{"InventoryId.ProductId.ProductCode":"PCode" ,"InventoryId.ProductId.Name":"Name","UnitPrice__currency":"Price","Units__number":"Qty","InventoryId.InventoryScale[0].ScaleId.Unit":"Unit","Total__currency":"Total","Discount__currency":"Discount","Amount__currency":"Net"}'
@@ -94,7 +94,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                    debounce-duration="500"
                    id="billRequest"
                    on-response="_reloadBill"
-                   url="/v1/bills/payable?refresh={{refresh}}"
+                   url="/v1/bills/payable/?refresh={{refresh}}"
                    last-response="{{bills}}">
         </iron-ajax>
         <!-- Bill Creator -->

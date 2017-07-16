@@ -96,6 +96,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <a name="discounts" on-click="_setOff" href="#/discounts">Discounts</a>
                     <a name="scales" on-click="_setOff" href="#/scales">Scales</a>
                     <a name="roles" on-click="_setOff" href="#/roles">Roles</a>
+                    <a name="users" on-click="_setOff" href="#/users">Users</a>
                 </iron-selector>
             </app-drawer> <!-- Main content -->
             <app-header-layout fullbleed has-scrolling-region>
@@ -144,6 +145,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     <roles-index name="roles-index"></roles-index>
                     <roles-create name="roles-create"></roles-create>
                     <roles-edit name="roles-edit" role-id="{{pathId}}"></roles-edit>
+                    
+                    
+                    
+                    <users-index name="users-index"></users-index>
+                    <users-create name="users-create"></users-create>
+                    <users-edit name="users-edit" user-id="{{pathId}}"></users-edit>
                 </iron-pages>
 
                 <app-toolbar style="height:24px;position:fixed;bottom:0;background:#999;width:100%;font-size:11px;">

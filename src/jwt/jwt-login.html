@@ -97,12 +97,12 @@
                     type: String,
                     value: "JuPo"
                 },
-                logout:{
-                    type:Boolean,
-                    value:false,
-                    reflectToAttribute:true,
-                    notify:true,
-                    observer:"_logout"
+                logout: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true,
+                    notify: true,
+                    observer: "_logout"
                 },
 
                 loginPopup: {
@@ -116,6 +116,7 @@
                 refreshUrl: {
                     type: String
                 },
+                loadRefresh: {type: Boolean, value: false},
                 logoutUrl: {
                     type: String
                 },
@@ -145,25 +146,26 @@
                 this.$.validationRequest.generateRequest();
             },
             _revalidateLogin: function (e, request) {
-                if(!this.tokenObject){
+                if (!this.tokenObject) {
                     this.tokenObject = {success: false, token: ""};
                 }
-                if(this.tokenObject.success){
-                    var current=Date.now() / 1000 | 0;
+                if (this.tokenObject.success) {
+                    var current = Date.now() / 1000 | 0;
                     var valid_for = this.decoded.exp - this.decoded.nbf;
-
-                    this.debounce('validationRequest', this._validationRequest, 4000);
-                    if(this.decoded.exp-(valid_for/2) <= current){
+                    this.debounce('validationRequest', this._validationRequest, 40000);
+                    if (this.decoded.exp - (valid_for / 2) <= current || !this.loadRefresh) {
+                        sleep(200);
                         this.$.refreshRequest.generateRequest();
+                        this.loadRefresh = true;
                     }
                 }
             },
             _validationRequest: function () {
-                if(!this.tokenObject){
+                if (!this.tokenObject) {
                     this.tokenObject = {success: false, token: ""};
                     this.$.loginBox.open();
                 }
-                if (this.tokenObject.success){
+                if (this.tokenObject.success) {
                     this.$.validationRequest.generateRequest();
                 }
 
@@ -198,7 +200,7 @@
                 };
                 return ko;
             },
-            _logout:function(){
+            _logout: function () {
                 this.$.logoutRequest.generateRequest();
 
             }

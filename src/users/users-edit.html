@@ -1,0 +1,209 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="/bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="/bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<link rel="import" href="../../bower_components/paper-chip/paper-chip-input-autocomplete.html">
+<link rel="import" href="../../bower_components/paper-chip/paper-chip.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../../bower_components/paper-chip/paper-chip-input.html">
+
+<dom-module id="users-edit">
+
+    <template>
+        <style include="iron-flex iron-flex-alignment iron-flex-factors"></style>
+
+        <style>
+
+        </style>
+
+
+        <div class="layout vertical">
+            <div class="layout horizontal">
+                <paper-input label="Name" value="{{user.Username}}"></paper-input>
+                <paper-input label="Name" value="{{user.Email}}"></paper-input>
+                <paper-input label="Name" value="{{user.Password}}" type="password"></paper-input>
+            </div>
+            <div class="layout horizontal">
+                <paper-button on-click="_userEdit">Edit</paper-button>
+            </div>
+            <div class="layout-horizontal">
+                <paper-chip-input-autocomplete
+                        class="flex"
+                        label="+Add (Enter) -Delete (Backspace)"
+                        source="{{roles}}"
+                        input-value="{{i_name}}"
+                        items-selected="{{roleSelected}}"
+                        closable>
+
+                    <dom-repeat items="{{user.Roles}}" as="role">
+                        <template>
+                            <paper-chip label="{{role.DisplayName}} - {{role.Description}}"
+                                        closable slot="input"
+                                        on-chip-removed="_removePerm"
+                                        data-ix="{{index}}"></paper-chip>
+                        </template>
+                    </dom-repeat>
+                </paper-chip-input-autocomplete>
+            </div>  <div class="layout-horizontal">
+            <paper-chip-input-autocomplete
+                    class="flex"
+                    label="+Add (Enter) -Delete (Backspace)"
+                    source="{{stores}}"
+                    items-selected="{{storeSelected}}"
+                    closable>
+
+                <dom-repeat items="{{user.Stores}}" as="store">
+                    <template>
+                        <paper-chip label="{{store.StoreName}}"
+                                    closable slot="input"
+                                    on-chip-removed="_removeStore"
+                                    data-ix="{{index}}"></paper-chip>
+                    </template>
+                </dom-repeat>
+            </paper-chip-input-autocomplete>
+        </div>
+        </div>
+
+
+        <app-detail headers="{{headers}}"></app-detail>
+        <iron-ajax
+                id="userEdit"
+                body="{{user}}"
+                headers="{{headers}}"
+                method="PUT"
+                url="/v1/users/{{user.Id}}"
+                last-response="{{user}}"
+                content-type="application/json">
+        </iron-ajax>
+        <iron-ajax
+                auto
+                headers="{{headers}}"
+                url="/v1/roles/?limit=1000"
+                on-response="_processRole"
+                last-response="{{rawRoles}}">
+        </iron-ajax>
+        <iron-ajax
+                auto
+                headers="{{headers}}"
+                url="/v1/stores/?limit=1000"
+                on-response="_processStores"
+                last-response="{{rawStores}}">
+        </iron-ajax>
+        <iron-ajax
+                auto
+                headers="{{headers}}"
+                method="GET"
+                url="/v1/users/{{userId}}"
+                last-response="{{user}}"
+                content-type="application/json">
+        </iron-ajax>
+    </template>
+
+
+    <script>
+        class UsersEdit extends Polymer.Element {
+            static get is() {
+                return "users-edit"
+            }
+
+            static get properties() {
+                return {
+                    userId: {
+                        type: Number,
+                        reflectToAttribute: true,
+                    },
+                    user: {
+                        type: Object,
+                        value: {
+                            Unit: null,
+                            Description: null,
+                            StoreId: {Id: 1},
+                        }
+                    },
+                };
+            }
+
+            static get observers() {
+                return [
+                    '_userEdit(roleSelected.*,storeSelected.*)'
+                ];
+            }
+
+            _userEdit() {
+                for (var p = 0; p < this.roleSelected.length; p++) {
+                    this.user.Roles.push({Id: this.roleSelected[p]})
+                }
+                for (var p = 0; p < this.storeSelected.length; p++) {
+                    this.user.Stores.push({Id: this.storeSelected[p]})
+                }
+                this.$.userEdit.generateRequest();
+            }
+
+
+            _removePerm() {
+                var ix = parseInt(event.target.dataIx);
+                console.log(ix);
+                delete this.user.Roles[ix];
+                var roles = this.user.Roles;
+                Object.keys(roles).forEach((key) => (roles[key] == null) && delete roles[key]);
+                this.user.Roles = roles;
+
+                this._userEdit();
+            }
+            _removeStore() {
+                var ix = parseInt(event.target.dataIx);
+                console.log(ix);
+                delete this.user.Stores[ix];
+                var stores = this.user.Stores;
+                Object.keys(stores).forEach((key) => (stores[key] == null) && delete stores[key]);
+                this.user.Stores = stores;
+
+                this._userEdit();
+            }
+
+            _processRole() {
+                if (!this.rawRoles)
+                    return
+                this.roles = [];
+                for (var i = 0; i < this.rawRoles.length; i++) {
+                    this.roles.push({
+                        "text": this.rawRoles[i].DisplayName,
+                        "value": this.rawRoles[i].Id
+                    });
+                }
+                this.notifyPath('roles');
+            }
+            _processStores() {
+                if (!this.rawStores)
+                    return
+                this.stores = [];
+                for (var i = 0; i < this.rawStores.length; i++) {
+                    this.stores.push({
+                        "text": this.rawStores[i].StoreName,
+                        "value": this.rawStores[i].Id
+                    });
+                }
+                this.notifyPath('stores');
+            }
+
+        }
+        window.customElements.define(UsersEdit.is, UsersEdit);
+
+
+    </script>
+
+</dom-module>

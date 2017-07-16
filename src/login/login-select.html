@@ -32,11 +32,10 @@
 
         <app-localstorage-document key="terminalId" data="{{terminalId}}"></app-localstorage-document>
         <app-localstorage-document key="storeId" data="{{storeId}}"></app-localstorage-document>
-        <app-localstorage-document key="tokenObject" data="{{tokenObject}}"></app-localstorage-document>
 
 
         <!--<jwt-detail headers="{{headers}}"></jwt-detail>-->
-        <app-detail headers="{{headers}}"></app-detail>
+        <app-detail headers="{{headers}}" token-object="{{tokenObject}}"></app-detail>
         <f-jwt-decode token="{{tokenObject.token}}" value="{{decoded}}"></f-jwt-decode>
 
         <paper-dialog
@@ -76,16 +75,19 @@
                 last-response="{{user}}"
                 url="/v1/users/{{decoded.UserId}}"></iron-ajax>
 
-        <!--Terminal Acquirer-->
-        <iron-ajax auto last-response="{{terminals}}"
-                   headers="{{headers}}"
-                   url="/v1/terminals/?query=StoreId:{{storeId}},UserId__isnull:true">
-        </iron-ajax>
         <!--Logouts the Terminal-->
-        <iron-ajax id="logoutRequest"
+        <iron-ajax
+                auto
+                id="logoutRequest"
                    headers="{{headers}}"
                    last-response="{{terminals}}"
-                   url="/v1/terminals/empty/?logout=true"></iron-ajax>
+                   url="/v1/terminals/empty/?store_id={{storeId}}"></iron-ajax>
+        <iron-ajax auto
+                   headers="{{headers}}"
+                   as="text"
+                   last-response="{{terminalsD}}"
+                   on-response="_refreshTerminals"
+                   url="/v1/terminals/request/{{terminalId}}/"></iron-ajax>
 
     </template>
     <script>
@@ -155,12 +157,16 @@
 
             _setTerminal() {
                 console.log(this.terminalId);
-                if (!this.storeId || !this.terminalId)
+                if ((!this.storeId || !this.terminalId ) && (this.tokenObject.success))
                     this.$.terminalBox.open();
             }
 
+            _refreshTerminals(){
+                this.$.logoutRequest.generateRequest();
+            }
             _reset() {
                 if (this.reset) {
+                    this.$.logoutRequest.generateRequest();
                     this.terminalId = 0;
                     this.reset = false;
                 }
@@ -172,7 +178,8 @@
                     this.$.terminalBox.close();
                 }
             }
-            _Logged(){
+
+            _Logged() {
                 console.log(this.headers)
             }
 
