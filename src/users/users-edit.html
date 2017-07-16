@@ -34,11 +34,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="layout vertical">
             <div class="layout horizontal">
                 <paper-input label="Name" value="{{user.Username}}"></paper-input>
-                <paper-input label="Name" value="{{user.Email}}"></paper-input>
-                <paper-input label="Name" value="{{user.Password}}" type="password"></paper-input>
-            </div>
-            <div class="layout horizontal">
-                <paper-button on-click="_userEdit">Edit</paper-button>
+                <paper-input label="Email" value="{{user.Email}}"></paper-input>
+                <paper-input label="Password" value="{{user.Password}}" type="password"></paper-input>
             </div>
             <div class="layout-horizontal">
                 <paper-chip-input-autocomplete
@@ -58,24 +55,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         </template>
                     </dom-repeat>
                 </paper-chip-input-autocomplete>
-            </div>  <div class="layout-horizontal">
-            <paper-chip-input-autocomplete
-                    class="flex"
-                    label="+Add (Enter) -Delete (Backspace)"
-                    source="{{stores}}"
-                    items-selected="{{storeSelected}}"
-                    closable>
+            </div>
+            <div class="layout-horizontal">
+                <paper-chip-input-autocomplete
+                        class="flex"
+                        label="+Add (Enter) -Delete (Backspace)"
+                        source="{{stores}}"
+                        items-selected="{{storeSelected}}"
+                        closable>
 
-                <dom-repeat items="{{user.Stores}}" as="store">
-                    <template>
-                        <paper-chip label="{{store.StoreName}}"
-                                    closable slot="input"
-                                    on-chip-removed="_removeStore"
-                                    data-ix="{{index}}"></paper-chip>
-                    </template>
-                </dom-repeat>
-            </paper-chip-input-autocomplete>
-        </div>
+                    <dom-repeat items="{{user.Stores}}" as="store">
+                        <template>
+                            <paper-chip label="{{store.StoreName}}"
+                                        closable slot="input"
+                                        on-chip-removed="_removeStore"
+                                        data-ix="{{index}}"></paper-chip>
+                        </template>
+                    </dom-repeat>
+                </paper-chip-input-autocomplete>
+            </div>
+
+            <div class="layout horizontal">
+                <paper-button on-click="_userEdit">Edit</paper-button>
+            </div>
         </div>
 
 
@@ -164,6 +166,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 this._userEdit();
             }
+
             _removeStore() {
                 var ix = parseInt(event.target.dataIx);
                 console.log(ix);
@@ -187,6 +190,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
                 this.notifyPath('roles');
             }
+
             _processStores() {
                 if (!this.rawStores)
                     return
