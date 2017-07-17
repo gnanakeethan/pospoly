@@ -8,6 +8,8 @@
     "src/data-table/data-table.html",
     "src/products/products-edit.html",
     "src/products/products-index.html",
+    "src/discounts/discounts-edit.html",
+    "src/discounts/discounts-index.html",
     "src/products/products-create.html",
     "src/purchases/purchases-create.html",
     "src/purchases/purchases-index.html",
@@ -31,6 +33,21 @@
     {
       "name": "bundled",
       "bundle": true,
+      "addServiceWorker": true,
+      "js": {
+        "minify": true
+      },
+      "css": {
+        "minify": true
+      },
+      "html": {
+        "minify": true
+      }
+    },
+
+    {
+      "name": "unbundled",
+      "bundle": false,
       "addServiceWorker": true,
       "js": {
         "minify": true
