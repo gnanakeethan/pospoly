@@ -86,7 +86,6 @@
                    headers="{{headers}}"
                    as="text"
                    last-response="{{terminalsD}}"
-                   on-response="_refreshTerminals"
                    url="/v1/terminals/request/{{terminalId}}/"></iron-ajax>
 
     </template>
@@ -100,7 +99,7 @@
                 return {
                     reset: {
                         Type: Boolean,
-                        value: null,
+                        value: 0,
                         reflectToAttribute: true,
                         notify: true,
                     },
