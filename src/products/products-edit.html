@@ -128,6 +128,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </template>
 
         <iron-ajax url="/v1/scales/"
+                   headers="{{headers}}"
                    last-response="{{scales}}"
                    auto></iron-ajax>
 
@@ -141,6 +142,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 </div>
                 <div class="flex flex-3">
                     <paper-input label="Barcode" value="{{product.Barcode}}"></paper-input>
+                </div>
+                <div class="flex flex-1">
+                    <paper-dropdown-menu label="Singularity">
+                        <paper-listbox slot="dropdown-content" selected="{{product.Singular}}"
+                                       attr-for-selected="data-value"
+                                       class="dropdown-content">
+                                <paper-item data-value="0">Weight</paper-item>
+                                <paper-item data-value="1">Single</paper-item>
+                        </paper-listbox>
+                    </paper-dropdown-menu>
+
                 </div>
                 <div class="flex flex-1">
                     <paper-dropdown-menu label="Master Scale">
@@ -338,8 +350,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                         "Id": null,
                         "InventoryId": {Id: null},
                         "ScaleId": {Id: null},
-                        "Units": 1,
-                        "Price": 0
+                        "Units": "1",
+                        "Price": "0"
                     }
                 }
             },
@@ -359,6 +371,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             productChanged: function (changed) {
                 this.productId = this.product.Id;
                 this.product.ScaleId.Id = parseInt(this.product.ScaleId.Id);
+                this.product.Singular = parseInt(this.product.Singular);
                 this.$.putProduct.generateRequest();
             }
             ,
