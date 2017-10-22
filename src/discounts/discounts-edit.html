@@ -74,7 +74,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             on-change="_discountEdit"
                             auto-validate="false" value="{{discount.To}}"></vaadin-date-picker>
                 </div>
-                    <div class="layout horizontal">
+                <div class="layout horizontal">
+                    {{i_name}}
                     <paper-chip-input-autocomplete
                             class="flex"
                             label="+Add (Enter) -Delete (Backspace)"
@@ -83,17 +84,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                             items-selected="{{invSelected}}"
                             closable>
 
+
                         <dom-repeat items="{{discountable_inventories}}" as="discountable">
                             <template>
-                                <iron-ajax headers="{{headers}}" auto url="/v1/inventories/{{discountable.DiscountableId}}"
+                                <iron-ajax headers="{{headers}}" auto
+                                           url="/v1/inventories/{{discountable.DiscountableId}}"
                                            last-response="{{discountable.inv}}"></iron-ajax>
-                                <paper-chip label="{{discountable.inv.ProductId.Name}} - {{discountable.inv.BatchNo}}" closable slot="input"
-                                            on-chip-removed="_removeProduct"
-                                            data-id="{{discountable.Id}}"></paper-chip>
+                                <paper-chip
+                                        label="{{discountable.inv.ProductId.Name}} - {{discountable.inv.BatchNo}}"
+                                        closable slot="input"
+                                        on-chip-removed="_removeProduct"
+                                        data-id="{{discountable.Id}}"></paper-chip>
                             </template>
                         </dom-repeat>
                     </paper-chip-input-autocomplete>
-
                     <paper-chip-input-autocomplete
                             label="+Add (Enter) -Delete (Backspace)"
                             class="flex"
@@ -199,7 +203,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 headers="{{headers}}"></iron-ajax>
 
 
-        {{discountId}}
     </template>
 
 
@@ -246,7 +249,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             static get observers() {
                 return ['_formatDate(discount.*)',
-                '_discountEdit(invSelected.*,prodSelected.*)'];
+                    '_discountEdit(invSelected.*,prodSelected.*)'];
             }
 
             constructor() {
@@ -345,7 +348,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     this.discountable.DiscountId = {Id: parseInt(this.discountId)};
                     this.$.discountable.generateRequest();
                 }
-                console.log(this.prodSelected);
                 this.$.putSet.generateRequest();
             }
 
@@ -353,6 +355,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 return a === b;
             }
         }
+
         window.customElements.define(DiscountsEdit.is, DiscountsEdit);
 
 

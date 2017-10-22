@@ -67,6 +67,9 @@
     "iron-autogrow-textarea": "1 - 2",
     "neon-animation": "1 - 2",
     "iron-fit-behavior": "1 - 2",
-    "iron-checked-element-behavior": "1 - 2"
+    "iron-checked-element-behavior": "1 - 2",
+    "iron-flex-layout": "1 - 2",
+    "iron-media-query": "2.0.0",
+    "polymer": "^v2.1.1"
   }
 }
