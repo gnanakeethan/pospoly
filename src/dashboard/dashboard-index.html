@@ -10,7 +10,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import"
       href="../../bower_components/polymer/polymer.html">
-
 <link rel="import"
       href="./product-data-table.html">
 <link rel="import"
@@ -30,7 +29,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         </style>
         <app-detail headers="{{headers}}" token-object="{{tokenObject}}"></app-detail>
-
         <f-jwt-decode token="{{tokenObject.token}}" value="{{decoded}}"></f-jwt-decode>
         <template is="dom-if" if="{{!_isset(productIdentifier)}}">
             <iron-a11y-keys id="a11y"
